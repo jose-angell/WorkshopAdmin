@@ -2,5 +2,7 @@
   <Project Path="WorkshopAdmin.Application/WorkshopAdmin.Application.csproj" Id="4e380822-af60-41a6-8f8a-803e99ac7770" />
   <Project Path="WorkshopAdmin.Domain/WorkshopAdmin.Domain.csproj" Id="3e84eff3-6e90-45eb-a770-7920fcbca1e5" />
   <Project Path="WorkshopAdmin.Infrastructure/WorkshopAdmin.Infrastructure.csproj" Id="811dfe78-2466-48ec-9cba-f3deba0bb3c0" />
+  <Project Path="WorkshopAdmin.Shared/WorkshopAdmin.Shared.csproj" Id="44fcbbc1-fb68-4bdb-91ea-118cfc213fc2" />
+  <Project Path="WorkshopAdmin.UI/WorkshopAdmin.UI.csproj" Id="c0d9c349-7663-489c-ba4c-bc31529c8000" />
   <Project Path="WorkshopAdmin.WebAPI/WorkshopAdmin.WebAPI.csproj" Id="307e2812-a4b3-4858-bdf1-ed8088b7756f" />
 </Solution>

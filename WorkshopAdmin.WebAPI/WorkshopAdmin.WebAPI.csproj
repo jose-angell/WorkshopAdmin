@@ -10,4 +10,10 @@
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.5" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\WorkshopAdmin.Application\WorkshopAdmin.Application.csproj" />
+    <ProjectReference Include="..\WorkshopAdmin.Infrastructure\WorkshopAdmin.Infrastructure.csproj" />
+    <ProjectReference Include="..\WorkshopAdmin.Shared\WorkshopAdmin.Shared.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -1,3 +1,4 @@
+ehthumbs.db
 # Visual Studio
 .vs/
 *.suo
@@ -8,8 +9,6 @@
 # Build artifacts
 **/bin/
 **/obj/
-*/bin/
-*/obj/
 
 # Rider
 .idea/
@@ -28,7 +27,6 @@ project.fragment.lock.json
 *.dbmdl
 *.pdb
 *.cache
-*.log
 
 # Publish outputs
 publish/
@@ -46,8 +44,14 @@ ScaffoldingReadMe.txt
 secrets.json
 secrets.*
 
-# Static web assets and Blazor framework files (will be restored/produced at build)
+# Blazor WebAssembly specific
+# Ignore generated framework and runtime assets produced at build/publish
 **/wwwroot/_framework/
+**/wwwroot/_bin/
+**/wwwroot/_content/
+
+# If using a separate ClientApp build output folder
+wwwroot/dist/
 
 # Node
 node_modules/
@@ -58,11 +62,10 @@ Thumbs.db
 ehthumbs.db
 Desktop.ini
 
-# DotCover / Coverage
+# Coverage / profiler
 *.dotCover
 
 # JetBrains Rider caches
-.idea/
 *.sln.iml
 
 # Temporary files
@@ -79,8 +82,5 @@ Desktop.ini
 
 # Ignore local launch settings
 Properties/launchSettings.json
-
-# Ignore generated client-side build assets (if any)
-wwwroot/dist/
 
 # End of file
