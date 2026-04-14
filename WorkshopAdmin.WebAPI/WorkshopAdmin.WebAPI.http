@@ -1,0 +1,6 @@
+@WorkshopAdmin.WebAPI_HostAddress = http://localhost:5052
+
+GET {{WorkshopAdmin.WebAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

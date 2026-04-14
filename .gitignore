@@ -1,0 +1,86 @@
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build artifacts
+**/bin/
+**/obj/
+*/bin/
+*/obj/
+
+# Rider
+.idea/
+
+# VS Code
+.vscode/
+
+# NuGet
+*.nupkg
+packages/
+.nuget/
+
+# dotnet
+project.lock.json
+project.fragment.lock.json
+*.dbmdl
+*.pdb
+*.cache
+*.log
+
+# Publish outputs
+publish/
+artifacts/
+
+# Test results
+TestResults/
+coverage.opencover.xml
+coverage/**
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# User secrets
+secrets.json
+secrets.*
+
+# Static web assets and Blazor framework files (will be restored/produced at build)
+**/wwwroot/_framework/
+
+# Node
+node_modules/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# DotCover / Coverage
+*.dotCover
+
+# JetBrains Rider caches
+.idea/
+*.sln.iml
+
+# Temporary files
+~$*
+
+# OneDrive temporary/local files
+*.tmp
+
+# Logs
+*.log
+
+# Pack output
+*.snupkg
+
+# Ignore local launch settings
+Properties/launchSettings.json
+
+# Ignore generated client-side build assets (if any)
+wwwroot/dist/
+
+# End of file
