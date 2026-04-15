@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace WorkshopAdmin.Shared.Enums;
+﻿namespace WorkshopAdmin.Shared.Enums;
 
 /// <summary>
 /// Define los estados permitidos para una Orden de Servicio.

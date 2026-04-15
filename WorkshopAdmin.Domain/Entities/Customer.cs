@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace WorkshopAdmin.Domain.Entities;
+﻿namespace WorkshopAdmin.Domain.Entities;
 
 public class Customer
 {

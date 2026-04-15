@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using WorkshopAdmin.Shared.Enums; // Referencia obligatoria a Shared 
+﻿using WorkshopAdmin.Shared.Enums; // Referencia obligatoria a Shared 
 
 namespace WorkshopAdmin.Domain.Entities;
 
