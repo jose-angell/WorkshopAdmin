@@ -33,5 +33,7 @@ public class EquipmentConfiguration : IEntityTypeConfiguration<Equipment>
             .HasColumnName("created_at")
             .HasColumnType("timestamptz")
             .HasDefaultValueSql("now()");
+
+        builder.HasIndex(x => new { x.Brand, x.Model });
     }
 }

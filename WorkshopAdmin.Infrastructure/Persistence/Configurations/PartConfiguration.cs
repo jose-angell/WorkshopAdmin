@@ -33,5 +33,7 @@ public class PartConfiguration : IEntityTypeConfiguration<Part>
             .HasColumnName("created_at")
             .HasColumnType("timestamptz")
             .HasDefaultValueSql("now()");
+
+        builder.HasIndex(x => x.Name);
     }
 }

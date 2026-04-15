@@ -49,5 +49,9 @@ public class ServiceOrderConfiguration : IEntityTypeConfiguration<ServiceOrder>
         builder.HasOne(so => so.Equipment)
             .WithMany(e => e.ServiceOrders)
             .HasForeignKey(so => so.EquipmentId);
+
+        // Índices
+        builder.HasIndex(x => x.CustomerId);
+        builder.HasIndex(x => x.Status);
     }
 }

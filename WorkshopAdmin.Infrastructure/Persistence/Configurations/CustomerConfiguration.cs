@@ -34,5 +34,7 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
             .HasColumnType("timestamptz")
             .HasDefaultValueSql("now()")
             .IsRequired();
+
+        builder.HasIndex(x => x.Name);
     }
 }
