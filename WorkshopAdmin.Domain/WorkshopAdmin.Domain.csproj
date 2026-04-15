@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\WorkshopAdmin.Shared\WorkshopAdmin.Shared.csproj" />
+  </ItemGroup>
+
 </Project>
