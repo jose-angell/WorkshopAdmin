@@ -43,6 +43,7 @@ ScaffoldingReadMe.txt
 # User secrets
 secrets.json
 secrets.*
+.env
 
 # Blazor WebAssembly specific
 # Ignore generated framework and runtime assets produced at build/publish
