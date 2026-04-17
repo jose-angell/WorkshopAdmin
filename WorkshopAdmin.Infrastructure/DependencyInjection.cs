@@ -1,7 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using WorkshopAdmin.Domain.Interfaces;
 using WorkshopAdmin.Infrastructure.Persistence;
+using WorkshopAdmin.Infrastructure.Repositories;
 
 namespace WorkshopAdmin.Infrastructure;
 
@@ -30,7 +32,7 @@ public static class DependencyInjection
                 b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
 
         // 2. Registro de Repositorios (Aquí se registrarán las implementaciones más adelante)
-        // Ejemplo: services.AddScoped<ICustomerRepository, CustomerRepository>();
+        services.AddScoped<ICustomerRepository, CustomerRepository>();
 
         return services;
     }
