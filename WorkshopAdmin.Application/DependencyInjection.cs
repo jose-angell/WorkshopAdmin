@@ -10,6 +10,7 @@ public static class DependencyInjection
     {
         // Registro del servicio de aplicación
         services.AddScoped<ICustomerService, CustomerService>();
+        services.AddScoped<IEquipmentService, EquipmentService>();
 
         return services;
     }

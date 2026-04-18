@@ -1,0 +1,75 @@
+﻿using WorkshopAdmin.Application.Interfaces;
+using WorkshopAdmin.Domain.Entities;
+using WorkshopAdmin.Domain.Interfaces;
+using WorkshopAdmin.Shared.Dtos.Equipments;
+
+namespace WorkshopAdmin.Application.Services;
+
+public class EquipmentService : IEquipmentService
+{
+    private readonly IEquipmentRepository _repository;
+
+    public EquipmentService(IEquipmentRepository repository)
+    {
+        _repository = repository;
+    }
+
+    public async Task<EquipmentDto?> GetByIdAsync(Guid id)
+    {
+        var equipment = await _repository.GetByIdAsync(id);
+        return equipment == null ? null : MapToDto(equipment);
+    }
+
+    public async Task<IEnumerable<EquipmentDto>> GetAllAsync()
+    {
+        var equipments = await _repository.GetAllAsync();
+        return equipments.Select(MapToDto);
+    }
+
+    public async Task<EquipmentDto> CreateAsync(CreateEquipmentRequest request)
+    {
+        // Lógica de Mapeo: CreateEquipmentRequest -> Entidad Equipment (Domain)
+        var equipment = new Equipment
+        {
+            Id = Guid.NewGuid(), // PK: uuid 
+            Type = request.Type,
+            Brand = request.Brand,
+            Model = request.Model,
+            CreatedAt = DateTimeOffset.UtcNow // timestamptz automático
+        };
+
+        await _repository.AddAsync(equipment);
+
+        // Retorna el DTO resultante tras la persistencia
+        return MapToDto(equipment);
+    }
+
+    public async Task UpdateAsync(UpdateEquipmentRequest request)
+    {
+        var existingEquipment = await _repository.GetByIdAsync(request.Id);
+        if (existingEquipment != null)
+        {
+            existingEquipment.Type = request.Type;
+            existingEquipment.Brand = request.Brand;
+            existingEquipment.Model = request.Model;
+
+            await _repository.UpdateAsync(existingEquipment);
+        }
+    }
+
+    public async Task DeleteAsync(Guid id)
+    {
+        await _repository.DeleteAsync(id);
+    }
+
+    // Helper privado de mapeo para cumplir con el contrato de Shared 
+    private static EquipmentDto MapToDto(Equipment equipment) =>
+        new EquipmentDto
+        {
+            Id = equipment.Id,
+            Type = equipment.Type,
+            Brand = equipment.Brand,
+            Model = equipment.Model,
+            CreatedAt = equipment.CreatedAt
+        };
+}
