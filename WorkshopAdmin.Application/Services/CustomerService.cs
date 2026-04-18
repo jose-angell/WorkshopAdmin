@@ -31,11 +31,11 @@ public class CustomerService : ICustomerService
         // Lógica de Mapeo: CreateCustomerRequest -> Entidad Customer (Domain)
         var customer = new Customer
         {
-            Id = Guid.NewGuid(), // PK: uuid [4]
+            Id = Guid.NewGuid(), // PK: uuid 
             Name = request.Name,
             Email = request.Email,
             Phone = request.Phone,
-            CreatedAt = DateTimeOffset.UtcNow // timestamptz [4]
+            CreatedAt = DateTimeOffset.UtcNow // timestamptz 
         };
 
         await _repository.AddAsync(customer);

@@ -1,27 +1,32 @@
 using WorkshopAdmin.Infrastructure;
+using WorkshopAdmin.Application; 
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
+// 1. Servicios básicos
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddEndpointsApiExplorer(); // Necesario para que Swagger encuentre tus endpoints
 
+// 2. Configuración de OpenAPI y Swagger
+builder.Services.AddOpenApi();     
+builder.Services.AddSwaggerGen();  // La parte de Swashbuckle para generar el UI
+
+// 3. Tus capas de Clean Architecture
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApplication();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// 4. Configurar el Pipeline (el orden importa aquí)
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.MapOpenApi();    // Mapea el JSON (/openapi/v1.json)
+    app.UseSwagger();    // Genera el documento Swagger
+    app.UseSwaggerUI();  // Crea la página visual en /swagger
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
