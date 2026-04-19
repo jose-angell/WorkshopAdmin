@@ -34,6 +34,7 @@ public static class DependencyInjection
         // 2. Registro de Repositorios (Aquí se registrarán las implementaciones más adelante)
         services.AddScoped<ICustomerRepository, CustomerRepository>();
         services.AddScoped<IEquipmentRepository, EquipmentRepository>();
+        services.AddScoped<IPartRepository, PartRepository>();
 
         return services;
     }
