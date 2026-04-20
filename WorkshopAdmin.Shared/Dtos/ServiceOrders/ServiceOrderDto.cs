@@ -24,4 +24,5 @@ public class ServiceOrderDto
 
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
+    public IEnumerable<OrderPartDto?> OrderPart { get; set; } = Enumerable.Empty<OrderPartDto?>();
 }

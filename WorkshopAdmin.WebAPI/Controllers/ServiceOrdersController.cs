@@ -84,4 +84,29 @@ public class ServiceOrdersController : ControllerBase
         await _serviceOrderService.UpdateAsync(request);
         return NoContent();
     }
+    /// <summary>
+    /// Asigna una refacción a la orden de servicio (US 15).
+    /// Registra el precio histórico y descuenta el stock (Regla 5.3).
+    /// </summary>
+    [HttpPost("parts")]
+    public async Task<IActionResult> AddPartToOrder([FromBody] CreateOrderPartRequest request)
+    {
+        // La lógica de aplicación valida stock suficiente y estado de la orden (Regla 5.6)
+        await _serviceOrderService.AddPartToOrderAsync(request);
+
+        // Retornamos 200 Ok ya que es una operación exitosa sobre una relación existente
+        return Ok("Refacción asignada correctamente a la orden.");
+    }
+    /// <summary>
+    /// Actualiza la cantidad de una refacción ya asignada.
+    /// Ajusta automáticamente la diferencia en el inventario (US 16).
+    /// </summary>
+    [HttpPut("parts")]
+    public async Task<IActionResult> UpdatePartToOrder([FromBody] UpdateOrderPartRequest request)
+    {
+        // No se permite modificar refacciones si la orden está en estado 'Completed' o 'Delivered'
+        await _serviceOrderService.UpdatePartToOrderAsync(request);
+
+        return NoContent();
+    }
 }

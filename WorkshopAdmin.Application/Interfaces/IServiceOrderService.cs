@@ -11,4 +11,6 @@ public interface IServiceOrderService
     Task<IEnumerable<ServiceOrderDto>> GetAllFilteredAsync(ServiceOrderStatus? status, Guid? customerId);
     Task UpdateStatusAsync(UpdateServiceOrderStatusRequest request);
     Task UpdateAsync(UpdateServiceOrderRequest request);
+    Task AddPartToOrderAsync(CreateOrderPartRequest request);
+    Task UpdatePartToOrderAsync(UpdateOrderPartRequest request);
 }

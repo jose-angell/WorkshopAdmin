@@ -11,15 +11,18 @@ public class ServiceOrderService : IServiceOrderService
     private readonly IServiceOrderRepository _orderRepository;
     private readonly ICustomerRepository _customerRepository;
     private readonly IEquipmentRepository _equipmentRepository;
+    private readonly IPartRepository _partRepository;
 
     public ServiceOrderService(
         IServiceOrderRepository orderRepository,
         ICustomerRepository customerRepository,
-        IEquipmentRepository equipmentRepository)
+        IEquipmentRepository equipmentRepository,
+        IPartRepository partRepository)
     {
         _orderRepository = orderRepository;
         _customerRepository = customerRepository;
         _equipmentRepository = equipmentRepository;
+        _partRepository = partRepository;
     }
 
     public async Task<ServiceOrderDto> CreateAsync(CreateServiceOrderRequest request)
@@ -140,6 +143,61 @@ public class ServiceOrderService : IServiceOrderService
 
         await _orderRepository.UpdateStatusAsync(request.Id, request.NewStatus);
     }
+    public async Task AddPartToOrderAsync(CreateOrderPartRequest request)
+    {
+        var orderPart = await _orderRepository.GetOrderPartAsync(request.ServiceOrderId, request.PartId);
+        if (orderPart != null) throw new Exception("La refacción ya está asignada a la orden. Use la opción de actualizar cantidad si desea modificarla.");
+        
+        // 1. Validar existencia y estado de la orden (Regla 5.6)
+        var order = await _orderRepository.GetByIdAsync(request.ServiceOrderId);
+        if (order == null) throw new Exception("Orden no encontrada.");
+
+        if (order.Status >= ServiceOrderStatus.Completed)
+            throw new Exception("No se pueden agregar refacciones a una orden completada o entregada.");
+
+        // 2. Validar stock y obtener precio histórico (Regla 5.3)
+        var part = await _partRepository.GetByIdAsync(request.PartId);
+        if (part == null) throw new Exception("Refacción no encontrada.");
+
+        int difference = request.Quantity - orderPart.Quantity;
+        if (difference > 0 && part.Stock < difference)
+            throw new Exception("Stock insuficiente para realizar la asignación.");
+        var newOrderPart = new OrderPart
+        {
+            ServiceOrderId = request.ServiceOrderId,
+            PartId = request.PartId,
+            Quantity = request.Quantity,
+            UnitPrice = part.Price // Se guarda el precio actual como histórico
+        };
+        // 3. Persistir mediante repositorio (incluye descuento automático de stock)
+        await _orderRepository.AddPartToOrderAsync(newOrderPart); 
+    }
+
+    public async Task UpdatePartToOrderAsync(UpdateOrderPartRequest request)
+    {
+        // 1. Validar estado de la orden (Regla 5.6)
+        var order = await _orderRepository.GetByIdAsync(request.ServiceOrderId);
+        if (order == null || order.Status >= ServiceOrderStatus.Completed)
+            throw new Exception("La orden no existe o ya ha sido cerrada para modificaciones.");
+        
+        var orderPart = await _orderRepository.GetOrderPartAsync(request.ServiceOrderId, request.PartId);
+        if (orderPart == null) throw new Exception("La pieza no está en la orden.");
+
+        // 2. Validar stock adicional si la cantidad aumenta (Regla 5.3)
+        // Nota: El repositorio se encargará del cálculo de la diferencia de stock.
+        var part = await _partRepository.GetByIdAsync(request.PartId);
+        if (part == null) throw new Exception("Refacción no encontrada.");
+
+        int difference = request.Quantity - orderPart.Quantity;
+        if (difference > 0 && part.Stock < difference) throw new Exception("Stock insuficiente para realizar la actualización.");
+
+        // Lógica de negocio simplificada: el repositorio ajustará el stock.
+        await _orderRepository.UpdatePartToOrderAsync(
+            request.ServiceOrderId,
+            request.PartId,
+            request.Quantity);
+    }
+
     private static ServiceOrderDto MapToDto(ServiceOrder order) => new ServiceOrderDto
     {
         Id = order.Id,
@@ -153,6 +211,14 @@ public class ServiceOrderService : IServiceOrderService
         Status = order.Status,
         LaborCost = order.LaborCost,
         CreatedAt = order.CreatedAt,
-        UpdatedAt = order.UpdatedAt
+        UpdatedAt = order.UpdatedAt,
+        OrderPart = order.OrderParts?.Select(op => new OrderPartDto
+        {
+            PartId = op.PartId,
+            PartName = op.Part?.Name ?? "N/A", // Esto requiere el ThenInclude anterior
+            Quantity = op.Quantity,
+            UnitPrice = op.UnitPrice,
+            Subtotal = op.Quantity * op.UnitPrice // Puedes agregar lógica simple aquí
+        }).ToList() ?? new List<OrderPartDto>()
     };
 }
