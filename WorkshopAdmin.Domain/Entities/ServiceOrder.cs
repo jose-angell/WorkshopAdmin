@@ -8,6 +8,7 @@ public class ServiceOrder
     public Guid CustomerId { get; set; } // FK: uuid 
     public Guid EquipmentId { get; set; } // FK: uuid 
     public string FailureDescription { get; set; } = string.Empty; // text 
+    public string? Diagnosis { get; set; } // Obligatorio antes de completar
     public ServiceOrderStatus Status { get; set; } // Enum (smallint) 
     public decimal LaborCost { get; set; } // numeric(12,2) 
     public DateTimeOffset CreatedAt { get; set; } // timestamptz 

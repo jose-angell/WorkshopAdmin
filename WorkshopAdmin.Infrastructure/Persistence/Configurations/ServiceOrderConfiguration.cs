@@ -21,6 +21,10 @@ public class ServiceOrderConfiguration : IEntityTypeConfiguration<ServiceOrder>
             .HasColumnType("text")
             .IsRequired();
 
+        builder.Property(so => so.Diagnosis)
+           .HasColumnName("diagnosis")
+           .HasColumnType("text");
+
         builder.Property(so => so.Status)
             .HasColumnName("status")
             .HasColumnType("smallint")
