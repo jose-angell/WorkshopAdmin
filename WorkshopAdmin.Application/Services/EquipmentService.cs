@@ -1,5 +1,6 @@
 ﻿using WorkshopAdmin.Application.Interfaces;
 using WorkshopAdmin.Domain.Entities;
+using WorkshopAdmin.Domain.Exceptions;
 using WorkshopAdmin.Domain.Interfaces;
 using WorkshopAdmin.Shared.Dtos.Equipments;
 
@@ -47,18 +48,21 @@ public class EquipmentService : IEquipmentService
     public async Task UpdateAsync(UpdateEquipmentRequest request)
     {
         var existingEquipment = await _repository.GetByIdAsync(request.Id);
-        if (existingEquipment != null)
-        {
-            existingEquipment.Type = request.Type;
-            existingEquipment.Brand = request.Brand;
-            existingEquipment.Model = request.Model;
+        if (existingEquipment == null) throw new NotFoundException($"Equipo con ID {request.Id} no encontrado.");
+        
+        existingEquipment.Type = request.Type;
+        existingEquipment.Brand = request.Brand;
+        existingEquipment.Model = request.Model;
 
-            await _repository.UpdateAsync(existingEquipment);
-        }
+        await _repository.UpdateAsync(existingEquipment);
+        
     }
 
     public async Task DeleteAsync(Guid id)
     {
+        var existingEquipment = await _repository.GetByIdAsync(id);
+        if (existingEquipment == null) throw new NotFoundException($"Equipo con ID {id} no encontrado.");
+
         await _repository.DeleteAsync(id);
     }
 

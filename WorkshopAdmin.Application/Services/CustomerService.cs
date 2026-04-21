@@ -1,5 +1,6 @@
 ﻿using WorkshopAdmin.Application.Interfaces;
 using WorkshopAdmin.Domain.Entities;
+using WorkshopAdmin.Domain.Exceptions;
 using WorkshopAdmin.Domain.Interfaces;
 using WorkshopAdmin.Shared.Dtos.Customers;
 
@@ -47,14 +48,14 @@ public class CustomerService : ICustomerService
     public async Task UpdateAsync(UpdateCustomerRequest request)
     {
         var existingCustomer = await _repository.GetByIdAsync(request.Id);
-        if (existingCustomer != null)
-        {
-            existingCustomer.Name = request.Name;
-            existingCustomer.Email = request.Email;
-            existingCustomer.Phone = request.Phone;
+        if (existingCustomer == null) throw new NotFoundException($"Cliente con ID {request.Id} no encontrado.");
+        
+        existingCustomer.Name = request.Name;
+        existingCustomer.Email = request.Email;
+        existingCustomer.Phone = request.Phone;
 
-            await _repository.UpdateAsync(existingCustomer);
-        }
+        await _repository.UpdateAsync(existingCustomer);
+        
     }
 
     public async Task DeleteAsync(Guid id)

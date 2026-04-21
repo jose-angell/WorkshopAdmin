@@ -1,5 +1,6 @@
-using WorkshopAdmin.Infrastructure;
 using WorkshopAdmin.Application; 
+using WorkshopAdmin.Infrastructure;
+using WorkshopAdmin.WebAPI.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,8 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 // 4. Configurar el Pipeline (el orden importa aquí)
 if (app.Environment.IsDevelopment())

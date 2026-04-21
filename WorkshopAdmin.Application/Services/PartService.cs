@@ -1,5 +1,6 @@
 ﻿using WorkshopAdmin.Application.Interfaces;
 using WorkshopAdmin.Domain.Entities;
+using WorkshopAdmin.Domain.Exceptions;
 using WorkshopAdmin.Domain.Interfaces;
 using WorkshopAdmin.Shared.Dtos.Parts;
 
@@ -53,14 +54,14 @@ public class PartService : IPartService
     public async Task UpdateAsync(UpdatePartRequest request)
     {
         var existingPart = await _repository.GetByIdAsync(request.Id);
-        if (existingPart != null)
-        {
-            existingPart.Name = request.Name;
-            existingPart.Price = request.Price;
-            existingPart.Stock = request.Stock;
+        if (existingPart == null) throw new NotFoundException($"Parte con ID {request.Id} no encontrada.");
+        
+        existingPart.Name = request.Name;
+        existingPart.Price = request.Price;
+        existingPart.Stock = request.Stock;
 
-            await _repository.UpdateAsync(existingPart);
-        }
+        await _repository.UpdateAsync(existingPart);
+        
     }
 
     public async Task DeleteAsync(Guid id)

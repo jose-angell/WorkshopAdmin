@@ -1,5 +1,6 @@
 ﻿using WorkshopAdmin.Application.Interfaces;
 using WorkshopAdmin.Domain.Entities;
+using WorkshopAdmin.Domain.Exceptions;
 using WorkshopAdmin.Domain.Interfaces;
 using WorkshopAdmin.Shared.Dtos.ServiceOrders;
 using WorkshopAdmin.Shared.Enums;
@@ -30,11 +31,11 @@ public class ServiceOrderService : IServiceOrderService
         // 1. Lógica de Validación: Verificar existencia de Cliente y Equipo [4, 5]
         var customer = await _customerRepository.GetByIdAsync(request.CustomerId);
         if (customer == null)
-            throw new ApplicationException("El cliente proporcionado no es válido o no existe.");
+            throw new NotFoundException($"Cliente con ID {request.CustomerId} no encontrado.");
 
         var equipment = await _equipmentRepository.GetByIdAsync(request.EquipmentId);
         if (equipment == null)
-            throw new ApplicationException("El equipo proporcionado no está registrado en el sistema.");
+            throw new NotFoundException($"Equipo con ID {request.EquipmentId} no encontrado.");
 
         // 2. Mapeo y Inicialización [4, 6]
         var order = new ServiceOrder
@@ -103,15 +104,15 @@ public class ServiceOrderService : IServiceOrderService
     {
         var order = await _orderRepository.GetByIdAsync(request.Id);
 
-        if (order == null) throw new ApplicationException("Orden no encontrada.");
+        if (order == null) throw new NotFoundException($"Orden con ID {request.Id} no encontrada.");
 
         // Regla 5.6: No se puede modificar una orden en estado Delivered [3]
         if (order.Status == ServiceOrderStatus.Delivered)
-            throw new ApplicationException("No se pueden realizar cambios en una orden ya entregada.");
+            throw new DomainException("No se pueden realizar cambios en una orden ya entregada.");
 
         // Regla 5.4: El costo de mano de obra no puede ser negativo [2, 5]
         if (request.LaborCost < 0)
-            throw new ApplicationException("El costo de mano de obra debe ser mayor o igual a cero.");
+            throw new DomainException("El costo de mano de obra debe ser mayor o igual a cero.");
 
         order.FailureDescription = request.FailureDescription;
         order.LaborCost = request.LaborCost;
@@ -126,42 +127,42 @@ public class ServiceOrderService : IServiceOrderService
     {
         var order = await _orderRepository.GetByIdAsync(request.Id);
 
-        if (order == null) throw new ApplicationException("Orden no encontrada.");
+        if (order == null) throw new NotFoundException($"Orden con ID {request.Id} no encontrada.");
 
         // Regla 5.6: Bloqueo de edición en estado final [3]
         if (order.Status == ServiceOrderStatus.Delivered)
-            throw new ApplicationException("El flujo ha finalizado; no se pueden cambiar estados de órdenes entregadas.");
+            throw new DomainException("El flujo ha finalizado; no se pueden cambiar estados de órdenes entregadas.");
 
         // Validación de Flujo (Regla 5.1):
         // 1. No se puede avanzar a Repairing sin haber pasado por Diagnosing [1]
         if (request.NewStatus == ServiceOrderStatus.Repairing && order.Status < ServiceOrderStatus.Diagnosing)
-            throw new ApplicationException("Debe completar el diagnóstico antes de iniciar la reparación.");
+            throw new DomainException("Debe completar el diagnóstico antes de iniciar la reparación.");
 
         // 2. No se puede marcar como Delivered si no está en estado Completed [1]
         if (request.NewStatus == ServiceOrderStatus.Delivered && order.Status != ServiceOrderStatus.Completed)
-            throw new ApplicationException("La orden debe marcarse como Completada antes de proceder a la Entrega.");
-
+            throw new DomainException("La orden debe marcarse como Completada antes de proceder a la Entrega.");
         await _orderRepository.UpdateStatusAsync(request.Id, request.NewStatus);
     }
     public async Task AddPartToOrderAsync(CreateOrderPartRequest request)
     {
         var orderPart = await _orderRepository.GetOrderPartAsync(request.ServiceOrderId, request.PartId);
-        if (orderPart != null) throw new Exception("La refacción ya está asignada a la orden. Use la opción de actualizar cantidad si desea modificarla.");
+        if (orderPart != null) throw new DomainException("La refacción ya está asignada a la orden. Use la opción de actualizar cantidad si desea modificarla.");
         
         // 1. Validar existencia y estado de la orden (Regla 5.6)
         var order = await _orderRepository.GetByIdAsync(request.ServiceOrderId);
-        if (order == null) throw new Exception("Orden no encontrada.");
+        if (order == null) throw new NotFoundException($"Orden con ID {request.ServiceOrderId} no encontrada.");
 
         if (order.Status >= ServiceOrderStatus.Completed)
-            throw new Exception("No se pueden agregar refacciones a una orden completada o entregada.");
+            throw new DomainException("No se pueden agregar refacciones a una orden completada o entregada.");
 
         // 2. Validar stock y obtener precio histórico (Regla 5.3)
         var part = await _partRepository.GetByIdAsync(request.PartId);
-        if (part == null) throw new Exception("Refacción no encontrada.");
+        if (part == null) throw new NotFoundException($"Refacción con ID {request.PartId} no encontrada.");
 
         int difference = request.Quantity - orderPart.Quantity;
         if (difference > 0 && part.Stock < difference)
-            throw new Exception("Stock insuficiente para realizar la asignación.");
+            throw new DomainException("Stock insuficiente para realizar la asignación.");
+
         var newOrderPart = new OrderPart
         {
             ServiceOrderId = request.ServiceOrderId,
@@ -178,18 +179,18 @@ public class ServiceOrderService : IServiceOrderService
         // 1. Validar estado de la orden (Regla 5.6)
         var order = await _orderRepository.GetByIdAsync(request.ServiceOrderId);
         if (order == null || order.Status >= ServiceOrderStatus.Completed)
-            throw new Exception("La orden no existe o ya ha sido cerrada para modificaciones.");
+            throw new NotFoundException($"La orden con ID {request.ServiceOrderId} no fue encontrada.");
         
         var orderPart = await _orderRepository.GetOrderPartAsync(request.ServiceOrderId, request.PartId);
-        if (orderPart == null) throw new Exception("La pieza no está en la orden.");
+        if (orderPart == null) throw new NotFoundException($"La pieza con ID {request.PartId} no está en la orden.");
 
         // 2. Validar stock adicional si la cantidad aumenta (Regla 5.3)
         // Nota: El repositorio se encargará del cálculo de la diferencia de stock.
         var part = await _partRepository.GetByIdAsync(request.PartId);
-        if (part == null) throw new Exception("Refacción no encontrada.");
+        if (part == null) throw new NotFoundException($"La refacción con ID {request.PartId} no fue encontrada.");
 
         int difference = request.Quantity - orderPart.Quantity;
-        if (difference > 0 && part.Stock < difference) throw new Exception("Stock insuficiente para realizar la actualización.");
+        if (difference > 0 && part.Stock < difference) throw new InsufficientStockException();
 
         // Lógica de negocio simplificada: el repositorio ajustará el stock.
         await _orderRepository.UpdatePartToOrderAsync(
