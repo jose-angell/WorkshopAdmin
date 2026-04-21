@@ -198,7 +198,14 @@ public class ServiceOrderService : IServiceOrderService
             request.PartId,
             request.Quantity);
     }
-
+    public async Task UpdateDiagnosisAsync(Guid id, string diagnosis)
+    {
+        var order = await _orderRepository.GetByIdAsync(id);
+        if (order == null)
+            throw new NotFoundException($"La orden con ID {id} no fue encontrada.");
+        if (order.Status != ServiceOrderStatus.Diagnosing) throw new DomainException($"La actualizacion del diagnostico debe hacerde en la etapa de diagnostico");
+        await _orderRepository.UpdateDiagnosisAsync(id, diagnosis); 
+    }
     private static ServiceOrderDto MapToDto(ServiceOrder order) => new ServiceOrderDto
     {
         Id = order.Id,

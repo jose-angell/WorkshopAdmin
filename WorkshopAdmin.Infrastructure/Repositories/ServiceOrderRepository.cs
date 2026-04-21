@@ -134,6 +134,18 @@ public class ServiceOrderRepository : IServiceOrderRepository
         await _context.OrderParts.AddAsync(orderPart);
         await _context.SaveChangesAsync();
     }
+    public async Task UpdateDiagnosisAsync(Guid serviceOrderId, string diagnosis)
+    {
+        var orderService = await _context.ServiceOrders
+            .FirstOrDefaultAsync(op => op.Id == serviceOrderId);
+
+        if (orderService != null && orderService.Status == ServiceOrderStatus.Diagnosing)
+        {
+            orderService.Diagnosis = diagnosis;
+            await _context.SaveChangesAsync();
+        }
+        
+    }
     public async Task UpdatePartToOrderAsync(Guid serviceOrderId, Guid partId, int newQuantity)
     {
         // 1. Buscar la relación existente

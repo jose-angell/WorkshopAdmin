@@ -12,6 +12,7 @@ public interface IServiceOrderRepository
     Task UpdateAsync(ServiceOrder serviceOrder);
     Task DeleteAsync(Guid id);
     Task AddPartToOrderAsync(OrderPart orderPart);
+    Task UpdateDiagnosisAsync(Guid serviceOrderId, string diagnosis);
     Task UpdatePartToOrderAsync(Guid serviceOrderId, Guid partId, int newQuantity);
     // Métodos específicos solicitados
     Task<IEnumerable<ServiceOrder>> GetByStatusAsync(string status);

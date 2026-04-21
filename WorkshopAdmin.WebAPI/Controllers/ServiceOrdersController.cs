@@ -85,6 +85,16 @@ public class ServiceOrdersController : ControllerBase
         return NoContent();
     }
     /// <summary>
+    /// Actualiza información general de la orden (descripción, costos de mano de obra).
+    /// No permite modificar órdenes en estado 'Delivered' [7].
+    /// </summary>
+    [HttpPatch("{id:guid}/diagnosis")]
+    public async Task<IActionResult> UpdateLaborCost(Guid id, [FromBody] string diagnosis)
+    {
+        await _serviceOrderService.UpdateDiagnosisAsync(id, diagnosis);
+        return NoContent();
+    }
+    /// <summary>
     /// Asigna una refacción a la orden de servicio (US 15).
     /// Registra el precio histórico y descuenta el stock (Regla 5.3).
     /// </summary>
