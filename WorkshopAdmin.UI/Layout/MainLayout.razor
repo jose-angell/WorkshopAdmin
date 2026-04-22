@@ -1,16 +1,41 @@
 ﻿@inherits LayoutComponentBase
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
+<MudThemeProvider Theme="_industrialTheme" />
+<MudDialogProvider />
+<MudSnackbarProvider />
 
-        <article class="content px-4">
+<MudLayout>
+    <MudAppBar Elevation="1">
+        <MudText Typo="Typo.h5" Class="ml-3">WorkshopAdmin</MudText>
+    </MudAppBar>
+    <MudDrawer Open="true" ClipMode="DrawerClipMode.Always" Elevation="2">
+    </MudDrawer>
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.Large" Class="my-4">
             @Body
-        </article>
-    </main>
-</div>
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    private MudTheme _industrialTheme = new MudTheme()
+    {
+        PaletteLight = new PaletteLight()
+        {
+            Primary = "#000666",             // Deep Blue de Stitch
+            Secondary = "#4c616c",           // Secondary Gray
+            Tertiary = "#380b00",            // El tono café/industrial
+            Background = "#f9f9f9",          // Surface
+            AppbarBackground = "#000666",    // Usamos el Primary para el Header
+            Surface = "#ffffff",             // Surface container lowest
+            DrawerBackground = "#eeeeee",    // Surface container
+            Error = "#ba1a1a",
+            TextPrimary = "#1a1c1c",         // On-surface
+            LinesDefault = "#767683",        // Outline
+        },
+        LayoutProperties = new LayoutProperties()
+        {
+            DefaultBorderRadius = "4px",     // El "Soft (0.25rem)" que pidió Stitch
+        },
+    };
+}

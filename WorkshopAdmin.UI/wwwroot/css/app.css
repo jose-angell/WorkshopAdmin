@@ -113,3 +113,37 @@ code {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
 }
+
+.data-mono {
+    font-family: 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', monospace !important;
+    font-size: 14px;
+    font-weight: 500;
+}
+:root {
+    /* Tipografía Base - Basado en DESIGN.md */
+    --mud-typography-default-font-family: 'Inter', 'Helvetica', 'Arial', sans-serif;
+    --mud-typography-default-size: 1rem;
+    --mud-typography-default-weight: 400;
+    --mud-typography-default-lineheight: 1.5;
+    /* Títulos */
+    --mud-typography-h1-size: 34px;
+    --mud-typography-h1-weight: 700;
+    --mud-typography-h1-letterspacing: -0.02em;
+    --mud-typography-h2-size: 24px;
+    --mud-typography-h2-weight: 600;
+    /* Estilo Especial: Data-Mono */
+    --mud-typography-caption-font-family: 'ui-monospace', 'SFMono-Regular', monospace;
+    --mud-typography-caption-size: 14px;
+    --mud-typography-caption-weight: 500;
+}
+
+/* Ajustes adicionales para el look "Industrial" */
+.mud-button-filled {
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
+.mud-table-head {
+    background-color: var(--mud-palette-drawer-background);
+}
