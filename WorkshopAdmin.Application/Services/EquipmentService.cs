@@ -36,6 +36,7 @@ public class EquipmentService : IEquipmentService
             Type = request.Type,
             Brand = request.Brand,
             Model = request.Model,
+            TechnicalSpecifications = request.TechnicalSpecifications,
             CreatedAt = DateTimeOffset.UtcNow // timestamptz automático
         };
 
@@ -53,6 +54,7 @@ public class EquipmentService : IEquipmentService
         existingEquipment.Type = request.Type;
         existingEquipment.Brand = request.Brand;
         existingEquipment.Model = request.Model;
+        existingEquipment.TechnicalSpecifications = request.TechnicalSpecifications;
 
         await _repository.UpdateAsync(existingEquipment);
         
@@ -74,6 +76,7 @@ public class EquipmentService : IEquipmentService
             Type = equipment.Type,
             Brand = equipment.Brand,
             Model = equipment.Model,
+            TechnicalSpecifications = equipment.TechnicalSpecifications,
             CreatedAt = equipment.CreatedAt
         };
 }

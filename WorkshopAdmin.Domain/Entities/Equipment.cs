@@ -6,6 +6,7 @@ public class Equipment
     public string Type { get; set; } = string.Empty; // varchar(50) 
     public string Brand { get; set; } = string.Empty; // varchar(100) 
     public string Model { get; set; } = string.Empty; // varchar(100) 
+    public string? TechnicalSpecifications { get; set; } = string.Empty; // varchar(2000) 
     public DateTimeOffset CreatedAt { get; set; } // timestamptz 
 
     // Propiedades de navegación

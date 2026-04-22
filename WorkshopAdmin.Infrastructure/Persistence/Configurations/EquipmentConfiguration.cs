@@ -29,6 +29,10 @@ public class EquipmentConfiguration : IEntityTypeConfiguration<Equipment>
             .HasColumnType("varchar(100)")
             .IsRequired();
 
+        builder.Property(e => e.TechnicalSpecifications)
+            .HasColumnName("technical_specifications")
+            .HasColumnType("varchar(2000)");
+
         builder.Property(e => e.CreatedAt)
             .HasColumnName("created_at")
             .HasColumnType("timestamptz")

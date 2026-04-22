@@ -85,8 +85,8 @@ public class ServiceOrdersController : ControllerBase
         return NoContent();
     }
     /// <summary>
-    /// Actualiza información general de la orden (descripción, costos de mano de obra).
-    /// No permite modificar órdenes en estado 'Delivered' [7].
+    /// Actualiza el campo de diagnostico de la order de sevicio.
+    /// No permite modificar órdenes en estado distinto a 'Diagnosting' [7].
     /// </summary>
     [HttpPatch("{id:guid}/diagnosis")]
     public async Task<IActionResult> UpdateLaborCost(Guid id, [FromBody] string diagnosis)
