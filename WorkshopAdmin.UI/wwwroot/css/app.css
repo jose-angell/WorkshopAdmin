@@ -135,6 +135,10 @@ code {
     --mud-typography-caption-font-family: 'ui-monospace', 'SFMono-Regular', monospace;
     --mud-typography-caption-size: 14px;
     --mud-typography-caption-weight: 500;
+
+    --indigo-900: #000666;
+    --slate-50: #f8fafc;
+    --slate-200: #e2e8f0;
 }
 
 /* Ajustes adicionales para el look "Industrial" */
@@ -146,4 +150,49 @@ code {
 
 .mud-table-head {
     background-color: var(--mud-palette-drawer-background);
+}
+/* Utilidades rápidas para bordes y fondos industriales */
+.bg-slate-50 {
+    background-color: #f8fafc;
+}
+
+.bg-slate-100 {
+    background-color: #f1f5f9;
+}
+
+.border-slate-200 {
+    border-color: #e2e8f0;
+}
+
+.text-error {
+    color: var(--mud-palette-error);
+}
+.nav-item-industrial .mud-nav-link {
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.05em !important;
+    color: #475569 !important;
+    transition: all 0.2s;
+}
+
+    .nav-item-industrial .mud-nav-link.active {
+        background-color: #e0e0ff !important;
+        color: #000666 !important;
+        border-right: 4px solid #000666;
+    }
+
+.nav-item-industrial-sm .mud-nav-link {
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.05em !important;
+}
+
+/* Estilo del buscador */
+.industrial-search .mud-input-outlined {
+    background-color: var(--slate-50);
+    border-radius: 6px;
+}
+
+.industrial-search .mud-input-outlined:focus-within {
+    background-color: #ffffff;
 }

@@ -1,0 +1,49 @@
+﻿@* Components/Layout/SideNav.razor *@
+<div class="d-flex flex-column h-100 border-r border-slate-200 bg-slate-50">
+    @* Brand Header *@
+    <div class="px-6 py-6 d-flex flex-column gap-2">
+        <MudText Typo="Typo.h3" Class="font-black tracking-tighter" Style="font-weight: 700; color: #000666; font-size: 1.5rem;">
+            WorkshopAdmin
+        </MudText>
+        <MudText Typo="Typo.caption" Class="mud-text-secondary" Style="font-size: .8rem;">
+            Technical Service Mgmt
+        </MudText>
+    </div>
+
+    @* Navigation *@
+    <MudNavMenu Class="px-4 flex-grow-1 mt-2">
+        <MudNavLink Href="/" Icon="@Icons.Material.Filled.Dashboard" Match="NavLinkMatch.All" Class="nav-item-industrial">
+            DASHBOARD
+        </MudNavLink>
+        <MudNavLink Href="/orders" Icon="@Icons.Material.Filled.Handyman" Class="nav-item-industrial">
+            SERVICE ORDERS
+        </MudNavLink>
+        <MudNavLink Href="/inventory" Icon="@Icons.Material.Filled.Inventory2" Class="nav-item-industrial">
+            INVENTORY
+        </MudNavLink>
+        <MudNavLink Href="/clients" Icon="@Icons.Material.Filled.Badge" Class="nav-item-industrial">
+            CLIENTS
+        </MudNavLink>
+        <MudNavLink Href="/reports" Icon="@Icons.Material.Filled.Analytics" Class="nav-item-industrial">
+            REPORTS
+        </MudNavLink>
+    </MudNavMenu>
+
+    @* Quick Action Button *@
+    <div class="px-4 mb-6">
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   FullWidth="true"
+                   StartIcon="@Icons.Material.Filled.Add"
+                   Class="py-3 font-bold shadow-none"
+                   Style="border-radius: 4px; text-transform: none;">
+            New Service Order
+        </MudButton>
+    </div>
+
+    @* Bottom Actions *@
+    <div class="px-4 py-4 border-t border-slate-200">
+        <MudNavLink Href="/settings" Icon="@Icons.Material.Filled.Settings" Class="nav-item-industrial-sm">SETTINGS</MudNavLink>
+        <MudNavLink Href="/logout" Icon="@Icons.Material.Filled.Logout" Class="nav-item-industrial-sm text-red-600">LOGOUT</MudNavLink>
+    </div>
+</div>

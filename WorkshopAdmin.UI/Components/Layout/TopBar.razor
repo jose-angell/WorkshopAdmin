@@ -1,0 +1,43 @@
+﻿@* Components/Layout/TopBar.razor *@
+<MudAppBar Elevation="0" Class="border-b border-slate-200 bg-white" Fixed="true">
+    <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@DrawerToggleCallback" Class="d-md-none mr-2" />
+    
+    @* Search Bar Container *@
+    <div class="d-flex align-center flex-grow-1">
+        <div style="max-width: 450px; width: 100%;" class="relative">
+            <MudTextField @bind-Value="_search"
+                          Placeholder="Search orders, clients, or parts..."
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          Class="industrial-search" />
+        </div>
+    </div>
+
+    <MudSpacer />
+
+    @* Actions & Profile *@
+    <div class="d-flex align-center gap-4">
+        <MudBadge Color="Color.Error" Dot="true" Overlap="true" Bordered="true">
+            <MudIconButton Icon="@Icons.Material.Outlined.Notifications" Size="Size.Small" />
+        </MudBadge>
+        
+        <MudIconButton Icon="@Icons.Material.Outlined.HelpOutline" Size="Size.Small" />
+
+        <div class="h-8 w-px bg-slate-200 mx-2"></div>
+
+        <div class="d-flex align-center gap-3">
+            <div class="text-right d-none d-lg-block">
+                <MudText Typo="Typo.caption" Class="font-bold d-block leading-none" Style="color: #000666;">Admin User</MudText>
+                <MudText Typo="Typo.caption" Class="uppercase text-slate-500" Style="font-size: 10px;">Supervisor</MudText>
+            </div>
+            <MudAvatar Size="Size.Medium" Image="https://randomuser.me/api/portraits/men/32.jpg" Class="border border-slate-200" />
+        </div>
+    </div>
+</MudAppBar>
+
+@code {
+    private string _search = "";
+    [Parameter] public EventCallback DrawerToggleCallback { get; set; }
+}

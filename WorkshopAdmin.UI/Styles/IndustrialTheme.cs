@@ -8,22 +8,22 @@ public static class IndustrialTheme
     {
         PaletteLight = new PaletteLight()
         {
-            Primary = "#000666",             // Deep Blue
-            Secondary = "#4c616c",           // Secondary Gray
-            Tertiary = "#380b00",            // Deep Brown
-            Background = "#f9f9f9",          // Surface background
-            AppbarBackground = "#000666",    // Marca corporativa en el header
-            Surface = "#ffffff",             // Surface-container-lowest
-            DrawerBackground = "#eeeeee",    // Surface-container
-            Error = "#ba1a1a",               // Error state
-            TextPrimary = "#1a1c1c",         // On-surface
-            LinesDefault = "#767683",        // Outline
-            Success = "#2e7d32",             // Color funcional para 'Completed'
-            Warning = "#ed6c02"              // Color funcional para 'Repairing'
+            Primary = "#000666",             // El Azul Profundo de Stitch
+            Secondary = "#4c616c",
+            Tertiary = "#380b00",
+            Background = "#f9f9f9",
+            AppbarBackground = "#ffffff",    // TopBar en blanco
+            Surface = "#ffffff",
+            DrawerBackground = "#eeeeee",
+            Error = "#ba1a1a",
+            TextPrimary = "#1a1c1c",
+            LinesDefault = "#767683",
+            Success = "#2e7d32",
+            Warning = "#ed6c02"
         },
         LayoutProperties = new LayoutProperties()
         {
-            DefaultBorderRadius = "4px"      // Soft (0.25rem)
-        },
+            DefaultBorderRadius = "4px"
+        }
     };
 }
