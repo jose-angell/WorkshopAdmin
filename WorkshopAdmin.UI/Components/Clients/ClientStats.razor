@@ -1,0 +1,44 @@
+﻿@* Components/Clients/ClientStats.razor *@
+<MudGrid Class="mb-6">
+    @* Card: Customer Retention *@
+    <MudItem xs="12" sm="6">
+        <MudPaper Elevation="0" Class="pa-6 border-t-2 border-slate-200 bg-white shadow-sm" Style="border-top-color: var(--mud-palette-primary) !important;">
+            <div class="d-flex justify-space-between align-start">
+                <div>
+                    <MudText Typo="Typo.caption" Class="uppercase font-bold tracking-widest text-slate-500" Style="font-size: 10px;">
+                        Customer Retention Rate
+                    </MudText>
+                    <MudText Typo="Typo.h4" Class="font-black mt-1">94.2%</MudText>
+                </div>
+                <div class="pa-3 rounded bg-indigo-50">
+                    <MudIcon Icon="@Icons.Material.Filled.Loop" Style="color: #000666;" />
+                </div>
+            </div>
+            <div class="mt-4 d-flex align-center">
+                <MudIcon Icon="@Icons.Material.Filled.TrendingUp" Color="Color.Success" Size="Size.Small" Class="mr-1" />
+                <MudText Typo="Typo.caption" Class="font-bold text-green-600">+2.4% from last month</MudText>
+            </div>
+        </MudPaper>
+    </MudItem>
+
+    @* Card: New Customers *@
+    <MudItem xs="12" sm="6">
+        <MudPaper Elevation="0" Class="pa-6 border-t-2 border-slate-200 bg-white shadow-sm" Style="border-top-color: var(--mud-palette-secondary) !important;">
+            <div class="d-flex justify-space-between align-start">
+                <div>
+                    <MudText Typo="Typo.caption" Class="uppercase font-bold tracking-widest text-slate-500" Style="font-size: 10px;">
+                        New Clients (This Month)
+                    </MudText>
+                    <MudText Typo="Typo.h4" Class="font-black mt-1">12</MudText>
+                </div>
+                <div class="pa-3 rounded bg-slate-100">
+                    <MudIcon Icon="@Icons.Material.Filled.PersonAdd" Color="Color.Secondary" />
+                </div>
+            </div>
+            <div class="mt-4 d-flex align-center">
+                <MudIcon Icon="@Icons.Material.Filled.History" Color="Color.Default" Size="Size.Small" Class="mr-1" />
+                <MudText Typo="Typo.caption" Class="text-slate-500">Target: 15 per month</MudText>
+            </div>
+        </MudPaper>
+    </MudItem>
+</MudGrid>

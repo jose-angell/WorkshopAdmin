@@ -1,0 +1,29 @@
+﻿@* Components/Clients/ClientFilters.razor *@
+<MudPaper Elevation="0" Class="pa-4 border border-slate-200 bg-white mb-6">
+    <MudGrid Spacing="3" Class="align-center">
+        <MudItem xs="12" sm="6" md="4">
+            <MudTextField T="string"
+                          Placeholder="Search clients by name, email or ID..."
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          Class="bg-slate-50" />
+        </MudItem>
+        <MudItem xs="12" sm="3" md="2">
+            <MudSelect T="string" Label="Status" Variant="Variant.Outlined" Margin="Margin.Dense" Class="bg-slate-50">
+                <MudSelectItem Value="@("All")">All Clients</MudSelectItem>
+                <MudSelectItem Value="@("Active")">Active</MudSelectItem>
+                <MudSelectItem Value="@("Inactive")">Inactive</MudSelectItem>
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="12" sm="3" md="2">
+            <MudButton Variant="Variant.Outlined"
+                       StartIcon="@Icons.Material.Filled.FilterList"
+                       FullWidth="true"
+                       Style="height: 40px; text-transform: none; border-color: var(--slate-200);">
+                More Filters
+            </MudButton>
+        </MudItem>
+    </MudGrid>
+</MudPaper>

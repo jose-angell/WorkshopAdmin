@@ -1,0 +1,144 @@
+﻿@* Components/Clients/ClientTable.razor *@
+@using WorkshopAdmin.Shared.Dtos.Customers
+
+<MudDataGrid T="CustomerDto"
+             Items="@_clients"
+             Hover="true"
+             Striped="false"
+             Elevation="0"
+             Class="border border-slate-200 overflow-hidden"
+             Filterable="true"
+             QuickFilter="@_quickFilter">
+    
+    <Columns>
+        @* ID con fuente monoespaciada *@
+        <PropertyColumn Property="x => x.Id" Title="ID">
+            <CellTemplate>
+                <MudText Typo="Typo.caption" Class="font-mono text-slate-400" Style="font-size: 11px;">
+                    #@context.Item.Id.ToString().Substring(0, 8).ToUpper()
+                </MudText>
+            </CellTemplate>
+        </PropertyColumn>
+
+        @* Nombre y Detalles *@
+        <PropertyColumn Property="x => x.Name" Title="Customer / Contact">
+            <CellTemplate>
+                <div class="d-flex flex-column">
+                    <MudText Typo="Typo.body2" Class="font-bold text-indigo-900" Style="color: #000666;">
+                        @context.Item.Name
+                    </MudText>
+                    <MudText Typo="Typo.caption" Class="text-slate-500">@context.Item.Email</MudText>
+                </div>
+            </CellTemplate>
+        </PropertyColumn>
+
+        <PropertyColumn Property="x => x.Phone" Title="Phone" />
+
+        @* Órdenes Activas con indicador visual *@
+        <PropertyColumn Property="x => x.ActiveOrders" Title="Orders">
+            <CellTemplate>
+                <div class="d-flex align-center gap-2">
+                    <MudText Typo="Typo.body2" Class="font-bold">@context.Item.ActiveOrders</MudText>
+                    @if (context.Item.ActiveOrders > 0)
+                    {
+                        <div class="rounded-full bg-amber-500" style="width: 6px; height: 6px;"></div>
+                    }
+                </div>
+            </CellTemplate>
+        </PropertyColumn>
+
+        @* Estatus con Chips Industriales *@
+        <PropertyColumn Property="x => x.Status" Title="Status">
+            <CellTemplate>
+                @if (context.Item.Status)
+                {
+                    <MudChip T="string" Color="Color.Success" Variant="Variant.Text" Size="Size.Small"
+                             Class="font-black px-2 uppercase tracking-tighter" Style="font-size: 10px; background-color: #f0fdf4;">
+                        ACTIVE
+                    </MudChip>
+                }
+                else
+                {
+                    <MudChip T="string" Color="Color.Default" Variant="Variant.Text" Size="Size.Small"
+                             Class="font-black px-2 uppercase tracking-tighter" Style="font-size: 10px; background-color: #f1f5f9;">
+                        INACTIVE
+                    </MudChip>
+                }
+            </CellTemplate>
+        </PropertyColumn>
+
+        @* Fecha de registro *@
+        <PropertyColumn Property="x => x.CreatedAt" Title="Registered">
+            <CellTemplate>
+                <MudText Typo="Typo.caption">@context.Item.CreatedAt.ToString("MMM dd, yyyy")</MudText>
+            </CellTemplate>
+        </PropertyColumn>
+
+        @* Acciones con iconos de la interfaz industrial *@
+        <TemplateColumn CellClass="d-flex justify-end gap-1">
+            <CellTemplate>
+                <MudTooltip Text="View History">
+                    <MudIconButton Icon="@Icons.Material.Filled.History" Size="Size.Small" Class="text-slate-400 hover:text-indigo-900" />
+                </MudTooltip>
+                <MudTooltip Text="Edit Client">
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Primary" />
+                </MudTooltip>
+                <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Size="Size.Small" />
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+
+    <PagerContent>
+        <MudDataGridPager T="CustomerDto" />
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+    private List<CustomerDto> _clients = new();
+    private string _searchString = "";
+
+    protected override void OnInitialized()
+    {
+        // Datos duros basados en el DTO proporcionado
+        _clients = new List<CustomerDto>
+        {
+            new CustomerDto {
+                Id = Guid.NewGuid(), Name = "Industrias Metalmecánicas S.A.",
+                Email = "mantenimiento@metalmecanica.mx", Phone = "+52 229 100 2030",
+                Status = true, ActiveOrders = 3, CreatedAt = DateTimeOffset.Now.AddMonths(-5)
+            },
+            new CustomerDto {
+                Id = Guid.NewGuid(), Name = "Logística Express Veracruz",
+                Email = "fleet@logisticaver.com", Phone = "+52 229 450 6070",
+                Status = true, ActiveOrders = 1, CreatedAt = DateTimeOffset.Now.AddMonths(-2)
+            },
+            new CustomerDto {
+                Id = Guid.NewGuid(), Name = "Constructora del Golfo",
+                Email = "admin@golfoconstruye.com", Phone = "+52 228 123 4567",
+                Status = false, ActiveOrders = 0, CreatedAt = DateTimeOffset.Now.AddYears(-1)
+            },
+            new CustomerDto {
+                Id = Guid.NewGuid(), Name = "Taller Central Diesel",
+                Email = "jorge.perez@centraldiesel.mx", Phone = "+52 229 987 6543",
+                Status = true, ActiveOrders = 5, CreatedAt = DateTimeOffset.Now.AddMonths(-8)
+            },
+            new CustomerDto {
+                Id = Guid.NewGuid(), Name = "Servicios Portuarios Integrales",
+                Email = "operaciones@spi-ver.com", Phone = "+52 229 555 0199",
+                Status = true, ActiveOrders = 0, CreatedAt = DateTimeOffset.Now.AddDays(-15)
+            }
+        };
+    }
+
+    // Filtro rápido para el buscador del TopBar o ClientFilters
+    private Func<CustomerDto, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+        if (x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (x.Email.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    };
+}

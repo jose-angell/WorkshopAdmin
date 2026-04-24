@@ -11,5 +11,7 @@ public class CustomerDto
     public string Name { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string Phone { get; set; } = string.Empty;
+    public bool Status { get; set; } = true;
+    public int ActiveOrders { get; set; } = 0;
     public DateTimeOffset CreatedAt { get; set; }
 }
