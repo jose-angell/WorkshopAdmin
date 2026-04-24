@@ -9,4 +9,5 @@ public interface ICustomerService
     Task<CustomerDto> CreateAsync(CreateCustomerRequest request);
     Task UpdateAsync(UpdateCustomerRequest request);
     Task DeleteAsync(Guid id);
+    Task IsActivateAsync(Guid id);
 }

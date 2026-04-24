@@ -62,7 +62,15 @@ public class CustomersController : ControllerBase
         await _customerService.UpdateAsync(request);
         return NoContent(); // 204 NoContent según estándares REST
     }
-
+    /// <summary>
+    /// Actualiza el estatus de un cliente (activo/inactivo).
+    /// </summary>
+    [HttpPut("status/{id:guid}")]
+    public async Task<IActionResult> UpdateStatus(Guid id)
+    {
+        await _customerService.IsActivateAsync(id);
+        return NoContent(); // 204 NoContent según estándares REST
+    }
     /// <summary>
     /// Elimina un cliente del sistema.
     /// </summary>

@@ -57,7 +57,14 @@ public class CustomerService : ICustomerService
         await _repository.UpdateAsync(existingCustomer);
         
     }
-
+    public async Task IsActivateAsync(Guid Id)
+    {
+        var existingCustomer = await _repository.GetByIdAsync(Id);
+        if (existingCustomer == null) throw new NotFoundException($"Cliente con ID {Id} no encontrado.");
+        
+        existingCustomer.IsActive = !existingCustomer.IsActive;
+        await _repository.UpdateAsync(existingCustomer);
+    }
     public async Task DeleteAsync(Guid id)
     {
         await _repository.DeleteAsync(id);
