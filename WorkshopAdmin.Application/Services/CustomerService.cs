@@ -3,6 +3,7 @@ using WorkshopAdmin.Domain.Entities;
 using WorkshopAdmin.Domain.Exceptions;
 using WorkshopAdmin.Domain.Interfaces;
 using WorkshopAdmin.Shared.Dtos.Customers;
+using WorkshopAdmin.Shared.Enums;
 
 namespace WorkshopAdmin.Application.Services;
 
@@ -72,12 +73,16 @@ public class CustomerService : ICustomerService
 
     // Helper privado para mapeo de Entidad a DTO
     private static CustomerDto MapToDto(Customer customer) =>
-        new CustomerDto
-        {
-            Id = customer.Id,
-            Name = customer.Name,
-            Email = customer.Email,
-            Phone = customer.Phone,
-            CreatedAt = customer.CreatedAt
-        };
+     new CustomerDto
+     {
+         Id = customer.Id,
+         Name = customer.Name,
+         Email = customer.Email,
+         Phone = customer.Phone,
+         IsActive = customer.IsActive,
+         CreatedAt = customer.CreatedAt,
+         // Lógica para contar órdenes activas (no entregadas)
+         ActiveOrders = customer.ServiceOrders?
+             .Count(o => o.Status != ServiceOrderStatus.Delivered) ?? 0
+     };
 }

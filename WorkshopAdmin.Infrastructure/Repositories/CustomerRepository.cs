@@ -17,12 +17,14 @@ public class CustomerRepository : ICustomerRepository
     public async Task<Customer?> GetByIdAsync(Guid id)
     {
         return await _context.Customers
+            .Include(c => c.ServiceOrders)
             .FirstOrDefaultAsync(c => c.Id == id);
     }
 
     public async Task<IEnumerable<Customer>> GetAllAsync()
     {
         return await _context.Customers
+            .Include(c => c.ServiceOrders)
             .OrderByDescending(c => c.CreatedAt)
             .ToListAsync();
     }
@@ -30,6 +32,7 @@ public class CustomerRepository : ICustomerRepository
     public async Task<IEnumerable<Customer>> SearchByNameAsync(string name)
     {
         return await _context.Customers
+            .Include(c => c.ServiceOrders)
             .Where(c => c.Name.Contains(name))
             .ToListAsync();
     }
