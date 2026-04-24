@@ -48,9 +48,9 @@
         </PropertyColumn>
 
         @* Estatus con Chips Industriales *@
-        <PropertyColumn Property="x => x.Status" Title="Status">
+        <PropertyColumn Property="x => x.IsActive" Title="Status">
             <CellTemplate>
-                @if (context.Item.Status)
+                @if (context.Item.IsActive)
                 {
                     <MudChip T="string" Color="Color.Success" Variant="Variant.Text" Size="Size.Small"
                              Class="font-black px-2 uppercase tracking-tighter" Style="font-size: 10px; background-color: #f0fdf4;">
@@ -105,27 +105,27 @@
             new CustomerDto {
                 Id = Guid.NewGuid(), Name = "Industrias Metalmecánicas S.A.",
                 Email = "mantenimiento@metalmecanica.mx", Phone = "+52 229 100 2030",
-                Status = true, ActiveOrders = 3, CreatedAt = DateTimeOffset.Now.AddMonths(-5)
+                IsActive = true, ActiveOrders = 3, CreatedAt = DateTimeOffset.Now.AddMonths(-5)
             },
             new CustomerDto {
                 Id = Guid.NewGuid(), Name = "Logística Express Veracruz",
                 Email = "fleet@logisticaver.com", Phone = "+52 229 450 6070",
-                Status = true, ActiveOrders = 1, CreatedAt = DateTimeOffset.Now.AddMonths(-2)
+                IsActive = true, ActiveOrders = 1, CreatedAt = DateTimeOffset.Now.AddMonths(-2)
             },
             new CustomerDto {
                 Id = Guid.NewGuid(), Name = "Constructora del Golfo",
                 Email = "admin@golfoconstruye.com", Phone = "+52 228 123 4567",
-                Status = false, ActiveOrders = 0, CreatedAt = DateTimeOffset.Now.AddYears(-1)
+                IsActive = false, ActiveOrders = 0, CreatedAt = DateTimeOffset.Now.AddYears(-1)
             },
             new CustomerDto {
                 Id = Guid.NewGuid(), Name = "Taller Central Diesel",
                 Email = "jorge.perez@centraldiesel.mx", Phone = "+52 229 987 6543",
-                Status = true, ActiveOrders = 5, CreatedAt = DateTimeOffset.Now.AddMonths(-8)
+                IsActive = true, ActiveOrders = 5, CreatedAt = DateTimeOffset.Now.AddMonths(-8)
             },
             new CustomerDto {
                 Id = Guid.NewGuid(), Name = "Servicios Portuarios Integrales",
                 Email = "operaciones@spi-ver.com", Phone = "+52 229 555 0199",
-                Status = true, ActiveOrders = 0, CreatedAt = DateTimeOffset.Now.AddDays(-15)
+                IsActive = true, ActiveOrders = 0, CreatedAt = DateTimeOffset.Now.AddDays(-15)
             }
         };
     }

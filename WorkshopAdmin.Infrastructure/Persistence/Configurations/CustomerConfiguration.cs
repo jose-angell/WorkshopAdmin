@@ -29,6 +29,11 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
             .HasColumnName("email")
             .HasColumnType("varchar(150)");
 
+        builder.Property(c => c.IsActive)
+           .HasColumnName("is_active")
+           .HasColumnType("boolean")
+           .HasDefaultValue(true);
+
         builder.Property(c => c.CreatedAt)
             .HasColumnName("created_at")
             .HasColumnType("timestamptz")

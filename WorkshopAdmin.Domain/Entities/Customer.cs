@@ -6,6 +6,7 @@ public class Customer
     public string Name { get; set; } = string.Empty; // varchar(150) 
     public string Phone { get; set; } = string.Empty; // varchar(20) 
     public string Email { get; set; } = string.Empty; // varchar(150) 
+    public bool IsActive { get; set; } = true; // boolean, default true
     public DateTimeOffset CreatedAt { get; set; } // timestamptz 
 
     // Propiedades de navegación
