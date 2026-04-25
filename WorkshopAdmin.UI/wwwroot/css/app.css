@@ -196,3 +196,22 @@ code {
 .industrial-search .mud-input-outlined:focus-within {
     background-color: #ffffff;
 }
+
+.custom-industrial-dialog .mud-dialog-title {
+    background-color: #000666; /* Tu azul industrial */
+    color: white;
+    padding: 8px 24px;
+}
+
+.custom-industrial-dialog .mud-dialog-title .mud-button-root {
+    color: rgba(255,255,255,0.7) !important;
+}
+
+.industrial-gradient-bar {
+    height: 4px;
+    background: linear-gradient(90deg, #000666 0%, #4c56af 50%, #5c1800 100%);
+}
+
+.text-white-50 {
+    color: rgba(255,255,255,0.7);
+}

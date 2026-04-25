@@ -1,6 +1,9 @@
 ﻿@page "/clients"
 @using WorkshopAdmin.Shared.Dtos
+@using WorkshopAdmin.Shared.Dtos.Customers
 @using WorkshopAdmin.UI.Components.Clients
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="py-8">
     @* Header Section *@
@@ -22,6 +25,7 @@
             
             <MudButton Variant="Variant.Filled"
                        Color="Color.Primary"
+                       OnClick="OpenCreateCustomerDialog"
                        StartIcon="@Icons.Material.Filled.Add"
                        Class="py-2 px-4 shadow-none font-bold"
                        Style="text-transform: none; border-radius: 4px;">
@@ -46,3 +50,38 @@
 
     </MudGrid>
 </MudContainer>
+
+
+@code {
+    private async Task OpenCreateCustomerDialog()
+    {
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true,
+            CloseButton = true
+        };
+
+        var dialog = await DialogService.ShowAsync<CreateCustomerDialog>(" ", options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled && result.Data is CreateCustomerRequest newClient)
+        {
+            try
+            {
+                // Aquí es donde conectas con tu servicio de aplicación
+                // await CustomerService.CreateAsync(newClient);
+                
+                Snackbar.Add($"Client {newClient.Name} added to the system.", Severity.Success);
+                
+                // Opcional: Recargar la lista de la tabla
+                // await LoadClients();
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add("Error saving client: " + ex.Message, Severity.Error);
+            }
+        }
+    }
+}

@@ -1,5 +1,7 @@
 ﻿@* Components/Clients/ClientTable.razor *@
 @using WorkshopAdmin.Shared.Dtos.Customers
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
 
 <MudDataGrid T="CustomerDto"
              Items="@_clients"
@@ -81,7 +83,10 @@
                     <MudIconButton Icon="@Icons.Material.Filled.History" Size="Size.Small" Class="text-slate-400 hover:text-indigo-900" />
                 </MudTooltip>
                 <MudTooltip Text="Edit Client">
-                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Primary" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                   Size="Size.Small"
+                                   Color="Color.Primary"
+                                   OnClick="@(() => OpenEditDialog(context.Item))" />
                 </MudTooltip>
                 <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Size="Size.Small" />
             </CellTemplate>
@@ -141,4 +146,50 @@
             return true;
         return false;
     };
+    private async Task OpenEditDialog(CustomerDto client)
+    {
+        // 1. Mapeamos el DTO al modelo de edición
+        var updateRequest = new UpdateCustomerRequest
+        {
+            Id = client.Id,
+            Name = client.Name,
+            Email = client.Email,
+            Phone = client.Phone,
+            IsActive = client.IsActive
+        };
+
+        var parameters = new DialogParameters<EditCustomerDialog>
+        {
+            { x => x.InitialData, updateRequest }
+        };
+
+        var options = new DialogOptions
+        {
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true,
+            CloseButton = true,
+            BackdropClick = false // Evita que se cierre por error al dar click fuera
+        };
+
+        var dialog = await DialogService.ShowAsync<EditCustomerDialog>(" ", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled && result.Data is UpdateCustomerRequest updated)
+        {
+            // 2. Aquí llamarías a tu servicio: await CustomerService.UpdateAsync(updated);
+
+            // 3. Actualizamos la lista local para que la UI refleje el cambio inmediatamente
+            var clientInList = _clients.FirstOrDefault(c => c.Id == updated.Id);
+            if (clientInList != null)
+            {
+                clientInList.Name = updated.Name;
+                clientInList.Email = updated.Email;
+                clientInList.Phone = updated.Phone;
+                clientInList.IsActive = updated.IsActive;
+                
+                Snackbar.Add("Cliente actualizado correctamente", Severity.Success);
+                StateHasChanged(); // Forzamos el renderizado del DataGrid
+            }
+        }
+    }
 }

@@ -1,0 +1,82 @@
+﻿@using WorkshopAdmin.Shared.Dtos.Customers
+@* Asegúrate de tener este namespace para los iconos y componentes *@
+@using MudBlazor
+
+<MudDialog Class="custom-industrial-dialog">
+    <TitleContent >
+        <div class="d-flex align-center gap-3 py-2 px-1">
+            <MudIcon Icon="@Icons.Material.Filled.PersonAdd" Style="color: white;"  />
+            <MudText Typo="Typo.h6" Class="font-bold text-white uppercase tracking-tighter">Add New Customer</MudText>
+        </div>
+    </TitleContent>
+    <DialogContent>
+        <MudForm @ref="_form" @bind-IsValid="_isValid">
+            <MudStack Spacing="4" Class="mt-2">
+                @* Campo: Name *@
+                <MudTextField T="string"
+                              Label="FULL NAME *"
+                              @bind-Value="_model.Name"
+                              Required="true"
+                              RequiredError="The name is mandatory for the audit trail."
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              Adornment="Adornment.End"
+                              AdornmentIcon="@Icons.Material.Filled.Badge" />
+
+                <MudGrid Spacing="2">
+                    @* Campo: Email *@
+                    <MudItem xs="12" sm="6">
+                        <MudTextField T="string"
+                                      Label="EMAIL ADDRESS"
+                                      @bind-Value="_model.Email"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Adornment="Adornment.End"
+                                      AdornmentIcon="@Icons.Material.Filled.Email" />
+                    </MudItem>
+                    @* Campo: Phone *@
+                    <MudItem xs="12" sm="6">
+                        <MudTextField T="string"
+                                      Label="PHONE NUMBER"
+                                      @bind-Value="_model.Phone"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Adornment="Adornment.End"
+                                      AdornmentIcon="@Icons.Material.Filled.Phone" />
+                    </MudItem>
+                </MudGrid>
+            </MudStack>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <div class="px-4 pb-4 d-flex gap-2 w-100 justify-end">
+            <MudButton OnClick="Cancel"
+                       Variant="Variant.Text"
+                       Class="px-6">Cancel</MudButton>
+            <MudButton OnClick="Submit"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       Disabled="@(!_isValid)"
+                       Class="px-8 font-bold shadow-none">Save Client</MudButton>
+        </div>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    // CORRECCIÓN: Usar IMudDialogInstance con la 'I'
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+    
+    // Modelo solicitado
+    private CreateCustomerRequest _model = new();
+    private MudForm _form = default!;
+    private bool _isValid;
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private void Submit()
+    {
+        // Al cerrar, devolvemos el objeto _model ya lleno
+        MudDialog.Close(DialogResult.Ok(_model));
+    }
+}

@@ -1,0 +1,133 @@
+﻿@using WorkshopAdmin.Shared.Dtos.Customers
+@using MudBlazor
+
+<MudDialog Class="custom-industrial-dialog">
+    <TitleContent>
+        @* Encabezado con estilo industrial oscuro del HTML *@
+        <div class="d-flex align-center gap-4 py-3 px-1">
+            <div class="pa-3 rounded-lg" style="background-color: rgba(255,255,255,0.15);">
+                <MudIcon Icon="@Icons.Material.Filled.Edit" Color="Color.Inherit" Size="Size.Large" />
+            </div>
+            <div>
+                <MudText Typo="Typo.h6" Class="font-bold text-white uppercase tracking-tight">Editar Cliente</MudText>
+                <MudText Typo="Typo.caption" Class="text-white-50">Actualice la información técnica del cliente</MudText>
+            </div>
+        </div>
+    </TitleContent>
+    <DialogContent>
+        <MudForm @ref="_form" @bind-IsValid="_isValid" Class="pt-4">
+            <MudStack Spacing="4">
+                @* Nombre Completo *@
+                <div class="space-y-1">
+                    <MudText Typo="Typo.caption" Class="font-bold uppercase text-slate-500 d-flex align-center gap-1">
+                        <MudIcon Icon="@Icons.Material.Filled.Badge" Size="Size.Small" /> NOMBRE COMPLETO
+                    </MudText>
+                    <MudTextField T="string" 
+                                  @bind-Value="_model.Name" 
+                                  Required="true"
+                                  Variant="Variant.Outlined" 
+                                  Margin="Margin.Dense"
+                                  Placeholder="Ingrese nombre del cliente" />
+                </div>
+
+                <MudGrid Spacing="2">
+                    <MudItem xs="12" sm="6">
+                        <MudText Typo="Typo.caption" Class="font-bold uppercase text-slate-500 d-flex align-center gap-1">
+                            <MudIcon Icon="@Icons.Material.Filled.Email" Size="Size.Small" /> EMAIL
+                        </MudText>
+                        <MudTextField T="string" 
+                                      @bind-Value="_model.Email" 
+                                      Variant="Variant.Outlined" 
+                                      Margin="Margin.Dense"
+                                      Placeholder="correo@ejemplo.com" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudText Typo="Typo.caption" Class="font-bold uppercase text-slate-500 d-flex align-center gap-1">
+                            <MudIcon Icon="@Icons.Material.Filled.PhoneIphone" Size="Size.Small" /> TELÉFONO
+                        </MudText>
+                        <MudTextField T="string" 
+                                      @bind-Value="_model.Phone" 
+                                      Variant="Variant.Outlined" 
+                                      Margin="Margin.Dense"
+                                      Placeholder="+XX XXX XXX XXX" />
+                    </MudItem>
+                </MudGrid>
+
+                @* Switch de Estado de Cuenta *@
+                <div class="mt-4 pa-4 rounded-lg border border-slate-100 d-flex align-center justify-space-between bg-slate-50">
+                    <div class="d-flex align-center gap-3">
+                        <div class="pa-2 rounded-full bg-indigo-50">
+                            <MudIcon Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Primary" Size="Size.Small" />
+                        </div>
+                        <div>
+                            <MudText Typo="Typo.body2" Class="font-bold">Estado de la Cuenta</MudText>
+                            <MudText Typo="Typo.caption" Class="text-slate-500">Define si el cliente puede solicitar servicios</MudText>
+                        </div>
+                    </div>
+                    <MudSwitch @bind-Value="_model.IsActive" Color="Color.Primary" />
+                </div>
+            </MudStack>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <div class="px-6 pb-6 d-flex gap-3 w-100 justify-end">
+            <MudButton OnClick="Cancel" Variant="Variant.Text" Class="px-8 py-2 font-bold text-slate-500">
+                Cancelar
+            </MudButton>
+            <MudButton OnClick="Submit" 
+                       Variant="Variant.Filled" 
+                       Color="Color.Primary" 
+                       Disabled="@(!_isValid)"
+                       StartIcon="@Icons.Material.Filled.Save"
+                       Class="px-8 py-2 font-bold shadow-md">
+                Actualizar Cliente
+            </MudButton>
+        </div>
+    </DialogActions>
+   
+</MudDialog>
+
+<style>
+    .industrial-dialog .mud-dialog-title {
+        background-color: #1a237e; /* Primary Container color */
+        color: white;
+        padding: 0 24px;
+    }
+    .industrial-gradient-bar {
+        height: 4px;
+        background: linear-gradient(90deg, #000666 0%, #4c56af 50%, #5c1800 100%);
+    }
+    .text-white-50 { color: rgba(255,255,255,0.7); }
+</style>
+
+@code {
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = default!;
+
+    // Recibimos el objeto para editar
+    [Parameter] public UpdateCustomerRequest InitialData { get; set; } = new();
+
+    private UpdateCustomerRequest _model = new();
+    private MudForm _form = default!;
+    private bool _isValid;
+
+    protected override void OnInitialized()
+    {
+        // Clonamos los datos para no modificar la lista original hasta que se guarde
+        _model = new UpdateCustomerRequest
+        {
+            Id = InitialData.Id,
+            Name = InitialData.Name,
+            Email = InitialData.Email,
+            Phone = InitialData.Phone,
+            IsActive = InitialData.IsActive
+        };
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private void Submit()
+    {
+        if (_isValid)
+            MudDialog.Close(DialogResult.Ok(_model));
+    }
+}
