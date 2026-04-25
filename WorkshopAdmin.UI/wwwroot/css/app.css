@@ -215,3 +215,20 @@ code {
 .text-white-50 {
     color: rgba(255,255,255,0.7);
 }
+.mud-table-cell.d-flex {
+    min-height: 52px; /* Esta es la altura estándar de una fila con 2 líneas de texto */
+    display: flex !important;
+    height: 100%;
+}
+
+/* 2. Alineamos el contenido de las celdas normales para que coincidan */
+.mud-table-cell {
+    padding-top: 12px !important;
+    padding-bottom: 12px !important;
+}
+
+/* 3. Ajuste para que el Header de Actions no se mueva */
+.mud-table-head .mud-table-cell {
+    height: 48px;
+    vertical-align: middle;
+}
