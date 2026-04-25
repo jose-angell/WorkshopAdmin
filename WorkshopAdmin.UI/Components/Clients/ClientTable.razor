@@ -77,7 +77,11 @@
         </PropertyColumn>
 
         @* Acciones con iconos de la interfaz industrial *@
-        <TemplateColumn CellClass="d-flex justify-end gap-1">
+        <TemplateColumn Title="Actions"
+                        HeaderClass="justify-end pr-4"
+                        CellClass="d-flex justify-end align-center gap-1 py-6"
+                        Sortable="false"
+                        Filterable="false">
             <CellTemplate>
                 <MudTooltip Text="View History">
                     <MudIconButton Icon="@Icons.Material.Filled.History" Size="Size.Small" Class="text-slate-400 hover:text-indigo-900" />
@@ -88,7 +92,6 @@
                                    Color="Color.Primary"
                                    OnClick="@(() => OpenEditDialog(context.Item))" />
                 </MudTooltip>
-                <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Size="Size.Small" />
             </CellTemplate>
         </TemplateColumn>
     </Columns>
