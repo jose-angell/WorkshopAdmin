@@ -3,6 +3,7 @@ using WorkshopAdmin.Domain.Entities;
 using WorkshopAdmin.Domain.Exceptions;
 using WorkshopAdmin.Domain.Interfaces;
 using WorkshopAdmin.Shared.Dtos.Parts;
+using WorkshopAdmin.Shared.Enums;
 
 namespace WorkshopAdmin.Application.Services;
 
@@ -35,19 +36,35 @@ public class PartService : IPartService
 
     public async Task<PartDto> CreateAsync(CreatePartRequest request)
     {
-        // Lógica de Mapeo: CreatePartRequest -> Entidad Part (Domain)
+        // 1. Validaciones de Reglas de Negocio (Reglas de Integridad 3 y 4) [2]
+        if (request.Price < 0)
+            throw new DomainException("El precio de la refacción debe ser mayor o igual a cero.");
+
+
+        if (request.Stock < 0)
+            throw new DomainException("El inventario inicial no puede ser negativo.");
+
+        // 2. Lógica de Mapeo: CreatePartRequest -> Entidad Part (Domain)
         var part = new Part
         {
             Id = Guid.NewGuid(), // PK: uuid
+            Sku = request.Sku, // Código único / fabricante para búsquedas 
             Name = request.Name,
-            Price = request.Price, // numeric(12,2)
-            Stock = request.Stock, // Regla: stock >= 0
-            CreatedAt = DateTimeOffset.UtcNow // timestamptz
+            Brand = request.Brand,
+            PartCategoryId = request.CategoryId,
+            Price = request.Price, // tipo numeric(12,2)
+            Stock = request.Stock, // Existencia actual 
+            MinStock = request.MinStock, // Punto de reorden para alertas visuales
+            UnitOfMeasure = request.UnitOfMeasure ?? "Pz", // Unidad (Pz, L, Kg)
+            WarehouseLocation = request.WarehouseLocation, // Ubicación física 
+            IsActive = true, // Estado lógico inicial 
+            CreatedAt = DateTimeOffset.UtcNow // timestamptz automática 
         };
 
+        // 3. Persistencia mediante el repositorio
         await _repository.AddAsync(part);
 
-        // Retorna el PartDto resultante
+        // 4. Retorno del DTO (Shared) con la información procesada [7]
         return MapToDto(part);
     }
 
@@ -55,13 +72,22 @@ public class PartService : IPartService
     {
         var existingPart = await _repository.GetByIdAsync(request.Id);
         if (existingPart == null) throw new NotFoundException($"Parte con ID {request.Id} no encontrada.");
-        
+
+        if (request.Price < 0) throw new DomainException("El precio de la refacción debe ser mayor o igual a cero.");
+        if (request.Stock < 0) throw new DomainException("El inventario no puede ser negativo.");
+
+        existingPart.Sku = request.Sku;
         existingPart.Name = request.Name;
+        existingPart.Brand = request.Brand;
+        existingPart.PartCategoryId = request.CategoryId;
         existingPart.Price = request.Price;
         existingPart.Stock = request.Stock;
+        existingPart.MinStock = request.MinStock;
+        existingPart.UnitOfMeasure = request.UnitOfMeasure;
+        existingPart.WarehouseLocation = request.WarehouseLocation;
+        existingPart.IsActive = request.IsActive;
 
         await _repository.UpdateAsync(existingPart);
-        
     }
 
     public async Task DeleteAsync(Guid id)
@@ -74,9 +100,19 @@ public class PartService : IPartService
         new PartDto
         {
             Id = part.Id,
+            Sku = part.Sku, // Código único del fabricante 
             Name = part.Name,
+            Brand = part.Brand,
+            // Mapeo de Categoría [1]
+            CategoryId = part.PartCategoryId,
+            // Uso de la extensión para obtener el nombre técnico descriptivo 
+            CategoryName = part.PartCategoryId.ToFriendlyName(),
             Price = part.Price,
             Stock = part.Stock,
+            MinStock = part.MinStock, // Punto de reorden para alertas visuales [
+            UnitOfMeasure = part.UnitOfMeasure,
+            WarehouseLocation = part.WarehouseLocation ?? string.Empty,
+            IsActive = part.IsActive,
             CreatedAt = part.CreatedAt
         };
 }

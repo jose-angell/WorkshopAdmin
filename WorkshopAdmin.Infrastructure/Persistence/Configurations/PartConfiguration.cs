@@ -56,8 +56,7 @@ public class PartConfiguration : IEntityTypeConfiguration<Part>
 
         builder.Property(p => p.WarehouseLocation)
             .HasColumnName("warehouse_location")
-            .HasColumnType("varchar(100)")
-            .IsRequired();
+            .HasColumnType("varchar(100)");
 
         builder.Property(c => c.IsActive)
            .HasColumnName("is_active")
