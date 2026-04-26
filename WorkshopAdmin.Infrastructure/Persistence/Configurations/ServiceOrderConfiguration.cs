@@ -35,6 +35,11 @@ public class ServiceOrderConfiguration : IEntityTypeConfiguration<ServiceOrder>
             .HasColumnType("numeric(12,2)")
             .HasDefaultValue(0);
 
+        builder.Property(so => so.ServiceTypeId)
+            .HasColumnName("service_type_id")
+            .HasColumnType("smallint")
+            .IsRequired();
+
         builder.Property(so => so.CreatedAt)
             .HasColumnName("created_at")
             .HasColumnType("timestamptz")

@@ -14,9 +14,14 @@ public class EquipmentConfiguration : IEntityTypeConfiguration<Equipment>
 
         builder.Property(e => e.Id).HasColumnName("id").HasColumnType("uuid");
 
-        builder.Property(e => e.Type)
-            .HasColumnName("type")
-            .HasColumnType("varchar(50)")
+        builder.Property(p => p.EquipmentTypeId)
+            .HasColumnName("equipment_type_id")
+            .HasColumnType("smallint")
+            .IsRequired();
+
+        builder.Property(e => e.DescriptionType)
+            .HasColumnName("description_type")
+            .HasColumnType("varchar(100)")
             .IsRequired();
 
         builder.Property(e => e.Brand)
@@ -32,6 +37,11 @@ public class EquipmentConfiguration : IEntityTypeConfiguration<Equipment>
         builder.Property(e => e.TechnicalSpecifications)
             .HasColumnName("technical_specifications")
             .HasColumnType("varchar(2000)");
+
+        builder.Property(c => c.IsActive)
+           .HasColumnName("is_active")
+           .HasColumnType("boolean")
+           .HasDefaultValue(true);
 
         builder.Property(e => e.CreatedAt)
             .HasColumnName("created_at")

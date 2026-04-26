@@ -31,3 +31,16 @@ public enum ServiceOrderStatus : short
     /// </summary>
     Delivered = 4
 }
+
+public static class ServiceOrderStatusExtensions
+{
+    public static string ToFriendlyName(this ServiceOrderStatus status) => status switch
+    {
+        ServiceOrderStatus.Received => "Recibido",
+        ServiceOrderStatus.Diagnosing => "En Diagnóstico",
+        ServiceOrderStatus.Repairing => "En Reparación",
+        ServiceOrderStatus.Completed => "Servicio Completado",
+        ServiceOrderStatus.Delivered => "Equipo Entregado",
+        _ => status.ToString()
+    };
+}

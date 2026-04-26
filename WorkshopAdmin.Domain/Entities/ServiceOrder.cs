@@ -11,6 +11,7 @@ public class ServiceOrder
     public string? Diagnosis { get; set; } // Obligatorio antes de completar
     public ServiceOrderStatus Status { get; set; } // Enum (smallint) 
     public decimal LaborCost { get; set; } // numeric(12,2) 
+    public ServiceType ServiceTypeId { get; set; } // Enum: Preventive, Corrective, etc. [8]
     public DateTimeOffset CreatedAt { get; set; } // timestamptz 
     public DateTimeOffset UpdatedAt { get; set; } // timestamptz 
 
