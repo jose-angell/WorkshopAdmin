@@ -33,10 +33,12 @@ public class EquipmentService : IEquipmentService
         var equipment = new Equipment
         {
             Id = Guid.NewGuid(), // PK: uuid 
-            Type = request.Type,
+            EquipmentTypeId = request.TypeId,
+            DescriptionType = request.DescriptionType,
             Brand = request.Brand,
             Model = request.Model,
             TechnicalSpecifications = request.TechnicalSpecifications,
+            IsActive = true, // Nuevo equipo se asume activo por defecto
             CreatedAt = DateTimeOffset.UtcNow // timestamptz automático
         };
 
@@ -51,10 +53,12 @@ public class EquipmentService : IEquipmentService
         var existingEquipment = await _repository.GetByIdAsync(request.Id);
         if (existingEquipment == null) throw new NotFoundException($"Equipo con ID {request.Id} no encontrado.");
         
-        existingEquipment.Type = request.Type;
+        existingEquipment.EquipmentTypeId = request.TypeId;
+        existingEquipment.DescriptionType = request.DescriptionType;
         existingEquipment.Brand = request.Brand;
         existingEquipment.Model = request.Model;
         existingEquipment.TechnicalSpecifications = request.TechnicalSpecifications;
+        existingEquipment.IsActive = request.IsActive;
 
         await _repository.UpdateAsync(existingEquipment);
         
@@ -73,7 +77,9 @@ public class EquipmentService : IEquipmentService
         new EquipmentDto
         {
             Id = equipment.Id,
-            Type = equipment.Type,
+            TypeId = equipment.EquipmentTypeId,
+            TypeName = equipment.EquipmentTypeId.ToString(), 
+            DescriptionType = equipment.DescriptionType,
             Brand = equipment.Brand,
             Model = equipment.Model,
             TechnicalSpecifications = equipment.TechnicalSpecifications,
