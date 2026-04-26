@@ -48,6 +48,7 @@ public class ServiceOrderService : IServiceOrderService
             Status = ServiceOrderStatus.Received,
             // Cálculo: Inicialización de costo de mano de obra base (numeric 12,2) [6, 7]
             LaborCost = 0,
+            ServiceTypeId = request.ServiceTypeId,
             // Regla: La fecha de creación es obligatoria y automática [4]
             CreatedAt = DateTimeOffset.UtcNow,
             UpdatedAt = DateTimeOffset.UtcNow
@@ -63,11 +64,15 @@ public class ServiceOrderService : IServiceOrderService
             CustomerId = order.CustomerId,
             CustomerName = customer.Name,
             EquipmentId = order.EquipmentId,
-            EquipmentType = equipment.Type,
+            EquipmentTypeId = equipment.EquipmentTypeId,
+            EquipmentTypeName = equipment.EquipmentTypeId.ToString(),
+            EquipmentDescription = equipment.DescriptionType,
             EquipmentBrand = equipment.Brand,
             EquipmentModel = equipment.Model,
             FailureDescription = order.FailureDescription,
             Status = order.Status,
+            ServiceTypeId= order.ServiceTypeId,
+            ServiceTypeDescription = order.ServiceTypeId.ToString(),
             LaborCost = order.LaborCost,
             CreatedAt = order.CreatedAt,
             UpdatedAt = order.UpdatedAt
@@ -114,6 +119,8 @@ public class ServiceOrderService : IServiceOrderService
         if (request.LaborCost < 0)
             throw new DomainException("El costo de mano de obra debe ser mayor o igual a cero.");
 
+        order.EquipmentId = request.EquipmentId;
+        order.ServiceTypeId = request.ServiceTypeId; 
         order.FailureDescription = request.FailureDescription;
         order.LaborCost = request.LaborCost;
         order.UpdatedAt = DateTimeOffset.UtcNow; // Actualización de timestamptz [4]
@@ -212,11 +219,15 @@ public class ServiceOrderService : IServiceOrderService
         CustomerId = order.CustomerId,
         CustomerName = order.Customer?.Name ?? "N/A",
         EquipmentId = order.EquipmentId,
-        EquipmentType = order.Equipment?.Type ?? "N/A",
+        EquipmentTypeId = order.Equipment?.EquipmentTypeId ?? EquipmentType.Unknown,
+        EquipmentTypeName = order.Equipment?.EquipmentTypeId.ToString() ?? "N/A",
+        EquipmentDescription = order.Equipment?.DescriptionType ?? "N/A",
         EquipmentBrand = order.Equipment?.Brand ?? "N/A",
         EquipmentModel = order.Equipment?.Model ?? "N/A",
         FailureDescription = order.FailureDescription,
         Status = order.Status,
+        ServiceTypeId = order.ServiceTypeId,
+        ServiceTypeDescription = order.ServiceTypeId.ToString(),
         LaborCost = order.LaborCost,
         CreatedAt = order.CreatedAt,
         UpdatedAt = order.UpdatedAt,

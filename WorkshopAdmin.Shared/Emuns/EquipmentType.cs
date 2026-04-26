@@ -6,7 +6,8 @@ public enum EquipmentType : short
     HeavyDuty = 1,    // Camiones, remolques y transporte de carga
     Industrial = 2,   // Maquinaria fija, prensas o motores estacionarios
     PowerTool = 3,    // Herramientas eléctricas o neumáticas industriales
-    Agricultural = 4  // Tractores y maquinaria de campo
+    Agricultural = 4,  // Tractores y maquinaria de campo
+    Unknown = -1   // Valor por defecto para casos no especificados
 }
 
 public static class EquipmentTypeExtensions
@@ -18,6 +19,7 @@ public static class EquipmentTypeExtensions
         EquipmentType.Industrial => "Maquinaria Industrial / Fija",
         EquipmentType.PowerTool => "Herramienta Eléctrica / Neumática",
         EquipmentType.Agricultural => "Maquinaria Agrícola",
+        EquipmentType.Unknown => "Desconocido / Sin especificar",
         _ => type.ToString()
     };
 }
