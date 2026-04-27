@@ -1,0 +1,158 @@
+﻿@using MudBlazor
+@using WorkshopAdmin.Shared.Dtos.Parts
+
+<MudDataGrid T="PartDto"
+             Items="@PartsList"
+             Dense="true"
+             Hover="true"
+             Elevation="0"
+             Filterable="true"
+             QuickFilter="@_quickFilter"
+             RowsPerPage="5">
+
+    <Columns>
+
+        <!-- SKU / BRAND -->
+        <TemplateColumn Title="SKU / Brand">
+            <CellTemplate Context="context">
+                @{
+                    var item = context.Item;
+                }
+                <MudStack Spacing="0">
+                    <MudText Typo="Typo.caption">@item.Sku</MudText>
+                    <MudText Typo="Typo.body2">@item.Brand</MudText>
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+
+        <!-- NAME -->
+        <TemplateColumn Title="Part Name">
+            <CellTemplate Context="context">
+                @{
+                    var item = context.Item;
+                }
+                <MudText Class="fw-bold">@item.Name</MudText>
+            </CellTemplate>
+        </TemplateColumn>
+
+        <!-- CATEGORY -->
+        <TemplateColumn Title="Category">
+            <CellTemplate Context="context">
+                @{
+                    var item = context.Item;
+                }
+                <MudChip T="string" Size="Size.Small">
+                    @item.CategoryName
+                </MudChip>
+            </CellTemplate>
+        </TemplateColumn>
+
+        <!-- STOCK -->
+        <TemplateColumn Title="Stock" Align="Align.Center">
+            <CellTemplate Context="context">
+                @{
+                    var item = context.Item;
+                    var isLow = item.Stock <= item.MinStock;
+                }
+
+                <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.Center" Spacing="1">
+
+                    @if (isLow)
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.Warning" Color="Color.Error" Size="Size.Small" />
+                    }
+
+                    <MudText Color="@(isLow ? Color.Error : Color.Default)">
+                        @item.Stock
+                    </MudText>
+
+                    <MudText Typo="Typo.caption">
+                        @item.UnitOfMeasure
+                    </MudText>
+
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+
+        <!-- PRICE -->
+        <PropertyColumn Property="x => x.Price"
+                        Title="Price"
+                        Align="Align.Right"
+                        Format="C" />
+
+        <!-- LOCATION -->
+        <TemplateColumn Title="Location">
+            <CellTemplate Context="context">
+                @{
+                    var item = context.Item;
+                }
+                <MudChip T="string"
+                         StartIcon="@Icons.Material.Filled.LocationOn"
+                         Size="Size.Small">
+                    @item.WarehouseLocation
+                </MudChip>
+            </CellTemplate>
+        </TemplateColumn>
+
+        <!-- STATUS -->
+        <TemplateColumn Title="Status" Align="Align.Center">
+            <CellTemplate Context="context">
+                @{
+                    var item = context.Item;
+                }
+                <MudIcon Icon="@Icons.Material.Filled.Circle"
+                         Color="@(item.IsActive ? Color.Success : Color.Default)"
+                         Size="Size.Small" />
+            </CellTemplate>
+        </TemplateColumn>
+
+        <!-- ACTIONS -->
+        <TemplateColumn Title="Actions" Align="Align.Right">
+            <CellTemplate Context="context">
+                <MudStack Row Justify="Justify.FlexEnd">
+                    <MudIconButton Icon="@Icons.Material.Outlined.Edit" Size="Size.Small" />
+                    <MudIconButton Icon="@Icons.Material.Outlined.History" Size="Size.Small" />
+                    <MudIconButton Icon="@Icons.Material.Outlined.Inventory" Size="Size.Small" />
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+
+    </Columns>
+    <PagerContent>
+        <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="pa-3">
+
+            <!-- INFO -->
+            <MudText Typo="Typo.caption">
+                Showing @($"{_from}-{_to} of {PartsList.Count} items")
+            </MudText>
+
+            <!-- PAGER -->
+            <MudDataGridPager T="PartDto" />
+
+        </MudStack>
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+    private string _searchString = "";
+    
+    // Lógica de búsqueda rápida de MudBlazor
+    private Func<PartDto, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString)) return true;
+        if (x.Sku.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
+        if (x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
+        return false;
+    };
+
+    private List<PartDto> PartsList = new()
+    {
+        new PartDto { Sku = "#SKU-FLTR-001", Brand = "WIX Filters", Name = "Heavy Duty Oil Filter XL-500", CategoryName = "Consumables", Stock = 4, UnitOfMeasure = "Pz", Price = 185.00m, IsActive = true, MinStock = 5, WarehouseLocation = "WH-E/SAFE-1" },
+        new PartDto { Sku = "#SKU-BRK-4421", Brand = "Bosch", Name = "Ceramic Brake Pad Set - Rear", CategoryName = "Mechanical", Stock = 24, UnitOfMeasure = "Kits", Price = 342.99m, IsActive = false, MinStock = 5,  WarehouseLocation = "WH-E/BIN-09"  }
+    };
+    private int _currentPage = 0;
+    private int _rowsPerPage = 5;
+
+    private int _from => (_currentPage * _rowsPerPage) + 1;
+    private int _to => Math.Min((_currentPage + 1) * _rowsPerPage, PartsList.Count);
+}

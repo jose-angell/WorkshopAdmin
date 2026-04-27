@@ -1,0 +1,52 @@
+﻿@page "/inventory"
+@using WorkshopAdmin.UI.Components.Inventory
+@inject ISnackbar Snackbar
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="py-5">
+    @* Header Section *@
+    <div class="d-flex justify-space-between align-center mb-8">
+        <div>
+            <MudText Typo="Typo.h4" Class="font-black tracking-tighter" Style="color: #000666;">Inventory &amp; Parts</MudText>
+            <MudText Typo="Typo.body2" Class="text-slate-500">Manage component stock levels, pricing, and technical catalog.</MudText>
+        </div>
+        
+        @* Button Group *@
+        <div class="d-flex gap-3">
+            <MudButton Variant="Variant.Outlined"
+                        Color="Color.Primary"
+                        StartIcon="@Icons.Material.Filled.Description"
+                        Class="py-2 px-4 font-bold"
+                        Style="text-transform: none; border-radius: 4px; border-color: var(--slate-200); color: #000666;">
+                Create Report
+            </MudButton>
+            
+            <MudButton Variant="Variant.Filled"
+                        Color="Color.Primary"
+                        
+                        StartIcon="@Icons.Material.Filled.Add"
+                        Class="py-2 px-4 shadow-none font-bold"
+                        Style="text-transform: none; border-radius: 4px;">
+                Add New Part
+            </MudButton>
+        </div>
+    </div>
+    @* Statistics Grid *@
+    <InventoryStats />
+
+    <MudGrid>
+        @* Main Content (Table and Filters) *@
+        <MudItem xs="12" lg="12">
+            <InventoryFilters />
+            
+            @* Aquí va tu MudDataGrid de Inventario *@
+            <MudPaper Elevation="0" Class="border border-slate-200 overflow-hidden">
+                @* ... Tu componente MudDataGrid ... *@
+                    <InventoryTable/>
+            </MudPaper>
+        </MudItem>
+
+    </MudGrid>
+</MudContainer>
+@code {
+    // Aquí iría la lógica de apertura de diálogos y carga de datos
+}

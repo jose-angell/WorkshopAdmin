@@ -1,0 +1,152 @@
+﻿@using MudBlazor
+
+<MudGrid Class="mb-6">
+    @* Tarjeta Principal - Catalog Items *@
+    <MudItem xs="8" sm="4" md="3">
+        <MudPaper Elevation="1"
+                  Class="p-4 rounded-xl border d-flex flex-column"
+                  Style="background-color: var(--mud-palette-surface);">
+            <!-- TOP (icon + delta) -->
+            <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="mb-3">
+                <!-- ICON BADGE -->
+                <MudPaper Class="pa-2 rounded-lg d-flex"
+                          Style="background-color: var(--mud-palette-primary-light); color: var(--mud-palette-primary);">
+                    <MudIcon Icon="@Icons.Material.Filled.Inventory2" />
+                </MudPaper>
+                <!-- DELTA -->
+                    <MudChip T="string"
+                             Color="Color.Success"
+                             Variant="Variant.Filled"
+                             Size="Size.Small"
+                             Class="fw-bold">
+                        +12%
+                    </MudChip>
+            </MudStack>
+            <!-- LABEL -->
+            <MudText Typo="Typo.overline"
+                     Class="text-uppercase fw-bold"
+                     Style="color: var(--mud-palette-text-secondary);">
+                Total Parts
+            </MudText>
+            <MudText Typo="Typo.h5" Class="fw-bold">
+                2,842
+            </MudText>
+        </MudPaper> 
+    </MudItem>
+
+    @* Tarjeta Stock Alerts *@
+    <MudItem xs="8" sm="4" md="3">
+        <MudPaper Elevation="1"
+                  Class="p-4 rounded-xl border d-flex flex-column"
+                  Style="
+            background-color: var(--mud-palette-surface);
+            border-color: var(--mud-palette-error);
+            box-shadow: 0 0 0 2px rgba(186, 26, 26, 0.2);
+            ">
+            <!-- TOP (icon + status) -->
+            <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="mb-3">
+                <!-- ICON BADGE -->
+                <MudPaper Class="pa-2 rounded-lg d-flex "
+                          Style="
+                    background-color: rgba(102, 0, 0, 0.22);
+                    color: rgb(102 0 39);
+                    ">
+                    <MudIcon Icon="@Icons.Material.Filled.Warning"  Color="Color.Error" Class="opacity-60" />
+                </MudPaper>
+                <!-- STATUS -->
+                <MudChip T="string"
+                         Color="Color.Error"
+                         Variant="Variant.Filled"
+                         Size="Size.Small"
+                         Class="fw-bold">
+                    Action Required
+                </MudChip>
+            </MudStack>
+            <!-- LABEL -->
+            <MudText Typo="Typo.overline"
+                     Class="text-uppercase fw-bold"
+                     Style="color: var(--mud-palette-text-secondary);">
+                Low Stock Alerts
+            </MudText>
+            <!-- VALUE -->
+            <MudText Typo="Typo.h5" Class="fw-bold">
+                18
+            </MudText>
+        </MudPaper>
+    </MudItem>
+
+    @* Tarjeta Total Value *@
+    <MudItem xs="8" sm="4" md="3">
+        <MudPaper Elevation="1"
+                  Class="p-4 rounded-xl border d-flex flex-column"
+                  Style="background-color: var(--mud-palette-surface);">
+
+            <!-- TOP (solo icono) -->
+            <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="mb-3">
+
+                <!-- ICON BADGE -->
+                <MudPaper Class="pa-2 rounded-lg d-flex"
+                          Style="
+                    background-color: rgba(0, 102, 102, 0.1);
+                    color: rgb(0 102 64);
+                        ">
+                    <MudIcon Icon="@Icons.Material.Filled.AccountBalanceWallet" Class="opacity-60" />
+                </MudPaper>
+
+            </MudStack>
+
+            <!-- LABEL -->
+            <MudText Typo="Typo.overline"
+                     Class="text-uppercase fw-bold"
+                     Style="color: var(--mud-palette-text-secondary);">
+                Inventory Value
+            </MudText>
+
+            <!-- VALUE -->
+            <MudText Typo="Typo.h5" Class="fw-bold">
+                @TotalValue.ToString("C")
+            </MudText>
+
+        </MudPaper>
+    </MudItem>
+
+    @* Tarjeta In Transit *@
+
+    <MudItem xs="8" sm="4" md="3">
+        <MudPaper Elevation="1"
+                  Class="p-4 rounded-xl border d-flex flex-column"
+                  Style="background-color: var(--mud-palette-surface);">
+
+            <!-- TOP (icono) -->
+            <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="mb-3">
+
+                <!-- ICON BADGE -->
+                <MudPaper Class="pa-2 rounded-lg d-flex"
+                          Style="
+                    background-color: rgba(0, 102, 102, 0.1);
+                    color: var(--mud-palette-primary);
+                    ">
+                    <MudIcon Icon="@Icons.Material.Filled.ShoppingCart" />
+                </MudPaper>
+
+            </MudStack>
+
+            <!-- LABEL -->
+            <MudText Typo="Typo.overline"
+                     Class="text-uppercase fw-bold"
+                     Style="color: var(--mud-palette-text-secondary);">
+                Orders
+            </MudText>
+
+            <!-- VALUE -->
+            <MudText Typo="Typo.h5" Class="fw-bold">
+                10
+            </MudText>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@code {
+    
+    public decimal TotalValue { get; set; } = 142500;
+}
