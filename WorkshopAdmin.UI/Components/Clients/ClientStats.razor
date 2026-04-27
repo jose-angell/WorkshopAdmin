@@ -2,43 +2,91 @@
 <MudGrid Class="mb-6">
     @* Card: Customer Retention *@
     <MudItem xs="12" sm="6">
-        <MudPaper Elevation="0" Class="pa-6 border-t-2 border-slate-200 bg-white shadow-sm" Style="border-top-color: var(--mud-palette-primary) !important;">
-            <div class="d-flex justify-space-between align-start">
-                <div>
-                    <MudText Typo="Typo.caption" Class="uppercase font-bold tracking-widest text-slate-500" Style="font-size: 10px;">
-                        Customer Retention Rate
+        <MudPaper Elevation="1"
+                  Class="pa-6 rounded-lg border d-flex justify-space-between align-start"
+                  Style="background-color: var(--mud-palette-surface);">
+
+            <!-- LEFT CONTENT -->
+            <div>
+                <!-- LABEL -->
+                <MudText Typo="Typo.overline"
+                         Class="text-uppercase fw-bold mb-2"
+                         Style="color: var(--mud-palette-text-secondary);">
+                    New Clients (Monthly)
+                </MudText>
+
+                <!-- VALUE -->
+                <MudText Typo="Typo.h4"
+                         Class="fw-bold"
+                         Style="color: var(--mud-palette-primary);">
+                    +24
+                </MudText>
+
+                <!-- TREND -->
+                <MudStack Row AlignItems="AlignItems.Center" Spacing="1" Class="mt-1">
+                    <MudIcon Icon="@Icons.Material.Filled.TrendingUp"
+                             Color="Color.Success"
+                             Size="Size.Small" />
+
+                    <MudText Typo="Typo.caption"
+                             Class="fw-bold"
+                             Style="color: var(--mud-palette-success);">
+                        12% increase from last month
                     </MudText>
-                    <MudText Typo="Typo.h4" Class="font-black mt-1">94.2%</MudText>
-                </div>
-                <div class="pa-3 rounded bg-indigo-50">
-                    <MudIcon Icon="@Icons.Material.Filled.Loop" Style="color: #000666;" />
-                </div>
+                </MudStack>
             </div>
-            <div class="mt-4 d-flex align-center">
-                <MudIcon Icon="@Icons.Material.Filled.TrendingUp" Color="Color.Success" Size="Size.Small" Class="mr-1" />
-                <MudText Typo="Typo.caption" Class="font-bold text-green-600">+2.4% from last month</MudText>
-            </div>
+
+            <!-- RIGHT ICON -->
+            <MudPaper Class="pa-3 rounded d-flex"
+                      Style="
+                background-color: rgb(0 10 143 / 15%);
+                color: var(--mud-palette-primary);
+                ">
+                <MudIcon Icon="@Icons.Material.Filled.PersonAdd" />
+            </MudPaper>
+
         </MudPaper>
     </MudItem>
-
     @* Card: New Customers *@
     <MudItem xs="12" sm="6">
-        <MudPaper Elevation="0" Class="pa-6 border-t-2 border-slate-200 bg-white shadow-sm" Style="border-top-color: var(--mud-palette-secondary) !important;">
-            <div class="d-flex justify-space-between align-start">
-                <div>
-                    <MudText Typo="Typo.caption" Class="uppercase font-bold tracking-widest text-slate-500" Style="font-size: 10px;">
-                        New Clients (This Month)
-                    </MudText>
-                    <MudText Typo="Typo.h4" Class="font-black mt-1">12</MudText>
-                </div>
-                <div class="pa-3 rounded bg-slate-100">
-                    <MudIcon Icon="@Icons.Material.Filled.PersonAdd" Color="Color.Secondary" />
-                </div>
+        <MudPaper Elevation="1"
+                  Class="pa-6 rounded-lg border d-flex justify-space-between align-start"
+                  Style="background-color: var(--mud-palette-surface);">
+
+            <!-- LEFT CONTENT -->
+            <div style="width:100%">
+            
+                <!-- LABEL -->
+                <MudText Typo="Typo.overline"
+                         Class="text-uppercase fw-bold mb-2"
+                         Style="color: var(--mud-palette-text-secondary);">
+                    Service Retention
+                </MudText>
+
+                <!-- VALUE -->
+                <MudText Typo="Typo.h4"
+                         Class="fw-bold"
+                         Style="color: var(--mud-palette-primary);">
+                    88.4%
+                </MudText>
+
+                <!-- PROGRESS BAR -->
+                <MudProgressLinear Value="88.4"
+                                   Color="Color.Primary"
+                                   Class="mt-3"
+                                   Rounded="true" />
+
             </div>
-            <div class="mt-4 d-flex align-center">
-                <MudIcon Icon="@Icons.Material.Filled.History" Color="Color.Default" Size="Size.Small" Class="mr-1" />
-                <MudText Typo="Typo.caption" Class="text-slate-500">Target: 15 per month</MudText>
-            </div>
+
+            <!-- RIGHT ICON -->
+            <MudPaper Class="pa-3 rounded d-flex"
+                      Style="
+                background-color: rgb(0 10 143 / 15%);
+                color: var(--mud-palette-primary);
+                ">
+                <MudIcon Icon="@Icons.Material.Filled.Verified" />
+            </MudPaper>
+
         </MudPaper>
     </MudItem>
 </MudGrid>
