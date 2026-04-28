@@ -3,6 +3,7 @@ using WorkshopAdmin.Domain.Entities;
 using WorkshopAdmin.Domain.Exceptions;
 using WorkshopAdmin.Domain.Interfaces;
 using WorkshopAdmin.Shared.Dtos.Equipments;
+using WorkshopAdmin.Shared.Enums;
 
 namespace WorkshopAdmin.Application.Services;
 
@@ -78,7 +79,7 @@ public class EquipmentService : IEquipmentService
         {
             Id = equipment.Id,
             TypeId = equipment.EquipmentTypeId,
-            TypeName = equipment.EquipmentTypeId.ToString(), 
+            TypeName = equipment.EquipmentTypeId.ToFriendlyName(), 
             DescriptionType = equipment.DescriptionType,
             Brand = equipment.Brand,
             Model = equipment.Model,
