@@ -37,9 +37,9 @@
         <PropertyColumn Property="x => x.Phone" Title="Phone" />
 
         @* Órdenes Activas con indicador visual *@
-        <PropertyColumn Property="x => x.ActiveOrders" Title="Orders">
+        <PropertyColumn Property="x => x.ActiveOrders" Title="Orders" Align="Align.Center" Filterable="false">
             <CellTemplate>
-                <div class="d-flex align-center gap-2">
+                <div class="d-flex align-center gap-1">
                     <MudText Typo="Typo.body2" Class="font-bold">@context.Item.ActiveOrders</MudText>
                     @if (context.Item.ActiveOrders > 0)
                     {
@@ -55,14 +55,14 @@
                 @if (context.Item.IsActive)
                 {
                     <MudChip T="string" Color="Color.Success" Variant="Variant.Text" Size="Size.Small"
-                             Class="font-black px-2 uppercase tracking-tighter" Style="font-size: 10px; background-color: #f0fdf4;">
+                             Class="font-black px-2 uppercase font-bold tracking-tighter" Style="font-size: 12px; background-color: #f0fdf4;">
                         ACTIVE
                     </MudChip>
                 }
                 else
                 {
                     <MudChip T="string" Color="Color.Default" Variant="Variant.Text" Size="Size.Small"
-                             Class="font-black px-2 uppercase tracking-tighter" Style="font-size: 10px; background-color: #f1f5f9;">
+                             Class="font-black px-2 uppercase font-bold tracking-tighter" Style="font-size: 12px; background-color: #f1f5f9;">
                         INACTIVE
                     </MudChip>
                 }

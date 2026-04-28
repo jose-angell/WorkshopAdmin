@@ -1,5 +1,8 @@
 ﻿@page "/inventory"
+@using WorkshopAdmin.Shared.Dtos.Parts
 @using WorkshopAdmin.UI.Components.Inventory
+@using WorkshopAdmin.UI.Components.Clients
+@inject IDialogService DialogService
 @inject ISnackbar Snackbar
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="py-5">
@@ -22,7 +25,7 @@
             
             <MudButton Variant="Variant.Filled"
                         Color="Color.Primary"
-                        
+                       OnClick="OpenCreatePartDialog"
                         StartIcon="@Icons.Material.Filled.Add"
                         Class="py-2 px-4 shadow-none font-bold"
                         Style="text-transform: none; border-radius: 4px;">
@@ -48,5 +51,35 @@
     </MudGrid>
 </MudContainer>
 @code {
-    // Aquí iría la lógica de apertura de diálogos y carga de datos
+    private async Task OpenCreatePartDialog()
+    {
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true,
+            CloseButton = true
+        };
+
+        var dialog = await DialogService.ShowAsync<CreatePartDialog>(" ", options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled && result.Data is CreatePartRequest newClient)
+        {
+            try
+            {
+                // Aquí es donde conectas con tu servicio de aplicación
+                // await CustomerService.CreateAsync(newClient);
+                
+                Snackbar.Add($"Part {newClient.Name} added to the system.", Severity.Success);
+                
+                // Opcional: Recargar la lista de la tabla
+                // await LoadClients();
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add("Error saving part: " + ex.Message, Severity.Error);
+            }
+        }
+    }
 }

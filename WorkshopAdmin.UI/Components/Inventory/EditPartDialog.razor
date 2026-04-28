@@ -1,0 +1,217 @@
+﻿@using MudBlazor
+@using System.Globalization
+@using WorkshopAdmin.Shared.Dtos.Parts
+@using WorkshopAdmin.Shared.Enums
+
+<MudDialog Class="custom-industrial-dialog">
+
+    <!-- HEADER -->
+    <TitleContent>
+        <div class="d-flex align-center gap-3 py-2 px-1">
+            <MudIcon Icon="@Icons.Material.Filled.Inventory2" Style="color: white;" />
+            <MudText Typo="Typo.h6" Class="font-bold text-white uppercase tracking-tighter">
+                Add New Part
+            </MudText>
+        </div>
+    </TitleContent>
+
+    <!-- CONTENT -->
+    <DialogContent>
+        <MudForm @ref="_form" @bind-IsValid="_isValid">
+
+            <MudStack Spacing="4" Class="mt-2">
+
+                <!-- SKU -->
+                <MudTextField T="string"
+                              Label="SKU *"
+                              @bind-Value="_model.Sku"
+                              Required="true"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              Adornment="Adornment.End"
+                              AdornmentIcon="@Icons.Material.Filled.QrCode" />
+
+                <!-- NAME -->
+                <MudTextField T="string"
+                              Label="PART NAME *"
+                              @bind-Value="_model.Name"
+                              Required="true"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              Adornment="Adornment.End"
+                              AdornmentIcon="@Icons.Material.Filled.Build" />
+
+                <!-- BRAND -->
+                <MudTextField T="string"
+                              Label="BRAND *"
+                              @bind-Value="_model.Brand"
+                              Required="true"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              Adornment="Adornment.End"
+                              AdornmentIcon="@Icons.Material.Filled.Business" />
+
+                <!-- CATEGORY + UNIT -->
+                <MudGrid Spacing="2">
+
+                    <MudItem xs="12" sm="6">
+                        <MudSelect T="PartCategory"
+                                   Label="CATEGORY *"
+                                   @bind-Value="_model.CategoryId"
+                                   Required="true"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense">
+                            @foreach (var category in Enum.GetValues<PartCategory>())
+                            {
+                                <MudSelectItem Value="@category">
+                                    @category.ToFriendlyName()
+                                </MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+
+                    <MudItem xs="12" sm="6">
+                        
+                        <MudNumericField T="decimal"
+                                         Label="UNIT PRICE ($) *"
+                                         @bind-Value="_model.Price"
+                                         Min="0"
+                                         Required="true"
+                                         Immediate="true"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         Adornment="Adornment.Start"
+                                         AdornmentText="$"
+                                         HelperText="Value must be ≥ 0"
+                                         Culture="@CultureInfo.GetCultureInfo("es-MX")"
+                                         Error="@(_model.Price < 0)" />
+                    </MudItem>
+                   
+                </MudGrid>
+
+                <!-- PRICE + STOCK -->
+                <MudGrid Spacing="2">
+
+                    <MudItem xs="12" sm="4">
+                        <MudTextField T="string"
+                                      Label="UNIT OF MEASURE"
+                                      @bind-Value="_model.UnitOfMeasure"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Adornment="Adornment.End"
+                                      AdornmentIcon="@Icons.Material.Filled.Straighten" />
+                    </MudItem>
+
+                    <MudItem xs="12" sm="4">
+                        <MudNumericField T="int"
+                                         Label="INITIAL STOCK"
+                                         @bind-Value="_model.Stock"
+                                         Min="1"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense" />
+                    </MudItem>
+
+                    <MudItem xs="12" sm="4">
+                        <MudNumericField T="int"
+                                         Label="MIN STOCK"
+                                         @bind-Value="_model.MinStock"
+                                         Min="1"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         Color="Color.Error"
+                                         HelperText="Automatic reorder point" />
+                    </MudItem>
+
+                </MudGrid>
+
+                <!-- LOCATION -->
+                <MudTextField T="string"
+                              Label="WAREHOUSE LOCATION"
+                              @bind-Value="_model.WarehouseLocation"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              Adornment="Adornment.End"
+                              AdornmentIcon="@Icons.Material.Filled.LocationOn" />
+
+                @* Switch de Estado de Cuenta *@
+                <div class="mt-4 pa-4 rounded-lg border border-slate-100 d-flex align-center justify-space-between bg-slate-50">
+                    <div class="d-flex align-center gap-3">
+                        <div class="pa-2 rounded-full bg-indigo-50">
+                            <MudIcon Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Primary" Size="Size.Small" />
+                        </div>
+                        <div>
+                            <MudText Typo="Typo.body2" Class="font-bold">Parte Activa en Catalogo</MudText>
+                            <MudText Typo="Typo.caption" Class="text-slate-500">Permitir su uso en ordenes de servicio y compras</MudText>
+                        </div>
+                    </div>
+                    <MudSwitch @bind-Value="_model.IsActive" Color="Color.Primary" />
+                </div>
+            </MudStack>
+
+        </MudForm>
+    </DialogContent>
+
+    <!-- FOOTER -->
+    <DialogActions>
+        <div class="px-4 pb-4 d-flex gap-2 w-100 justify-end">
+
+            <MudButton OnClick="Cancel"
+                       Variant="Variant.Text"
+                       Class="px-6">
+                Cancel
+            </MudButton>
+
+            <MudButton OnClick="Submit"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       Disabled="@(!_isValid)"
+                       Class="px-8 font-bold shadow-none"
+                       StartIcon="@Icons.Material.Filled.Save">
+                Actualizar Part
+            </MudButton>
+
+        </div>
+    </DialogActions>
+
+</MudDialog>
+
+@code {
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = default!;
+
+    // Recibimos el objeto para editar
+    [Parameter] public UpdatePartRequest InitialData { get; set; } = new();
+
+    private UpdatePartRequest _model = new();
+    private MudForm _form = default!;
+    private bool _isValid;
+    private bool _initialized;
+    protected override void OnParametersSet()
+    {
+        if (_initialized || InitialData is null)
+            return;
+
+        _model = new UpdatePartRequest
+        {
+            Id = InitialData.Id,
+            Sku = InitialData.Sku,
+            Name = InitialData.Name,
+            Brand = InitialData.Brand,
+            CategoryId = InitialData.CategoryId,
+            Price = InitialData.Price,
+            UnitOfMeasure = InitialData.UnitOfMeasure,
+            Stock = InitialData.Stock,
+            MinStock = InitialData.MinStock,
+            WarehouseLocation = InitialData.WarehouseLocation,
+            IsActive = InitialData.IsActive
+        };
+        _initialized = true;
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private void Submit()
+    {
+        if (_isValid)
+            MudDialog.Close(DialogResult.Ok(_model));
+    }
+}
