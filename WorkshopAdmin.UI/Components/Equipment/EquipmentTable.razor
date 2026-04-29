@@ -1,6 +1,8 @@
 ﻿@using MudBlazor
 @using WorkshopAdmin.Shared.Dtos.Equipments
 @using WorkshopAdmin.Shared.Enums
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
 
 <MudPaper Class="pa-0">
 
@@ -65,7 +67,7 @@
                         <MudIconButton Icon="@Icons.Material.Filled.Edit"
                                        Color="Color.Primary"
                                        Size="Size.Small"
-                                       OnClick="@(() => OnEdit.InvokeAsync(context.Item))" />
+                                       OnClick="@(() => OpenEditDialog(context.Item))" />
 
                         <MudIconButton Icon="@Icons.Material.Filled.History"
                                        Size="Size.Small"
@@ -215,5 +217,57 @@
                 CreatedAt = DateTimeOffset.Now.AddDays(-15)
             }
         };
+    }
+
+    private async Task OpenEditDialog(EquipmentDto equipment)
+    {
+        // 1. Mapeamos el DTO al modelo de edición
+        var updateRequest = new UpdateEquipmentRequest
+        {
+            Id = equipment.Id,
+            TypeId = equipment.TypeId,
+            DescriptionType = equipment.DescriptionType,
+            Model = equipment.Model,
+            Brand = equipment.Brand,
+            TechnicalSpecifications = equipment.TechnicalSpecifications,
+            IsActive = equipment.IsActive
+        };
+
+        var parameters = new DialogParameters<EditEquipmentDialog>
+        {
+            { x => x.InitialData, updateRequest }
+        };
+
+        var options = new DialogOptions
+        {
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true,
+            CloseButton = true,
+            BackdropClick = false // Evita que se cierre por error al dar click fuera
+        };
+
+        var dialog = await DialogService.ShowAsync<EditEquipmentDialog>(" ", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled && result.Data is UpdateEquipmentRequest updated)
+        {
+            // 2. Aquí llamarías a tu servicio: await EquipmentService.UpdateAsync(updated);
+
+            // 3. Actualizamos la lista local para que la UI refleje el cambio inmediatamente
+            var equipmentInList = _equipment.FirstOrDefault(c => c.Id == updated.Id);
+            if (equipmentInList != null)
+            {
+                equipmentInList.DescriptionType = updated.DescriptionType;
+                equipmentInList.Model = updated.Model;
+                equipmentInList.Brand = updated.Brand;
+                equipmentInList.TechnicalSpecifications = updated.TechnicalSpecifications;
+                equipmentInList.TypeId = updated.TypeId;
+                equipmentInList.TypeName = updated.TypeId.ToFriendlyName();
+                equipmentInList.IsActive = updated.IsActive;
+                
+                Snackbar.Add("Equipo actualizado correctamente", Severity.Success);
+                StateHasChanged(); // Forzamos el renderizado del DataGrid
+            }
+        }
     }
 }
