@@ -1,0 +1,135 @@
+﻿@using MudBlazor
+@using WorkshopAdmin.Shared.Dtos.Equipments
+@using WorkshopAdmin.Shared.Enums
+
+<MudDialog Class="custom-industrial-dialog">
+
+    <!-- HEADER -->
+    <TitleContent>
+        <div class="d-flex align-center gap-3 py-2 px-1">
+            <MudIcon Icon="@Icons.Material.Filled.Inventory2" Style="color: white;" />
+            <MudText Typo="Typo.h6" Class="font-bold text-white uppercase tracking-tighter">
+                Add New Equipment
+            </MudText>
+        </div>
+    </TitleContent>
+
+    <!-- CONTENT -->
+    <DialogContent>
+        <MudForm @ref="_form" @bind-IsValid="_isValid">
+
+            <MudStack Spacing="4" Class="mt-2">
+
+                
+                <MudGrid Spacing="2">
+                    
+                        <MudItem xs="12" sm="6">
+                            <MudSelect T="EquipmentType"
+                                       Label="CATEGORY "
+                                       @bind-Value="_model.TypeId"
+                                       Required="true"
+                                       Variant="Variant.Outlined"
+                                       Margin="Margin.Dense">
+                                @foreach (var equipment in Enum.GetValues<EquipmentType>())
+                                {
+                                    <MudSelectItem Value="@equipment">
+                                        @equipment.ToFriendlyName()
+                                    </MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
+                        <MudItem xs="12" sm="6">
+                            <MudTextField T="string"
+                                          Label="Description "
+                                          @bind-Value="_model.DescriptionType"
+                                          Required="true"
+                                          Variant="Variant.Outlined"
+                                          Margin="Margin.Dense"
+                                          Adornment="Adornment.End"
+                                           />
+                        </MudItem>
+                   
+
+
+                    <MudItem xs="12" sm="6">
+                        <MudTextField T="string"
+                                      Label="Brand "
+                                      @bind-Value="_model.Brand"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Required="true"
+                                      Adornment="Adornment.End"
+                                      AdornmentIcon="@Icons.Material.Filled.BrandingWatermark" />
+                    </MudItem>
+
+                    <MudItem xs="12" sm="6">
+                        <MudTextField T="string"
+                                      Label="Model "
+                                      @bind-Value="_model.Model"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Required="true"
+                                      Adornment="Adornment.End"
+                                      AdornmentIcon="@Icons.Material.Filled.ModelTraining" />
+                    </MudItem>
+
+                    <MudItem xs="12" sm="12">
+                        <MudTextField T="string"
+                                      Label="Technical Specifications *"
+                                      @bind-Value="_model.TechnicalSpecifications"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Adornment="Adornment.End"
+                                      AdornmentIcon="@Icons.Material.Filled.Engineering"
+                                      Lines="5"
+                                      AutoGrow="true" />
+                    </MudItem>
+
+                </MudGrid>
+
+            </MudStack>
+
+        </MudForm>
+    </DialogContent>
+
+    <!-- FOOTER -->
+    <DialogActions>
+        <div class="px-4 pb-4 d-flex gap-2 w-100 justify-end">
+
+            <MudButton OnClick="Cancel"
+                       Variant="Variant.Text"
+                       Class="px-6">
+                Cancel
+            </MudButton>
+
+            <MudButton OnClick="Submit"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       Disabled="@(!_isValid)"
+                       Class="px-8 font-bold shadow-none"
+                       StartIcon="@Icons.Material.Filled.Save">
+                Save Part
+            </MudButton>
+
+        </div>
+    </DialogActions>
+
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+
+    private CreateEquipmentRequest _model = new();
+    private MudForm _form = default!;
+    private bool _isValid;
+
+    private void Cancel() => MudDialog.Cancel();
+
+    private void Submit()
+    {
+        MudDialog.Close(DialogResult.Ok(_model));
+    }
+
+  
+}

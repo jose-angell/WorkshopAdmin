@@ -64,14 +64,14 @@
         var dialog = await DialogService.ShowAsync<CreatePartDialog>(" ", options);
         var result = await dialog.Result;
 
-        if (!result.Canceled && result.Data is CreatePartRequest newClient)
+        if (!result.Canceled && result.Data is CreatePartRequest newPart)
         {
             try
             {
                 // Aquí es donde conectas con tu servicio de aplicación
-                // await CustomerService.CreateAsync(newClient);
+                // await CustomerService.CreateAsync(newPart);
                 
-                Snackbar.Add($"Part {newClient.Name} added to the system.", Severity.Success);
+                Snackbar.Add($"Part {newPart.Name} added to the system.", Severity.Success);
                 
                 // Opcional: Recargar la lista de la tabla
                 // await LoadClients();
