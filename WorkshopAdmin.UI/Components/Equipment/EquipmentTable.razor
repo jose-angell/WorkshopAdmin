@@ -1,0 +1,219 @@
+﻿@using MudBlazor
+@using WorkshopAdmin.Shared.Dtos.Equipments
+@using WorkshopAdmin.Shared.Enums
+
+<MudPaper Class="pa-0">
+
+    <MudDataGrid T="EquipmentDto"
+                 Items="_equipment"
+                 Dense="true"
+                 Hover="true"
+                 Bordered="false"
+                 Striped="false"
+                 Elevation="0">
+
+        <Columns>
+
+            <!-- TYPE & DESCRIPTION -->
+            <TemplateColumn Title="TYPE & DESCRIPTION">
+                <CellTemplate>
+                    <div class="d-flex flex-column">
+                        <MudText Typo="Typo.body2" Class="font-bold text-indigo-900">
+                            @context.Item.TypeName
+                        </MudText>
+                        <MudText Typo="Typo.caption" Class="text-secondary">
+                            @context.Item.DescriptionType
+                        </MudText>
+                    </div>
+                </CellTemplate>
+            </TemplateColumn>
+
+            <!-- BRAND -->
+            <PropertyColumn Property="x => x.Brand" Title="BRAND" />
+
+            <!-- MODEL -->
+            <PropertyColumn Property="x => x.Model" Title="MODEL" />
+
+            <!-- TECHNICAL SPECIFICATIONS -->
+            <TemplateColumn Title="TECHNICAL SPECIFICATIONS">
+                <CellTemplate>
+                    <MudPaper Class="pa-2 rounded-lg"
+                              Style="background:#f5f5f5;">
+                        <MudText Typo="Typo.caption">
+                            @context.Item.TechnicalSpecifications
+                        </MudText>
+                    </MudPaper>
+                </CellTemplate>
+            </TemplateColumn>
+
+            <!-- STATUS -->
+            <TemplateColumn Title="STATUS" Align="Align.Center">
+                <CellTemplate>
+                    <MudChip Size="Size.Small"
+                             Variant="Variant.Filled"
+                             Color="@GetStatusColor(context.Item)">
+                        @GetStatusText(context.Item)
+                    </MudChip>
+                </CellTemplate>
+            </TemplateColumn>
+
+            <!-- ACTIONS -->
+            <TemplateColumn Title="ACTIONS" Align="Align.Right">
+                <CellTemplate>
+                    <div class="d-flex justify-end gap-1">
+
+                        <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                       Color="Color.Primary"
+                                       Size="Size.Small"
+                                       OnClick="@(() => OnEdit.InvokeAsync(context.Item))" />
+
+                        <MudIconButton Icon="@Icons.Material.Filled.History"
+                                       Size="Size.Small"
+                                       OnClick="@(() => OnHistory.InvokeAsync(context.Item))" />
+
+                        <MudIconButton Icon="@Icons.Material.Filled.Settings"
+                                       Size="Size.Small"
+                                       OnClick="@(() => OnManage.InvokeAsync(context.Item))" />
+
+                    </div>
+                </CellTemplate>
+            </TemplateColumn>
+
+        </Columns>
+
+        <!-- EMPTY -->
+        <NoRecordsContent>
+            <MudText Class="pa-4">No equipment found</MudText>
+        </NoRecordsContent>
+
+    </MudDataGrid>
+
+    <!-- FOOTER / PAGINATION -->
+    <div class="d-flex justify-space-between align-center pa-4">
+
+        <MudText Typo="Typo.caption">
+            Showing @GetRangeText()
+        </MudText>
+
+        <MudPagination Count="TotalPages"
+                       @bind-Selected="_page"
+                       OnSelectedChanged="OnPageChanged"
+                       Size="Size.Small" />
+
+    </div>
+
+</MudPaper>
+
+@code {
+
+    [Parameter] public IEnumerable<EquipmentDto> _equipment { get; set; } = new List<EquipmentDto>();
+
+    [Parameter] public int TotalItems { get; set; }
+    [Parameter] public int PageSize { get; set; } = 10;
+
+    [Parameter] public EventCallback<int> OnPage { get; set; }
+
+    [Parameter] public EventCallback<EquipmentDto> OnEdit { get; set; }
+    [Parameter] public EventCallback<EquipmentDto> OnHistory { get; set; }
+    [Parameter] public EventCallback<EquipmentDto> OnManage { get; set; }
+
+    private int _page = 1;
+
+    private int TotalPages => (int)Math.Ceiling((double)TotalItems / PageSize);
+
+    private Task OnPageChanged(int page)
+    {
+        _page = page;
+        return OnPage.InvokeAsync(page);
+    }
+
+    private string GetRangeText()
+    {
+        var start = ((_page - 1) * PageSize) + 1;
+        var end = Math.Min(_page * PageSize, TotalItems);
+
+        return $"{start} to {end} of {TotalItems} entries";
+    }
+
+    private Color GetStatusColor(EquipmentDto item)
+    {
+        if (!item.IsActive)
+            return Color.Error;
+
+        return Color.Success;
+    }
+
+    private string GetStatusText(EquipmentDto item)
+    {
+        if (!item.IsActive)
+            return "Decommissioned";
+
+        return "Active";
+    }
+    protected override void OnInitialized()
+    {
+        _equipment = new List<EquipmentDto>()
+        {
+            new()
+            {
+                Id = Guid.NewGuid(),
+                TypeId = EquipmentType.Industrial,
+                TypeName = EquipmentType.Industrial.ToFriendlyName(),
+                DescriptionType = "Heavy-duty assembly tool",
+                Brand = "Ingersoll Rand",
+                Model = "2235TiMAX",
+                TechnicalSpecifications = "Max Torque: 1,350 ft-lb; Weight: 4.6 lbs; Air Consumption: 6 cfm",
+                IsActive = true,
+                CreatedAt = DateTimeOffset.Now.AddDays(-10)
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                TypeId = EquipmentType.Agricultural,
+                TypeName = EquipmentType.Agricultural.ToFriendlyName(),
+                DescriptionType = "Metalworking precision tool",
+                Brand = "Precision Matched",
+                Model = "PM-1236",
+                TechnicalSpecifications = "12\" Swing; 36\" Center; 1.5HP Motor; D1-4 Camlock Spindle",
+                IsActive = true,
+                CreatedAt = DateTimeOffset.Now.AddDays(-30)
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                TypeId = EquipmentType.PowerTool,
+                TypeName = EquipmentType.PowerTool.ToFriendlyName(),
+                DescriptionType = "Fabrication machinery",
+                Brand = "Sunex Tools",
+                Model = "SUN5720",
+                TechnicalSpecifications = "20-Ton Capacity; H-Frame Design; Adjustable Bed; Floor Mount",
+                IsActive = true,
+                CreatedAt = DateTimeOffset.Now.AddDays(-5)
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                TypeId = EquipmentType.LightVehicle,
+                TypeName = EquipmentType.LightVehicle.ToFriendlyName(),
+                DescriptionType = "Vehicle electronic analyzer",
+                Brand = "Autel",
+                Model = "MaxiSys Elite",
+                TechnicalSpecifications = "WiFi/Bluetooth; 9.7\" Retina; OE-Level Coverage; 2GB RAM",
+                IsActive = false,
+                CreatedAt = DateTimeOffset.Now.AddDays(-60)
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                TypeId = EquipmentType.Unknown,
+                TypeName = EquipmentType.Unknown.ToFriendlyName(),
+                DescriptionType = "Electrical diagnostic tool",
+                Brand = "Midtronics",
+                Model = "MDX-650",
+                TechnicalSpecifications = "12V/24V Systems; Conductance Technology; Digital Display",
+                IsActive = true,
+                CreatedAt = DateTimeOffset.Now.AddDays(-15)
+            }
+        };
+    }
+}
