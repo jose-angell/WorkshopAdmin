@@ -20,6 +20,7 @@ public class ServiceOrderDto
 
     // Información de la Orden
     public string FailureDescription { get; set; } = string.Empty;
+    public string? Diagnosis { get; set; } 
     public ServiceOrderStatus Status { get; set; } // Enum (0-4)
     public decimal LaborCost { get; set; }
     public decimal TotalCost { get; set; } // Calculado: Σ refacciones + mano de obra

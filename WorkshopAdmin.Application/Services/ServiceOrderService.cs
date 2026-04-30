@@ -122,6 +122,7 @@ public class ServiceOrderService : IServiceOrderService
         order.EquipmentId = request.EquipmentId;
         order.ServiceTypeId = request.ServiceTypeId; 
         order.FailureDescription = request.FailureDescription;
+        order.Diagnosis = request.Diagnosis;
         order.LaborCost = request.LaborCost;
         order.UpdatedAt = DateTimeOffset.UtcNow; // Actualización de timestamptz [4]
 
@@ -225,6 +226,7 @@ public class ServiceOrderService : IServiceOrderService
         EquipmentBrand = order.Equipment?.Brand ?? "N/A",
         EquipmentModel = order.Equipment?.Model ?? "N/A",
         FailureDescription = order.FailureDescription,
+        Diagnosis = order.Diagnosis,
         Status = order.Status,
         ServiceTypeId = order.ServiceTypeId,
         ServiceTypeDescription = order.ServiceTypeId.ToFriendlyName(),

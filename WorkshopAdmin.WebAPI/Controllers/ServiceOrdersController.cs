@@ -89,7 +89,7 @@ public class ServiceOrdersController : ControllerBase
     /// No permite modificar órdenes en estado distinto a 'Diagnosting' [7].
     /// </summary>
     [HttpPatch("{id:guid}/diagnosis")]
-    public async Task<IActionResult> UpdateLaborCost(Guid id, [FromBody] string diagnosis)
+    public async Task<IActionResult> UpdateDiagnosis(Guid id, [FromBody] string diagnosis)
     {
         await _serviceOrderService.UpdateDiagnosisAsync(id, diagnosis);
         return NoContent();
