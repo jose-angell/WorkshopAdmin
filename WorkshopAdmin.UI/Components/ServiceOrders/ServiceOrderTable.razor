@@ -1,0 +1,313 @@
+﻿@using MudBlazor
+@using WorkshopAdmin.Shared.Dtos.ServiceOrders
+@using WorkshopAdmin.Shared.Enums
+
+<MudPaper Elevation="0" Class="rounded-xl border">
+
+    <MudDataGrid T="ServiceOrderDto"
+                 Items="@ServiceOrders"
+                 Dense="true"
+                 Hover="true"
+                 Filterable="true"
+                 QuickFilter="@_quickFilter"
+                 RowsPerPage="8"
+                 RowClassFunc="RowClass">
+
+        <Columns>
+
+            <!-- ID + FECHA -->
+            <TemplateColumn Title="ID / Fecha">
+                <CellTemplate Context="context">
+                    @{
+                        var item = context.Item;
+                    }
+
+                    <MudStack Spacing="0">
+                        <MudText Class="fw-bold"
+                                 Style="font-family: monospace; color: var(--mud-palette-primary);">
+                            #ORD-@item.Id.ToString()[..6]
+                        </MudText>
+
+                        <MudText Typo="Typo.caption"
+                                 Style="color: var(--mud-palette-text-secondary);">
+                            @item.CreatedAt.ToLocalTime().ToString("dd MMM yyyy - hh:mm tt")
+                        </MudText>
+                    </MudStack>
+                </CellTemplate>
+            </TemplateColumn>
+
+            <!-- CLIENTE -->
+            <TemplateColumn Title="Cliente" Filterable="true">
+                <CellTemplate Context="context">
+                    <MudText Class="fw-bold"
+                             Style="color: var(--mud-palette-primary-dark);">
+                        @context.Item.CustomerName
+                    </MudText>
+                </CellTemplate>
+            </TemplateColumn>
+
+            <!-- EQUIPO -->
+            <TemplateColumn Title="Equipo">
+                <CellTemplate Context="context">
+                    @{
+                        var item = context.Item;
+                    }
+
+                    <MudText Typo="Typo.body2" Class="fw-bold">
+                        @item.EquipmentBrand @item.EquipmentModel
+                    </MudText>
+
+                    <MudText Typo="Typo.caption">
+                        @item.EquipmentTypeName
+                    </MudText>
+                </CellTemplate>
+            </TemplateColumn>
+
+            <!-- FALLA -->
+            <TemplateColumn Title="Falla">
+                <CellTemplate Context="context">
+                    <MudText Typo="Typo.body2"
+                             Class="text-truncate"
+                             Style="max-width: 220px;">
+                        @context.Item.FailureDescription
+                    </MudText>
+                </CellTemplate>
+            </TemplateColumn>
+
+            <!-- STATUS -->
+            <TemplateColumn Title="Estado">
+                <CellTemplate Context="context">
+                    @{
+                        var status = context.Item.Status;
+                        var (bg, color) = GetStatusStyle(status);
+                    }
+
+                    <MudChip T="string"
+                             Size="Size.Small"
+                             Class="fw-bold text-uppercase"
+                             Style=$"background:{bg}; color:{color}; letter-spacing:0.5px;">
+                        @status.ToFriendlyName()
+                    </MudChip>
+                </CellTemplate>
+            </TemplateColumn>
+
+            <!-- TOTAL -->
+            <TemplateColumn Title="Total" Align="Align.Right">
+                <CellTemplate Context="context">
+                    <MudText Class="fw-bold"
+                             Style="font-family: monospace;">
+                        @context.Item.TotalCost.ToString("C")
+                    </MudText>
+                </CellTemplate>
+            </TemplateColumn>
+            
+            <!-- ACCIONES -->
+            <TemplateColumn Title="Acciones" Align="Align.Right">
+                <CellTemplate Context="context">
+                    <MudStack Row Justify="Justify.FlexEnd"
+                              Class="action-group">
+
+                        <MudIconButton Icon="@Icons.Material.Filled.Visibility"
+                                       Size="Size.Small"
+                                       OnClick="@(() => OnView.InvokeAsync(context.Item))" />
+
+                        <MudIconButton Icon="@Icons.Material.Filled.AccountTree"
+                                       Size="Size.Small"
+                                       OnClick="@(() => OnTrace.InvokeAsync(context.Item))" />
+
+                        <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                       Size="Size.Small"
+                                       Color="Color.Primary"
+                                       OnClick="@(() => OnEdit.InvokeAsync(context.Item))" />
+
+                    </MudStack>
+                </CellTemplate>
+            </TemplateColumn>
+
+        </Columns>
+
+        <!-- PAGER -->
+        <PagerContent>
+            <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="pa-3">
+
+                <MudText Typo="Typo.caption">
+                    Mostrando @($"{_from}-{_to} de {Items?.Count() ?? 0} órdenes")
+                </MudText>
+
+                <MudDataGridPager T="ServiceOrderDto" />
+
+            </MudStack>
+        </PagerContent>
+
+    </MudDataGrid>
+
+</MudPaper>
+
+
+@code {
+
+    [Parameter] public IEnumerable<ServiceOrderDto> Items { get; set; } = Enumerable.Empty<ServiceOrderDto>();
+
+    
+    [Parameter] public EventCallback<ServiceOrderDto> OnView { get; set; }
+    [Parameter] public EventCallback<ServiceOrderDto> OnEdit { get; set; }
+    [Parameter] public EventCallback<ServiceOrderDto> OnTrace { get; set; }
+    private string _searchString = "";
+
+    private Func<ServiceOrderDto, bool> _quickFilter => x =>
+     {
+         if (string.IsNullOrWhiteSpace(_searchString)) return true;
+         if (x.CustomerName.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
+         if (x.EquipmentDescription.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
+         return false;
+     };
+
+    private int _from => 1;
+    private int _to => Items?.Count() ?? 0;
+    private string RowClass(ServiceOrderDto item, int index)
+       => "hover-row";
+
+    private (string bg, string text) GetStatusStyle(ServiceOrderStatus status) => status switch
+    {
+        ServiceOrderStatus.Received => ("#ECEFF1", "#37474F"),
+        ServiceOrderStatus.Diagnosing => ("#E3F2FD", "#1565C0"),
+        ServiceOrderStatus.Repairing => ("#FFF3E0", "#EF6C00"),
+        ServiceOrderStatus.Completed => ("#E8F5E9", "#2E7D32"),
+        ServiceOrderStatus.Delivered => ("#1A237E", "#FFFFFF"),
+        _ => ("#ECEFF1", "#37474F")
+    };
+   
+    public List<ServiceOrderDto> ServiceOrders = new()
+    {
+        new ServiceOrderDto
+        {
+            Id = Guid.NewGuid(),
+            CustomerId = Guid.NewGuid(),
+            CustomerName = "Juan Pérez",
+
+            EquipmentId = Guid.NewGuid(),
+            EquipmentTypeName = "Laptop",
+            EquipmentBrand = "Dell",
+            EquipmentModel = "XPS 15",
+            EquipmentDescription = "Laptop no enciende",
+
+            FailureDescription = "No responde al presionar power",
+            Diagnosis = "Falla en tarjeta madre",
+            Status = ServiceOrderStatus.Diagnosing,
+
+            LaborCost = 800,
+            TotalCost = 1500,
+
+            ServiceTypeDescription = "Reparación",
+            CreatedAt = DateTimeOffset.Now.AddDays(-2),
+            UpdatedAt = DateTimeOffset.Now.AddHours(-5),
+
+            OrderPart = new List<OrderPartDto?> { new(), new() }
+        },
+
+        new ServiceOrderDto
+        {
+            Id = Guid.NewGuid(),
+            CustomerId = Guid.NewGuid(),
+            CustomerName = "María López",
+
+            EquipmentId = Guid.NewGuid(),
+            EquipmentTypeName = "Smartphone",
+            EquipmentBrand = "Samsung",
+            EquipmentModel = "Galaxy S21",
+            EquipmentDescription = "Pantalla rota",
+
+            FailureDescription = "Golpe frontal",
+            Diagnosis = "Pantalla dañada",
+            Status = ServiceOrderStatus.Repairing,
+
+            LaborCost = 500,
+            TotalCost = 2200,
+
+            ServiceTypeDescription = "Cambio de pantalla",
+            CreatedAt = DateTimeOffset.Now.AddDays(-5),
+            UpdatedAt = DateTimeOffset.Now.AddHours(-2),
+
+            OrderPart = new List<OrderPartDto?> { new() }
+        },
+
+        new ServiceOrderDto
+        {
+            Id = Guid.NewGuid(),
+            CustomerId = Guid.NewGuid(),
+            CustomerName = "Carlos Hernández",
+
+            EquipmentId = Guid.NewGuid(),
+            EquipmentTypeName = "Tablet",
+            EquipmentBrand = "Apple",
+            EquipmentModel = "iPad Air",
+            EquipmentDescription = "No carga",
+
+            FailureDescription = "Puerto dañado",
+            Diagnosis = "Requiere cambio de puerto",
+            Status = ServiceOrderStatus.Completed,
+
+            LaborCost = 700,
+            TotalCost = 1800,
+
+            ServiceTypeDescription = "Reparación",
+            CreatedAt = DateTimeOffset.Now.AddDays(-10),
+            UpdatedAt = DateTimeOffset.Now.AddDays(-1),
+
+            OrderPart = new List<OrderPartDto?> { new(), new(), new() }
+        },
+
+        new ServiceOrderDto
+        {
+            Id = Guid.NewGuid(),
+            CustomerId = Guid.NewGuid(),
+            CustomerName = "Ana Torres",
+
+            EquipmentId = Guid.NewGuid(),
+            EquipmentTypeName = "Laptop",
+            EquipmentBrand = "HP",
+            EquipmentModel = "Pavilion",
+            EquipmentDescription = "Lenta",
+
+            FailureDescription = "Rendimiento bajo",
+            Diagnosis = null,
+            Status = ServiceOrderStatus.Received,
+
+            LaborCost = 0,
+            TotalCost = 0,
+
+            ServiceTypeDescription = "Diagnóstico",
+            CreatedAt = DateTimeOffset.Now.AddHours(-6),
+            UpdatedAt = DateTimeOffset.Now.AddHours(-6),
+
+            OrderPart = new List<OrderPartDto?>()
+        },
+
+        new ServiceOrderDto
+        {
+            Id = Guid.NewGuid(),
+            CustomerId = Guid.NewGuid(),
+            CustomerName = "Luis Martínez",
+
+            EquipmentId = Guid.NewGuid(),
+            EquipmentTypeName = "PC Escritorio",
+            EquipmentBrand = "Custom",
+            EquipmentModel = "Ryzen 7",
+            EquipmentDescription = "No da video",
+
+            FailureDescription = "Pantalla negra",
+            Diagnosis = "GPU dañada",
+            Status = ServiceOrderStatus.Delivered,
+
+            LaborCost = 1200,
+            TotalCost = 4500,
+
+            ServiceTypeDescription = "Reparación avanzada",
+            CreatedAt = DateTimeOffset.Now.AddDays(-15),
+            UpdatedAt = DateTimeOffset.Now.AddDays(-3),
+
+            OrderPart = new List<OrderPartDto?> { new() }
+        }
+    };
+
+}

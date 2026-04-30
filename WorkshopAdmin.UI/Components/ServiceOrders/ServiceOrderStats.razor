@@ -1,0 +1,147 @@
+﻿@using MudBlazor
+
+<MudGrid Class="mb-6">
+
+    <!-- Órdenes Activas -->
+    <MudItem xs="12" sm="6" md="4">
+        <MudPaper Elevation="1"
+                  Class="p-4 rounded-xl border d-flex flex-column"
+                  Style="
+            background-color: var(--mud-palette-surface);
+            border-top: 4px solid var(--mud-palette-primary);
+            ">
+
+            <!-- TOP -->
+            <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="mb-3">
+                <MudText Typo="Typo.overline"
+                         Class="text-uppercase fw-bold"
+                         Style="color: var(--mud-palette-text-secondary);">
+                    Órdenes Activas
+                </MudText>
+
+                <MudIcon Icon="@Icons.Material.Filled.RocketLaunch"
+                         Style="color: var(--mud-palette-primary);" />
+            </MudStack>
+
+            <!-- VALUE -->
+            <MudText Typo="Typo.h4" Class="fw-bold">
+                @ActiveOrders
+            </MudText>
+
+            <!-- FOOTER -->
+            <MudStack Row AlignItems="AlignItems.Center" Class="mt-3">
+                <MudIcon Icon="@Icons.Material.Filled.TrendingUp"
+                         Size="Size.Small"
+                         Class="me-1"
+                         Style="color: var(--mud-palette-success);" />
+
+                <MudText Typo="Typo.caption"
+                         Class="fw-bold"
+                         Style="color: var(--mud-palette-success);">
+                    +@NewOrdersThisWeek esta semana
+                </MudText>
+            </MudStack>
+
+        </MudPaper>
+    </MudItem>
+
+
+    <!-- Pendientes de Diagnóstico -->
+    <MudItem xs="12" sm="6" md="4">
+        <MudPaper Elevation="1"
+                  Class="p-4 rounded-xl border d-flex flex-column"
+                  Style="
+            background-color: var(--mud-palette-surface);
+            border-top: 4px solid var(--mud-palette-tertiary);
+            ">
+
+            <!-- TOP -->
+            <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="mb-3">
+                <MudText Typo="Typo.overline"
+                         Class="text-uppercase fw-bold"
+                         Style="color: var(--mud-palette-text-secondary);">
+                    Pendientes de Diagnóstico
+                </MudText>
+
+                <MudIcon Icon="@Icons.Material.Filled.Biotech"
+                         Style="color: var(--mud-palette-tertiary);" />
+            </MudStack>
+
+            <!-- VALUE -->
+            <MudText Typo="Typo.h4" Class="fw-bold">
+                @PendingDiagnostics
+            </MudText>
+
+            <!-- FOOTER -->
+            <MudStack Row AlignItems="AlignItems.Center" Class="mt-3">
+                <MudIcon Icon="@Icons.Material.Filled.History"
+                         Size="Size.Small"
+                         Class="me-1"
+                         Style="color: var(--mud-palette-tertiary);" />
+
+                <MudText Typo="Typo.caption"
+                         Class="fw-bold"
+                         Style="color: var(--mud-palette-tertiary);">
+                    Promedio @AvgDiagnosticHours h espera
+                </MudText>
+            </MudStack>
+
+        </MudPaper>
+    </MudItem>
+
+
+    <!-- Costo Total en Reparación -->
+    <MudItem xs="12" sm="6" md="4">
+        <MudPaper Elevation="1"
+                  Class="p-4 rounded-xl border d-flex flex-column"
+                  Style="
+            background-color: var(--mud-palette-surface);
+            border-top: 4px solid var(--mud-palette-secondary);
+            ">
+
+            <!-- TOP -->
+            <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="mb-3">
+                <MudText Typo="Typo.overline"
+                         Class="text-uppercase fw-bold"
+                         Style="color: var(--mud-palette-text-secondary);">
+                    Costo Total en Reparación
+                </MudText>
+
+                <MudIcon Icon="@Icons.Material.Filled.Payments"
+                         Style="color: var(--mud-palette-secondary);" />
+            </MudStack>
+
+            <!-- VALUE -->
+            <MudText Typo="Typo.h4" Class="fw-bold">
+                @TotalRepairCost.ToString("C")
+            </MudText>
+
+            <!-- FOOTER -->
+            <MudStack Row AlignItems="AlignItems.Center" Class="mt-3">
+                <MudIcon Icon="@Icons.Material.Filled.AccountBalanceWallet"
+                         Size="Size.Small"
+                         Class="me-1"
+                         Style="color: var(--mud-palette-secondary);" />
+
+                <MudText Typo="Typo.caption"
+                         Class="fw-bold"
+                         Style="color: var(--mud-palette-secondary);">
+                    Pendiente por facturar
+                </MudText>
+            </MudStack>
+
+        </MudPaper>
+    </MudItem>
+
+</MudGrid>
+
+
+@code {
+    [Parameter] public int ActiveOrders { get; set; } = 42;
+    [Parameter] public int NewOrdersThisWeek { get; set; } = 5;
+
+    [Parameter] public int PendingDiagnostics { get; set; } = 12;
+    [Parameter] public int AvgDiagnosticHours { get; set; } = 4;
+
+    [Parameter] public decimal TotalRepairCost { get; set; } = 15240;
+}

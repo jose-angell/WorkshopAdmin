@@ -232,3 +232,25 @@ code {
     height: 48px;
     vertical-align: middle;
 }
+/* Hover fila tipo Tailwind */
+.hover-row:hover {
+    background-color: rgba(0, 0, 0, 0.03);
+    transition: background 0.2s ease;
+}
+
+/* Acciones con fade-in */
+.action-group {
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+}
+
+.hover-row:hover .action-group {
+    opacity: 1;
+}
+
+/* Truncate real */
+.text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
