@@ -1,6 +1,8 @@
 ﻿@using MudBlazor
 @using WorkshopAdmin.Shared.Dtos.ServiceOrders
 @using WorkshopAdmin.Shared.Enums
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
 
 <MudPaper Elevation="0" Class="rounded-xl border">
 
@@ -109,7 +111,7 @@
 
                         <MudIconButton Icon="@Icons.Material.Filled.Visibility"
                                        Size="Size.Small"
-                                       OnClick="@(() => OnView.InvokeAsync(context.Item))" />
+                                       OnClick="@(() => OpenViewDialog(context.Item))" />
 
                         <MudIconButton Icon="@Icons.Material.Filled.AccountTree"
                                        Size="Size.Small"
@@ -152,6 +154,9 @@
     [Parameter] public EventCallback<ServiceOrderDto> OnView { get; set; }
     [Parameter] public EventCallback<ServiceOrderDto> OnEdit { get; set; }
     [Parameter] public EventCallback<ServiceOrderDto> OnTrace { get; set; }
+
+    private Guid? _selectedOrderId;
+    private bool _openDialog;
     private string _searchString = "";
 
     private Func<ServiceOrderDto, bool> _quickFilter => x =>
@@ -176,7 +181,27 @@
         ServiceOrderStatus.Delivered => ("#1A237E", "#FFFFFF"),
         _ => ("#ECEFF1", "#37474F")
     };
-   
+    private async Task OpenViewDialog(ServiceOrderDto order)
+    {
+        var IdOrder = order.Id;
+
+        var parameters = new DialogParameters<ServiceOrderDetail>
+        {
+            { x => x.OrderId, IdOrder }
+        };
+
+        var options = new DialogOptions
+        {
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true,
+            CloseButton = true,
+            BackdropClick = false // Evita que se cierre por error al dar click fuera
+        };
+
+        var dialog = await DialogService.ShowAsync<ServiceOrderDetail>(" ", parameters, options);
+        var result = await dialog.Result;
+
+    }
     public List<ServiceOrderDto> ServiceOrders = new()
     {
         new ServiceOrderDto

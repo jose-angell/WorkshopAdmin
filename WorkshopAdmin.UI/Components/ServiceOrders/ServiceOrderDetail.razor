@@ -1,0 +1,195 @@
+﻿@using MudBlazor
+@using WorkshopAdmin.Shared.Dtos.ServiceOrders
+@using WorkshopAdmin.Shared.Enums
+
+<MudPaper Class="detail-container rounded-xl border" Elevation="0">
+
+    @if (_loading)
+    {
+        <!-- LOADING -->
+        <MudStack AlignItems="AlignItems.Center" Class="pa-6">
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+            <MudText Typo="Typo.caption" Class="mt-2">Cargando orden...</MudText>
+        </MudStack>
+    }
+    else if (_order is not null)
+    {
+        <MudPaper Class="pa-4 bg-slate-50"
+                  Style=" color: whitesmoke;">
+        <!-- HEADER -->
+            <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class=" detail-header mb-4 pa-3 rounded-lg">
+
+            <MudStack Spacing="0">
+                <MudText Typo="Typo.h6" Class="fw-bold">
+                    Orden #ORD-@_order.Id.ToString()[..6]
+                </MudText>
+                <MudText Typo="Typo.caption">
+                    @_order.CreatedAt.ToLocalTime().ToString("dd MMM yyyy - hh:mm tt")
+                </MudText>
+            </MudStack>
+
+            <MudChip T="ServiceOrderStatus" Color="@GetStatusColor(_order.Status)"
+                     Variant="Variant.Filled"
+                     Class="fw-bold">
+                @_order.Status.ToFriendlyName()
+            </MudChip>
+
+        </MudStack>
+
+        <!-- GRID -->
+        <MudGrid class="detail-body" >
+
+            <!-- CLIENTE -->
+            <MudItem xs="12" md="6">
+                <MudPaper Class="pa-3 rounded-lg border">
+                    <MudText Typo="Typo.caption">Cliente</MudText>
+                    <MudText Class="fw-bold">@_order.CustomerName</MudText>
+                </MudPaper>
+            </MudItem>
+
+            <!-- EQUIPO -->
+            <MudItem xs="12" md="6">
+                <MudPaper Class="pa-3 rounded-lg border">
+                    <MudText Typo="Typo.caption">Equipo</MudText>
+                    <MudText Class="fw-bold">
+                        @_order.EquipmentBrand @_order.EquipmentModel
+                    </MudText>
+                    <MudText Typo="Typo.caption">
+                        @_order.EquipmentTypeName
+                    </MudText>
+                </MudPaper>
+            </MudItem>
+
+            <!-- FALLA -->
+            <MudItem xs="12">
+                <MudPaper Class="pa-3 rounded-lg border">
+                    <MudText Typo="Typo.caption">Falla reportada</MudText>
+                    <MudText>@_order.FailureDescription</MudText>
+                </MudPaper>
+            </MudItem>
+
+            <!-- DIAGNOSTICO -->
+            @if (!string.IsNullOrWhiteSpace(_order.Diagnosis))
+            {
+                <MudItem xs="12">
+                    <MudPaper Class="pa-3 rounded-lg border">
+                        <MudText Typo="Typo.caption">Diagnóstico</MudText>
+                        <MudText>@_order.Diagnosis</MudText>
+                    </MudPaper>
+                </MudItem>
+            }
+
+            <!-- COSTOS -->
+            <MudItem xs="12" md="6">
+                <MudPaper Class="pa-3 rounded-lg border">
+                    <MudText Typo="Typo.caption">Mano de obra</MudText>
+                    <MudText Class="fw-bold">
+                        @_order.LaborCost.ToString("C")
+                    </MudText>
+                </MudPaper>
+            </MudItem>
+
+            <MudItem xs="12" md="6">
+                <MudPaper Class="pa-3 rounded-lg border">
+                    <MudText Typo="Typo.caption">Total</MudText>
+                    <MudText Class="fw-bold">
+                        @_order.TotalCost.ToString("C")
+                    </MudText>
+                </MudPaper>
+            </MudItem>
+
+            <!-- PARTES -->
+            <MudItem xs="12">
+                <MudPaper Class="pa-3 rounded-lg border">
+                    <MudStack Row Justify="Justify.SpaceBetween" Class="mb-2">
+                        <MudText Typo="Typo.caption">Refacciones</MudText>
+                        <MudChip T="int" Size="Size.Small" >
+                            @_order.OrderPart.Count()
+                        </MudChip>
+                    </MudStack>
+
+                    @if (_order.OrderPart.Any())
+                    {
+                        <MudList T="OrderPartDto" Dense="true">
+                            @foreach (var part in _order.OrderPart)
+                            {
+                                <MudListItem>
+                                    <MudText>Refacción genérica</MudText>
+                                </MudListItem>
+                            }
+                        </MudList>
+                    }
+                    else
+                    {
+                        <MudText Typo="Typo.caption">
+                            Sin refacciones registradas
+                        </MudText>
+                    }
+                </MudPaper>
+            </MudItem>
+
+        </MudGrid>
+    </MudPaper>
+    }
+
+</MudPaper>
+
+
+@code {
+
+    [Parameter] public Guid OrderId { get; set; }
+
+    private ServiceOrderDto? _order;
+    private bool _loading = true;
+    public static ServiceOrderDto GetOrder(Guid id)
+    {
+        return new ServiceOrderDto
+        {
+            Id = id,
+            CustomerName = "Constructora Horizon",
+
+            EquipmentBrand = "Caterpillar",
+            EquipmentModel = "320G",
+            EquipmentTypeName = "Excavadora",
+
+            FailureDescription = "Pérdida de potencia en sistema hidráulico, falla en el sistema de arranque, tira aceite.",
+            Diagnosis = "Bomba hidráulica dañada, requiere reemplazo, requiere cambio de juntas en el motor, ajuste en el arrancador.",
+
+            Status = ServiceOrderStatus.Repairing,
+
+            LaborCost = 1200,
+            TotalCost = 2450,
+
+            CreatedAt = DateTimeOffset.Now.AddDays(-2),
+            UpdatedAt = DateTimeOffset.Now,
+
+            OrderPart = new List<OrderPartDto?>
+            {
+                new(),
+                new(),
+                new(),
+                new()
+            }
+        };
+    }
+    protected override async Task OnParametersSetAsync()
+    {
+        _loading = true;
+
+        await Task.Delay(800); // Simula API
+
+        _order = GetOrder(OrderId);
+
+        _loading = false;
+    }
+
+    private Color GetStatusColor(ServiceOrderStatus status) => status switch
+    {
+        ServiceOrderStatus.Received => Color.Default,
+        ServiceOrderStatus.Diagnosing => Color.Info,
+        ServiceOrderStatus.Repairing => Color.Warning,
+        ServiceOrderStatus.Completed => Color.Success,
+        ServiceOrderStatus.Delivered => Color.Primary,
+        _ => Color.Default
+    };
+}
