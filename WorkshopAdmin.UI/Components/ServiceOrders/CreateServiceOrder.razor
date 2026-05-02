@@ -1,0 +1,222 @@
+﻿@page "/service-orders/create"
+
+@using WorkshopAdmin.Shared.Dtos.Customers
+@using WorkshopAdmin.Shared.Dtos.Equipments
+@using WorkshopAdmin.Shared.Dtos.ServiceOrders
+@using WorkshopAdmin.Shared.Enums
+
+@inject ISnackbar Snackbar
+
+<MudForm @ref="_form">
+
+    <div class="p-8 max-w-7xl mx-auto">
+
+        <!-- HEADER -->
+        <div class="mb-8">
+            <h2 class="text-[34px] font-bold text-[#000666] tracking-tight">
+                New Service Order
+            </h2>
+            <p class="text-gray-500">
+                Phase:
+                <span class="font-bold text-indigo-600 uppercase text-xs">
+                    Reception & Intake
+                </span>
+            </p>
+        </div>
+
+        <div class="grid grid-cols-12 gap-8">
+
+            <!-- CLIENTE -->
+            <div class="col-span-12 md:col-span-4">
+                <div class="bg-white p-6 rounded-xl border shadow-sm">
+
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xs font-bold uppercase text-gray-400">
+                            Customer Information
+                        </h3>
+                    </div>
+
+                    <MudAutocomplete T="CustomerDto"
+                                     Label="Search Customer"
+                                     Value="_selectedCustomer"
+                                     ValueChanged="OnCustomerChanged"
+                                     SearchFunc="SearchCustomers"
+                                     ToStringFunc="@(c => c?.Name)"
+                                     Variant="Variant.Outlined"
+                                     AdornmentIcon="@Icons.Material.Filled.Search"
+                                     Clearable="true"
+                                     Required="true" />
+
+                    @if (_selectedCustomer != null)
+                    {
+                        <div class="mt-4 p-3 bg-indigo-50 rounded-lg">
+                            <p class="text-sm font-bold text-[#000666]">
+                                @_selectedCustomer.Name
+                            </p>
+                            <p class="text-xs text-gray-500">
+                                @_selectedCustomer.Phone
+                            </p>
+                        </div>
+                    }
+
+                </div>
+            </div>
+
+            <!-- EQUIPO -->
+            <div class="col-span-12 md:col-span-4">
+                <div class="bg-white p-6 rounded-xl border shadow-sm">
+
+                    <h3 class="text-xs font-bold uppercase text-gray-400 mb-4">
+                        Equipment Details
+                    </h3>
+
+                    <MudSelect T="Guid"
+                               Label="Select Equipment"
+                               @bind-Value="_request.EquipmentId"
+                               Variant="Variant.Outlined"
+                               Disabled="@(_selectedCustomer == null)"
+                               Required="true">
+
+                        @foreach (var eq in _customerEquipments)
+                        {
+                            <MudSelectItem Value="@eq.Id">
+                                @eq.Brand @eq.Model
+                            </MudSelectItem>
+                        }
+
+                    </MudSelect>
+
+                    <p class="text-[10px] text-gray-400 mt-2 italic">
+                        Select a customer first
+                    </p>
+
+                </div>
+            </div>
+
+            <!-- SERVICIO -->
+            <div class="col-span-12 md:col-span-4">
+                <div class="bg-white p-6 rounded-xl border shadow-sm">
+
+                    <h3 class="text-xs font-bold uppercase text-gray-400 mb-4">
+                        Service & Failure
+                    </h3>
+
+                    <MudSelect T="ServiceType"
+                               Label="Service Type"
+                               @bind-Value="_request.ServiceTypeId"
+                               Required="true"
+                               Variant="Variant.Outlined">
+
+                        @foreach (var type in Enum.GetValues<ServiceType>())
+                        {
+                            <MudSelectItem Value="@type">
+                                @type.ToFriendlyName()
+                            </MudSelectItem>
+                        }
+
+                    </MudSelect>
+
+                    <MudTextField T="string"
+                                  Label="Failure Description"
+                                  @bind-Value="_request.FailureDescription"
+                                  Variant="Variant.Outlined"
+                                  Lines="4"
+                                  Required="true"
+                                  Class="mt-4" />
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="mt-8 flex justify-end gap-4">
+
+            <MudButton Variant="Variant.Text">
+                Cancel
+            </MudButton>
+
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       OnClick="SubmitOrder">
+
+                Complete Reception
+
+            </MudButton>
+
+        </div>
+
+    </div>
+
+</MudForm>
+
+@code {
+
+    private MudForm? _form;
+
+    private CreateServiceOrderRequest _request = new();
+
+    private CustomerDto? _selectedCustomer;
+
+    private List<EquipmentDto> _customerEquipments = new();
+
+    //  CAMBIO IMPORTANTE: manejar cambio explícito
+    private async Task OnCustomerChanged(CustomerDto? value)
+    {
+        _selectedCustomer = value;
+
+        _request.CustomerId = value?.Id ?? Guid.Empty;
+        _request.EquipmentId = Guid.Empty;
+
+        _customerEquipments.Clear();
+
+        if (value != null)
+        {
+            await LoadEquipments(value.Id);
+        }
+    }
+
+    //  DATA FAKE REALISTA
+    private Task<IEnumerable<CustomerDto>> SearchCustomers(string value, CancellationToken token)
+    {
+        var data = new List<CustomerDto>
+        {
+            new() { Id = Guid.NewGuid(), Name = "Constructora Horizon", Phone = "555-1111" },
+            new() { Id = Guid.NewGuid(), Name = "Minera San Juan", Phone = "555-2222" },
+            new() { Id = Guid.NewGuid(), Name = "Logística S.A.", Phone = "555-3333" }
+        };
+
+        var result = data
+            .Where(x => string.IsNullOrWhiteSpace(value)
+                     || x.Name.Contains(value, StringComparison.OrdinalIgnoreCase));
+
+        return Task.FromResult(result);
+    }
+
+    private async Task LoadEquipments(Guid customerId)
+    {
+        await Task.Delay(300); // simula API
+
+        _customerEquipments = new List<EquipmentDto>
+        {
+            new() { Id = Guid.NewGuid(), Brand = "Caterpillar", Model = "320G" },
+            new() { Id = Guid.NewGuid(), Brand = "Volvo", Model = "FH16" }
+        };
+    }
+
+    private async Task SubmitOrder()
+    {
+        await _form!.Validate();
+
+        if (!_form.IsValid)
+        {
+            Snackbar.Add("Complete all required fields", Severity.Warning);
+            return;
+        }
+
+        //  aquí iría tu API
+        await Task.Delay(500);
+
+        Snackbar.Add("Service Order Created", Severity.Success);
+    }
+}

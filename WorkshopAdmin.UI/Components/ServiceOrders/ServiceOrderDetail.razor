@@ -14,8 +14,7 @@
     }
     else if (_order is not null)
     {
-        <MudPaper Class="pa-4 bg-slate-50"
-                  Style=" color: whitesmoke;">
+        <MudPaper Class="pa-4 bg-slate-50" Style=" color: whitesmoke;">
         <!-- HEADER -->
             <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class=" detail-header mb-4 pa-3 rounded-lg">
 
@@ -37,98 +36,98 @@
         </MudStack>
 
         <!-- GRID -->
-        <MudGrid class="detail-body" >
+            <MudGrid class="detail-body" >
 
-            <!-- CLIENTE -->
-            <MudItem xs="12" md="6">
-                <MudPaper Class="pa-3 rounded-lg border">
-                    <MudText Typo="Typo.caption">Cliente</MudText>
-                    <MudText Class="fw-bold">@_order.CustomerName</MudText>
-                </MudPaper>
-            </MudItem>
-
-            <!-- EQUIPO -->
-            <MudItem xs="12" md="6">
-                <MudPaper Class="pa-3 rounded-lg border">
-                    <MudText Typo="Typo.caption">Equipo</MudText>
-                    <MudText Class="fw-bold">
-                        @_order.EquipmentBrand @_order.EquipmentModel
-                    </MudText>
-                    <MudText Typo="Typo.caption">
-                        @_order.EquipmentTypeName
-                    </MudText>
-                </MudPaper>
-            </MudItem>
-
-            <!-- FALLA -->
-            <MudItem xs="12">
-                <MudPaper Class="pa-3 rounded-lg border">
-                    <MudText Typo="Typo.caption">Falla reportada</MudText>
-                    <MudText>@_order.FailureDescription</MudText>
-                </MudPaper>
-            </MudItem>
-
-            <!-- DIAGNOSTICO -->
-            @if (!string.IsNullOrWhiteSpace(_order.Diagnosis))
-            {
-                <MudItem xs="12">
+                <!-- CLIENTE -->
+                <MudItem xs="12" md="6">
                     <MudPaper Class="pa-3 rounded-lg border">
-                        <MudText Typo="Typo.caption">Diagnóstico</MudText>
-                        <MudText>@_order.Diagnosis</MudText>
+                        <MudText Typo="Typo.caption">Cliente</MudText>
+                        <MudText Class="fw-bold">@_order.CustomerName</MudText>
                     </MudPaper>
                 </MudItem>
-            }
 
-            <!-- COSTOS -->
-            <MudItem xs="12" md="6">
-                <MudPaper Class="pa-3 rounded-lg border">
-                    <MudText Typo="Typo.caption">Mano de obra</MudText>
-                    <MudText Class="fw-bold">
-                        @_order.LaborCost.ToString("C")
-                    </MudText>
-                </MudPaper>
-            </MudItem>
-
-            <MudItem xs="12" md="6">
-                <MudPaper Class="pa-3 rounded-lg border">
-                    <MudText Typo="Typo.caption">Total</MudText>
-                    <MudText Class="fw-bold">
-                        @_order.TotalCost.ToString("C")
-                    </MudText>
-                </MudPaper>
-            </MudItem>
-
-            <!-- PARTES -->
-            <MudItem xs="12">
-                <MudPaper Class="pa-3 rounded-lg border">
-                    <MudStack Row Justify="Justify.SpaceBetween" Class="mb-2">
-                        <MudText Typo="Typo.caption">Refacciones</MudText>
-                        <MudChip T="int" Size="Size.Small" >
-                            @_order.OrderPart.Count()
-                        </MudChip>
-                    </MudStack>
-
-                    @if (_order.OrderPart.Any())
-                    {
-                        <MudList T="OrderPartDto" Dense="true">
-                            @foreach (var part in _order.OrderPart)
-                            {
-                                <MudListItem>
-                                    <MudText>Refacción genérica</MudText>
-                                </MudListItem>
-                            }
-                        </MudList>
-                    }
-                    else
-                    {
-                        <MudText Typo="Typo.caption">
-                            Sin refacciones registradas
+                <!-- EQUIPO -->
+                <MudItem xs="12" md="6">
+                    <MudPaper Class="pa-3 rounded-lg border">
+                        <MudText Typo="Typo.caption">Equipo</MudText>
+                        <MudText Class="fw-bold">
+                            @_order.EquipmentBrand @_order.EquipmentModel
                         </MudText>
-                    }
-                </MudPaper>
-            </MudItem>
+                        <MudText Typo="Typo.caption">
+                            @_order.EquipmentTypeName
+                        </MudText>
+                    </MudPaper>
+                </MudItem>
 
-        </MudGrid>
+                <!-- FALLA -->
+                <MudItem xs="12">
+                    <MudPaper Class="pa-3 rounded-lg border">
+                        <MudText Typo="Typo.caption">Falla reportada</MudText>
+                        <MudText>@_order.FailureDescription</MudText>
+                    </MudPaper>
+                </MudItem>
+
+                <!-- DIAGNOSTICO -->
+                @if (!string.IsNullOrWhiteSpace(_order.Diagnosis))
+                {
+                    <MudItem xs="12">
+                        <MudPaper Class="pa-3 rounded-lg border">
+                            <MudText Typo="Typo.caption">Diagnóstico</MudText>
+                            <MudText>@_order.Diagnosis</MudText>
+                        </MudPaper>
+                    </MudItem>
+                }
+
+                <!-- COSTOS -->
+                <MudItem xs="12" md="6">
+                    <MudPaper Class="pa-3 rounded-lg border">
+                        <MudText Typo="Typo.caption">Mano de obra</MudText>
+                        <MudText Class="fw-bold">
+                            @_order.LaborCost.ToString("C")
+                        </MudText>
+                    </MudPaper>
+                </MudItem>
+
+                <MudItem xs="12" md="6">
+                    <MudPaper Class="pa-3 rounded-lg border">
+                        <MudText Typo="Typo.caption">Total</MudText>
+                        <MudText Class="fw-bold">
+                            @_order.TotalCost.ToString("C")
+                        </MudText>
+                    </MudPaper>
+                </MudItem>
+
+                <!-- PARTES -->
+                <MudItem xs="12">
+                    <MudPaper Class="pa-3 rounded-lg border">
+                        <MudStack Row Justify="Justify.SpaceBetween" Class="mb-2">
+                            <MudText Typo="Typo.caption">Refacciones</MudText>
+                            <MudChip T="int" Size="Size.Small" >
+                                @_order.OrderPart.Count()
+                            </MudChip>
+                        </MudStack>
+
+                        @if (_order.OrderPart.Any())
+                        {
+                            <MudList T="OrderPartDto" Dense="true">
+                                @foreach (var part in _order.OrderPart)
+                                {
+                                    <MudListItem>
+                                        <MudText>Refacción genérica</MudText>
+                                    </MudListItem>
+                                }
+                            </MudList>
+                        }
+                        else
+                        {
+                            <MudText Typo="Typo.caption">
+                                Sin refacciones registradas
+                            </MudText>
+                        }
+                    </MudPaper>
+                </MudItem>
+
+            </MudGrid>
     </MudPaper>
     }
 
