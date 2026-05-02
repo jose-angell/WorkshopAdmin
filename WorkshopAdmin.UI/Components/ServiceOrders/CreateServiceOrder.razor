@@ -9,144 +9,342 @@
 
 <MudForm @ref="_form">
 
-    <div class="p-8 max-w-7xl mx-auto">
+   @*  <!-- HEADER -->
+    <header class="bg-white border-b px-6 py-4 flex items-center justify-between sticky top-0 z-50">
 
-        <!-- HEADER -->
-        <div class="mb-8">
-            <h2 class="text-[34px] font-bold text-[#000666] tracking-tight">
-                New Service Order
-            </h2>
-            <p class="text-gray-500">
-                Phase:
-                <span class="font-bold text-indigo-600 uppercase text-xs">
-                    Reception & Intake
-                </span>
-            </p>
+        <div class="flex items-center gap-4">
+            <MudIconButton Icon="@Icons.Material.Filled.ArrowBack" />
+
+            <div>
+                <h1 class="text-xl font-bold text-[#1A237E] tracking-tight">
+                    New Service Order
+                </h1>
+
+                <p class="text-xs uppercase text-gray-500 flex items-center gap-1">
+                    <MudIcon Icon="@Icons.Material.Filled.Settings" Size="Size.Small" />
+                    Reception & Intake Phase
+                </p>
+            </div>
+        </div> 
+
+        <div class="flex items-center gap-6">
+
+            <div class="flex flex-col items-end">
+                <div class="flex gap-2 text-sm">
+                    <span>Progress</span>
+                    <span class="text-indigo-600 font-bold">33%</span>
+                </div>
+
+                <div class="w-48 h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div class="h-full bg-indigo-600" style="width:33%"></div>
+                </div>
+            </div>
+
+            <div class="w-px h-10 bg-gray-300"></div>
+
+            <div class="text-right">
+                <p class="text-xs text-gray-400 uppercase">Operator</p>
+                <p class="text-sm font-semibold">Alex Jensen</p>
+            </div>
+
         </div>
+    </header>
+ *@
+    <!-- MAIN -->
+    <main class="max-w-[1440px] mx-auto p-6 flex flex-col gap-6">
 
-        <div class="grid grid-cols-12 gap-8">
+        <!-- ===================== -->
+        <!-- 1. CUSTOMER -->
+        <!-- ===================== -->
+        <section class="bg-white border rounded-xl shadow-sm overflow-hidden">
 
-            <!-- CLIENTE -->
-            <div class="col-span-12 md:col-span-4">
-                <div class="bg-white p-6 rounded-xl border shadow-sm">
+            <div class="bg-gray-50 px-5 py-3 border-b flex justify-between items-center">
 
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-xs font-bold uppercase text-gray-400">
-                            Customer Information
-                        </h3>
-                    </div>
+                <h3 class="text-sm font-bold text-[#1A237E] uppercase flex items-center gap-2">
+                    <MudIcon Icon="@Icons.Material.Filled.Person" Size="Size.Small" />
+                    1. Customer Selection
+                </h3>
+
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add">
+                    New Customer
+                </MudButton>
+
+            </div>
+
+            <div class="p-5 flex flex-col md:flex-row gap-6">
+
+                <!-- SEARCH -->
+                <div class="flex-1">
+                    <label class="text-xs text-gray-500 uppercase block mb-2">
+                        Search Client
+                    </label>
 
                     <MudAutocomplete T="CustomerDto"
-                                     Label="Search Customer"
                                      Value="_selectedCustomer"
                                      ValueChanged="OnCustomerChanged"
                                      SearchFunc="SearchCustomers"
                                      ToStringFunc="@(c => c?.Name)"
                                      Variant="Variant.Outlined"
                                      AdornmentIcon="@Icons.Material.Filled.Search"
-                                     Clearable="true"
+                                     Class="w-full"
                                      Required="true" />
+                </div>
 
-                    @if (_selectedCustomer != null)
-                    {
-                        <div class="mt-4 p-3 bg-indigo-50 rounded-lg">
-                            <p class="text-sm font-bold text-[#000666]">
-                                @_selectedCustomer.Name
-                            </p>
-                            <p class="text-xs text-gray-500">
-                                @_selectedCustomer.Phone
-                            </p>
+                <!-- SELECTED -->
+                <div class="flex-1">
+                    <label class="text-xs text-gray-500 uppercase block mb-2">
+                        Selected Profile
+                    </label>
+
+                    <div class="bg-gray-50 rounded-lg p-4 border flex items-center gap-4">
+
+                        <div class="flex-1 min-w-0">
+                            @if (_selectedCustomer != null)
+                            {
+                                <p class="font-bold text-[#1A237E] truncate">
+                                    @_selectedCustomer.Name
+                                </p>
+
+                                <p class="text-xs text-gray-500">
+                                    @_selectedCustomer.Phone
+                                </p>
+                            }
+                            else
+                            {
+                                <p class="text-sm text-gray-400">
+                                    No customer selected
+                                </p>
+                            }
                         </div>
-                    }
 
+                        <MudButton Variant="Variant.Outlined" Color="Color.Primary">
+                            Change
+                        </MudButton>
+
+                    </div>
                 </div>
+
             </div>
 
-            <!-- EQUIPO -->
-            <div class="col-span-12 md:col-span-4">
-                <div class="bg-white p-6 rounded-xl border shadow-sm">
+        </section>
 
-                    <h3 class="text-xs font-bold uppercase text-gray-400 mb-4">
-                        Equipment Details
-                    </h3>
+        <!-- ===================== -->
+        <!-- 2. EQUIPMENT -->
+        <!-- ===================== -->
+        <section class="bg-white border rounded-xl shadow-sm overflow-hidden">
 
-                    <MudSelect T="Guid"
-                               Label="Select Equipment"
-                               @bind-Value="_request.EquipmentId"
-                               Variant="Variant.Outlined"
-                               Disabled="@(_selectedCustomer == null)"
-                               Required="true">
+            <div class="bg-gray-50 px-5 py-3 border-b flex justify-between items-center">
 
-                        @foreach (var eq in _customerEquipments)
-                        {
-                            <MudSelectItem Value="@eq.Id">
-                                @eq.Brand @eq.Model
-                            </MudSelectItem>
-                        }
+                <h3 class="text-sm font-bold text-[#1A237E] uppercase flex items-center gap-2">
+                    <MudIcon Icon="@Icons.Material.Filled.Build" Size="Size.Small" />
+                    2. Equipment Selection
+                </h3>
 
-                    </MudSelect>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add">
+                    Register Asset
+                </MudButton>
 
-                    <p class="text-[10px] text-gray-400 mt-2 italic">
-                        Select a customer first
-                    </p>
-
-                </div>
             </div>
 
-            <!-- SERVICIO -->
-            <div class="col-span-12 md:col-span-4">
-                <div class="bg-white p-6 rounded-xl border shadow-sm">
+            <div class="p-5">
 
-                    <h3 class="text-xs font-bold uppercase text-gray-400 mb-4">
-                        Service & Failure
-                    </h3>
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-                    <MudSelect T="ServiceType"
-                               Label="Service Type"
-                               @bind-Value="_request.ServiceTypeId"
-                               Required="true"
-                               Variant="Variant.Outlined">
+                    <!-- LEFT -->
+                    <div class="lg:col-span-8 flex flex-col gap-4">
+
+                        <div class="grid md:grid-cols-2 gap-4">
+
+                            <!-- SELECT -->
+                            <div>
+                                <label class="text-xs text-gray-500 uppercase block mb-2">
+                                    Select Asset
+                                </label>
+
+                                <MudSelect T="Guid"
+                                           @bind-Value="_request.EquipmentId"
+                                           Variant="Variant.Outlined"
+                                           Disabled="@(_selectedCustomer == null)"
+                                           Required="true">
+
+                                    @foreach (var eq in _customerEquipments)
+                                    {
+                                        <MudSelectItem Value="@eq.Id">
+                                            @eq.Brand @eq.Model
+                                        </MudSelectItem>
+                                    }
+
+                                </MudSelect>
+                            </div>
+
+                            <!-- SCAN -->
+                            <div>
+                                <label class="text-xs text-gray-500 uppercase block mb-2">
+                                    Scan Identifier
+                                </label>
+
+                                <MudTextField T="string"
+                                              Variant="Variant.Outlined"
+                                              AdornmentIcon="@Icons.Material.Filled.QrCodeScanner"
+                                              Placeholder="Scan VIN or Serial..." />
+                            </div>
+
+                        </div>
+
+                        <!-- INFO BOXES -->
+                        <div class="grid grid-cols-3 gap-4">
+
+                            <div class="bg-gray-50 p-4 rounded-lg border">
+                                <p class="text-[10px] text-gray-400 uppercase">Serial</p>
+                                <p class="font-bold text-[#1A237E]">---</p>
+                            </div>
+
+                            <div class="bg-gray-50 p-4 rounded-lg border">
+                                <p class="text-[10px] text-gray-400 uppercase">Hours</p>
+                                <p class="font-bold text-[#1A237E]">---</p>
+                            </div>
+
+                            <div class="bg-gray-50 p-4 rounded-lg border">
+                                <p class="text-[10px] text-gray-400 uppercase">Last Service</p>
+                                <p class="font-bold text-[#1A237E]">---</p>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- RIGHT (QUITAMOS IMAGEN) -->
+                    <div class="lg:col-span-4">
+                        <div class="h-full min-h-[160px] border rounded-xl flex items-center justify-center text-gray-400">
+                            No preview
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- ===================== -->
+        <!-- 3. SERVICE -->
+        <!-- ===================== -->
+        <section class="bg-white border rounded-xl shadow-sm overflow-hidden">
+
+            <div class="bg-gray-50 px-5 py-3 border-b">
+                <h3 class="text-sm font-bold text-[#1A237E] uppercase flex items-center gap-2">
+                    <MudIcon Icon="@Icons.Material.Filled.ReportProblem" Size="Size.Small" />
+                    3. Service Details
+                </h3>
+            </div>
+
+            <div class="p-5 flex flex-col gap-6">
+
+                <!-- SERVICE TYPE -->
+                <div>
+                    <label class="text-xs text-gray-500 uppercase block mb-3">
+                        Service Type Selection
+                    </label>
+
+                    <div class="grid md:grid-cols-5 gap-3">
 
                         @foreach (var type in Enum.GetValues<ServiceType>())
                         {
-                            <MudSelectItem Value="@type">
+                            var selected = _request.ServiceTypeId == type;
+
+                            <button type="button"
+                                    class="px-4 py-3 text-[11px] font-bold border-2 rounded-lg text-center transition
+                                @(selected
+                                                                         ? "border-[#1A237E] bg-indigo-50 text-[#1A237E]"
+                                                                         : "border-gray-300 hover:border-[#1A237E] hover:text-[#1A237E]")"
+                                    @onclick="() => _request.ServiceTypeId = type">
+
                                 @type.ToFriendlyName()
-                            </MudSelectItem>
+                            </button>
                         }
 
-                    </MudSelect>
+                    </div>
+                </div>
 
-                    <MudTextField T="string"
-                                  Label="Failure Description"
-                                  @bind-Value="_request.FailureDescription"
-                                  Variant="Variant.Outlined"
-                                  Lines="4"
-                                  Required="true"
-                                  Class="mt-4" />
+                <!-- CONTENT -->
+                <div class="grid md:grid-cols-3 gap-6">
+
+                    <!-- DESCRIPTION -->
+                    <div class="md:col-span-2">
+                        <label class="text-xs text-gray-500 uppercase block mb-2">
+                            Failure Description
+                        </label>
+
+                        <MudTextField T="string"
+                                      @bind-Value="_request.FailureDescription"
+                                      Variant="Variant.Outlined"
+                                      Lines="6"
+                                      Required="true"
+                                      Class="w-full" />
+                    </div>
+
+                    <!-- PRIORITY -->
+                    <div class="flex flex-col gap-4">
+
+                        <label class="text-xs text-gray-500 uppercase">
+                            Priority Level
+                        </label>
+
+                        <div class="flex gap-2">
+
+                            <button class="flex-1 py-2 text-xs border-2 border-gray-300 rounded font-bold">
+                                NORMAL
+                            </button>
+
+                            <button class="flex-1 py-2 text-xs border-2 border-indigo-600 bg-indigo-600 text-white rounded font-bold">
+                                URGENT
+                            </button>
+
+                            <button class="flex-1 py-2 text-xs border-2 border-red-500 text-red-500 rounded font-bold">
+                                CRITICAL
+                            </button>
+
+                        </div>
+
+                        <div class="bg-indigo-50 border p-3 rounded text-xs italic text-gray-600">
+                            Diagnostic suggestions will appear here...
+                        </div>
+
+                    </div>
 
                 </div>
+
             </div>
 
-        </div>
+        </section>
 
-        <!-- ACTIONS -->
-        <div class="mt-8 flex justify-end gap-4">
+    </main>
 
+    <!-- FOOTER -->
+    <footer class="fixed bottom-0 left-0 right-0 bg-white border-t px-6 py-4 flex justify-between items-center shadow">
+
+        <div class="flex gap-4">
             <MudButton Variant="Variant.Text">
                 Cancel
             </MudButton>
 
-            <MudButton Variant="Variant.Filled"
-                       Color="Color.Primary"
-                       OnClick="SubmitOrder">
-
-                Complete Reception
-
+            <MudButton Variant="Variant.Text" StartIcon="@Icons.Material.Filled.Print">
+                Save as Draft
             </MudButton>
-
         </div>
 
-    </div>
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   EndIcon="@Icons.Material.Filled.ArrowForward"
+                   OnClick="SubmitOrder">
+
+            Complete Reception
+
+        </MudButton>
+
+    </footer>
+
+    <div class="h-24"></div>
 
 </MudForm>
 
