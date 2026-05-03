@@ -4,7 +4,7 @@
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 
-<MudPaper Elevation="0" Class="rounded-xl border">
+<MudPaper Elevation="0" Class="border rounded-4">
 
     <MudDataGrid T="ServiceOrderDto"
                  Items="@ServiceOrders"
@@ -13,6 +13,7 @@
                  Filterable="true"
                  QuickFilter="@_quickFilter"
                  RowsPerPage="8"
+                 Class="rounded-4"
                  RowClassFunc="RowClass">
 
         <Columns>

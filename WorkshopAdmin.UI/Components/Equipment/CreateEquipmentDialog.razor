@@ -6,9 +6,9 @@
 
     <!-- HEADER -->
     <TitleContent>
-        <div class="d-flex align-center gap-3 py-2 px-1">
+        <div class="d-flex align-items-center gap-3 py-2 px-1">
             <MudIcon Icon="@Icons.Material.Filled.Handyman" Style="color: white;" />
-            <MudText Typo="Typo.h6" Class="font-bold text-white uppercase tracking-tighter">
+            <MudText Typo="Typo.h6" Class="fw-bold text-white text-uppercase">
                 Add New Equipment
             </MudText>
         </div>
@@ -20,36 +20,33 @@
 
             <MudStack Spacing="4" Class="mt-2">
 
-                
                 <MudGrid Spacing="2">
-                    
-                        <MudItem xs="12" sm="6">
-                            <MudSelect T="EquipmentType"
-                                       Label="CATEGORY "
-                                       @bind-Value="_model.TypeId"
-                                       Required="true"
-                                       Variant="Variant.Outlined"
-                                       Margin="Margin.Dense">
-                                @foreach (var equipment in Enum.GetValues<EquipmentType>())
-                                {
-                                    <MudSelectItem Value="@equipment">
-                                        @equipment.ToFriendlyName()
-                                    </MudSelectItem>
-                                }
-                            </MudSelect>
-                        </MudItem>
-                        <MudItem xs="12" sm="6">
-                            <MudTextField T="string"
-                                          Label="Description "
-                                          @bind-Value="_model.DescriptionType"
-                                          Required="true"
-                                          Variant="Variant.Outlined"
-                                          Margin="Margin.Dense"
-                                          Adornment="Adornment.End"
-                                           />
-                        </MudItem>
-                   
 
+                    <MudItem xs="12" sm="6">
+                        <MudSelect T="EquipmentType"
+                                   Label="CATEGORY "
+                                   @bind-Value="_model.TypeId"
+                                   Required="true"
+                                   Variant="Variant.Outlined"
+                                   Margin="Margin.Dense">
+                            @foreach (var equipment in Enum.GetValues<EquipmentType>())
+                            {
+                                <MudSelectItem Value="@equipment">
+                                    @equipment.ToFriendlyName()
+                                </MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+
+                    <MudItem xs="12" sm="6">
+                        <MudTextField T="string"
+                                      Label="Description "
+                                      @bind-Value="_model.DescriptionType"
+                                      Required="true"
+                                      Variant="Variant.Outlined"
+                                      Margin="Margin.Dense"
+                                      Adornment="Adornment.End" />
+                    </MudItem>
 
                     <MudItem xs="12" sm="6">
                         <MudTextField T="string"
@@ -73,7 +70,7 @@
                                       AdornmentIcon="@Icons.Material.Filled.ModelTraining" />
                     </MudItem>
 
-                    <MudItem xs="12" sm="12">
+                    <MudItem xs="12">
                         <MudTextField T="string"
                                       Label="Technical Specifications *"
                                       @bind-Value="_model.TechnicalSpecifications"
@@ -94,11 +91,11 @@
 
     <!-- FOOTER -->
     <DialogActions>
-        <div class="px-4 pb-4 d-flex gap-2 w-100 justify-end">
+        <div class="px-4 pb-4 d-flex gap-2 w-100 justify-content-end">
 
             <MudButton OnClick="Cancel"
                        Variant="Variant.Text"
-                       Class="px-6">
+                       Class="px-3">
                 Cancel
             </MudButton>
 
@@ -106,7 +103,7 @@
                        Variant="Variant.Filled"
                        Color="Color.Primary"
                        Disabled="@(!_isValid)"
-                       Class="px-8 font-bold shadow-none"
+                       Class="px-4 fw-bold shadow-none"
                        StartIcon="@Icons.Material.Filled.Save">
                 Save Part
             </MudButton>
@@ -115,7 +112,6 @@
     </DialogActions>
 
 </MudDialog>
-
 @code {
     [CascadingParameter]
     private IMudDialogInstance MudDialog { get; set; } = default!;

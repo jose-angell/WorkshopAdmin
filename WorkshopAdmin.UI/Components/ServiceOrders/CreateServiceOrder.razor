@@ -4,7 +4,9 @@
 @using WorkshopAdmin.Shared.Dtos.Equipments
 @using WorkshopAdmin.Shared.Dtos.ServiceOrders
 @using WorkshopAdmin.Shared.Enums
-
+@using WorkshopAdmin.UI.Components.Clients
+@using WorkshopAdmin.UI.Components.Equipment
+@inject IDialogService DialogService
 @inject ISnackbar Snackbar
 
 <MudForm @ref="_form">
@@ -40,6 +42,7 @@
                         <MudButton Variant="Variant.Text"
                                    Color="Color.Primary"
                                    StartIcon="@Icons.Material.Filled.Add"
+                                   OnClick="OpenCreateCustomerDialog"
                                    Class="fw-bold"
                                    Style="font-size:11px;">
                             New Customer
@@ -111,9 +114,10 @@
 
                         <MudButton Variant="Variant.Text"
                                    Color="Color.Primary"
+                                   OnClick="OpenCreateEquipmentDialog"
                                    StartIcon="@Icons.Material.Filled.Add"
                                    Style="font-size:11px;">
-                            Register Asset
+                            Register Equipment
                         </MudButton>
                     </div>
 
@@ -331,5 +335,67 @@
         await Task.Delay(500);
 
         Snackbar.Add("Service Order Created", Severity.Success);
+    }
+    private async Task OpenCreateCustomerDialog()
+    {
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true,
+            CloseButton = true
+        };
+
+        var dialog = await DialogService.ShowAsync<CreateCustomerDialog>(" ", options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled && result.Data is CreateCustomerRequest newClient)
+        {
+            try
+            {
+                // Aquí es donde conectas con tu servicio de aplicación
+                // await CustomerService.CreateAsync(newClient);
+                
+                Snackbar.Add($"Client {newClient.Name} added to the system.", Severity.Success);
+                
+                // Opcional: Recargar la lista de la tabla
+                // await LoadClients();
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add("Error saving client: " + ex.Message, Severity.Error);
+            }
+        }
+    }
+    private async Task OpenCreateEquipmentDialog()
+    {
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true,
+            CloseButton = true
+        };
+
+        var dialog = await DialogService.ShowAsync<CreateEquipmentDialog>(" ", options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled && result.Data is CreateEquipmentRequest newEquipment)
+        {
+            try
+            {
+                // Aquí es donde conectas con tu servicio de aplicación
+                // await CustomerService.CreateAsync(newEquipment);
+                
+                Snackbar.Add($"Equipment {newEquipment.DescriptionType} added to the system.", Severity.Success);
+                
+                // Opcional: Recargar la lista de la tabla
+                // await LoadClients();
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add("Error saving part: " + ex.Message, Severity.Error);
+            }
+        }
     }
 }

@@ -6,9 +6,9 @@
 
     <!-- HEADER -->
     <TitleContent>
-        <div class="d-flex align-center gap-3 py-2 px-1">
+        <div class="d-flex align-items-center gap-3 py-2 px-1">
             <MudIcon Icon="@Icons.Material.Filled.Handyman" Style="color: white;" />
-            <MudText Typo="Typo.h6" Class="font-bold text-white uppercase tracking-tighter">
+            <MudText Typo="Typo.h6" Class="fw-bold text-white text-uppercase">
                 Edit Equipment
             </MudText>
         </div>
@@ -20,7 +20,6 @@
 
             <MudStack Spacing="4" Class="mt-2">
 
-                
                 <MudGrid Spacing="2">
                     
                     <MudItem xs="12" sm="6">
@@ -38,6 +37,7 @@
                             }
                         </MudSelect>
                     </MudItem>
+
                     <MudItem xs="12" sm="6">
                         <MudTextField T="string"
                                       Label="Description "
@@ -47,8 +47,6 @@
                                       Margin="Margin.Dense"
                                       Adornment="Adornment.End" />
                     </MudItem>
-
-                   
 
                     <MudItem xs="12" sm="6">
                         <MudTextField T="string"
@@ -72,7 +70,7 @@
                                       AdornmentIcon="@Icons.Material.Filled.ModelTraining" />
                     </MudItem>
 
-                    <MudItem xs="12" sm="12">
+                    <MudItem xs="12">
                         <MudTextField T="string"
                                       Label="Technical Specifications *"
                                       @bind-Value="_model.TechnicalSpecifications"
@@ -84,19 +82,26 @@
                                       AutoGrow="true" />
                     </MudItem>
                 </MudGrid>
-                    @* Switch de Estado de Cuenta *@
-                    <div class="mt-4 pa-4 rounded-lg border border-slate-100 d-flex align-center justify-space-between bg-slate-50">
-                        <div class="d-flex align-center gap-3">
-                            <div class="pa-2 rounded-full bg-indigo-50">
-                                <MudIcon Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Primary" Size="Size.Small" />
-                            </div>
-                            <div>
-                                <MudText Typo="Typo.body2" Class="font-bold">Parte Activa en Catalogo</MudText>
-                                <MudText Typo="Typo.caption" Class="text-slate-500">Permitir su uso en ordenes de servicio</MudText>
-                            </div>
+
+                @* Switch de Estado *@
+                <div class="mt-4 p-3 rounded border d-flex align-items-center justify-content-between bg-light">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="p-2 rounded-circle bg-light">
+                            <MudIcon Icon="@Icons.Material.Filled.VerifiedUser"
+                                     Color="Color.Primary"
+                                     Size="Size.Small" />
                         </div>
-                        <MudSwitch @bind-Value="_model.IsActive" Color="Color.Primary" />
+                        <div>
+                            <MudText Typo="Typo.body2" Class="fw-bold">
+                                Parte Activa en Catalogo
+                            </MudText>
+                            <MudText Typo="Typo.caption" Class="text-muted">
+                                Permitir su uso en ordenes de servicio
+                            </MudText>
+                        </div>
                     </div>
+                    <MudSwitch @bind-Value="_model.IsActive" Color="Color.Primary" />
+                </div>
 
             </MudStack>
 
@@ -105,11 +110,11 @@
 
     <!-- FOOTER -->
     <DialogActions>
-        <div class="px-4 pb-4 d-flex gap-2 w-100 justify-end">
+        <div class="px-4 pb-4 d-flex gap-2 w-100 justify-content-end">
 
             <MudButton OnClick="Cancel"
                        Variant="Variant.Text"
-                       Class="px-6">
+                       Class="px-3">
                 Cancel
             </MudButton>
 
@@ -117,7 +122,7 @@
                        Variant="Variant.Filled"
                        Color="Color.Primary"
                        Disabled="@(!_isValid)"
-                       Class="px-8 font-bold shadow-none"
+                       Class="px-4 fw-bold shadow-none"
                        StartIcon="@Icons.Material.Filled.Save">
                 Save Part
             </MudButton>
@@ -126,7 +131,6 @@
     </DialogActions>
 
 </MudDialog>
-
 @code {
     [CascadingParameter]
     private IMudDialogInstance MudDialog { get; set; } = default!;

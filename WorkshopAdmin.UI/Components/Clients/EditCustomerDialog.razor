@@ -3,88 +3,121 @@
 
 <MudDialog Class="custom-industrial-dialog">
     <TitleContent>
-        @* Encabezado con estilo industrial oscuro del HTML *@
-        <div class="d-flex align-center gap-4 py-3 px-1">
-            <div class="pa-3 rounded-lg" style="background-color: rgba(255,255,255,0.15);">
+        <div class="d-flex align-items-center gap-4 py-3 px-1">
+            <div class="p-3 rounded" style="background-color: rgba(255,255,255,0.15);">
                 <MudIcon Icon="@Icons.Material.Filled.Edit" Color="Color.Inherit" Size="Size.Large" />
             </div>
             <div>
-                <MudText Typo="Typo.h6" Class="font-bold text-white uppercase tracking-tight">Editar Cliente</MudText>
-                <MudText Typo="Typo.caption" Class="text-white-50">Actualice la información técnica del cliente</MudText>
+                <MudText Typo="Typo.h6" Class="fw-bold text-white text-uppercase">
+                    Editar Cliente
+                </MudText>
+                <MudText Typo="Typo.caption" Class="text-white-50">
+                    Actualice la información técnica del cliente
+                </MudText>
             </div>
         </div>
     </TitleContent>
+
     <DialogContent>
         <MudForm @ref="_form" @bind-IsValid="_isValid" Class="pt-4">
             <MudStack Spacing="4">
-                @* Nombre Completo *@
-                <div class="space-y-1">
-                    <MudText Typo="Typo.caption" Class="font-bold uppercase text-slate-500 d-flex align-center gap-1">
-                        <MudIcon Icon="@Icons.Material.Filled.Badge" Size="Size.Small" /> NOMBRE COMPLETO
+
+                <!-- NOMBRE -->
+                <div class="mb-2">
+                    <MudText Typo="Typo.caption" Class="fw-bold text-uppercase text-secondary d-flex align-items-center gap-1">
+                        <MudIcon Icon="@Icons.Material.Filled.Badge" Size="Size.Small" />
+                        NOMBRE COMPLETO
                     </MudText>
-                    <MudTextField T="string" 
-                                  @bind-Value="_model.Name" 
+
+                    <MudTextField T="string"
+                                  @bind-Value="_model.Name"
                                   Required="true"
-                                  Variant="Variant.Outlined" 
+                                  Variant="Variant.Outlined"
                                   Margin="Margin.Dense"
                                   Placeholder="Ingrese nombre del cliente" />
                 </div>
 
                 <MudGrid Spacing="2">
+
+                    <!-- EMAIL -->
                     <MudItem xs="12" sm="6">
-                        <MudText Typo="Typo.caption" Class="font-bold uppercase text-slate-500 d-flex align-center gap-1">
-                            <MudIcon Icon="@Icons.Material.Filled.Email" Size="Size.Small" /> EMAIL
+                        <MudText Typo="Typo.caption" Class="fw-bold text-uppercase text-secondary d-flex align-items-center gap-1">
+                            <MudIcon Icon="@Icons.Material.Filled.Email" Size="Size.Small" />
+                            EMAIL
                         </MudText>
-                        <MudTextField T="string" 
-                                      @bind-Value="_model.Email" 
-                                      Variant="Variant.Outlined" 
+
+                        <MudTextField T="string"
+                                      @bind-Value="_model.Email"
+                                      Variant="Variant.Outlined"
                                       Margin="Margin.Dense"
                                       Placeholder="correo@ejemplo.com" />
                     </MudItem>
+
+                    <!-- PHONE -->
                     <MudItem xs="12" sm="6">
-                        <MudText Typo="Typo.caption" Class="font-bold uppercase text-slate-500 d-flex align-center gap-1">
-                            <MudIcon Icon="@Icons.Material.Filled.PhoneIphone" Size="Size.Small" /> TELÉFONO
+                        <MudText Typo="Typo.caption" Class="fw-bold text-uppercase text-secondary d-flex align-items-center gap-1">
+                            <MudIcon Icon="@Icons.Material.Filled.PhoneIphone" Size="Size.Small" />
+                            TELÉFONO
                         </MudText>
-                        <MudTextField T="string" 
-                                      @bind-Value="_model.Phone" 
-                                      Variant="Variant.Outlined" 
+
+                        <MudTextField T="string"
+                                      @bind-Value="_model.Phone"
+                                      Variant="Variant.Outlined"
                                       Margin="Margin.Dense"
                                       Placeholder="+XX XXX XXX XXX" />
                     </MudItem>
+
                 </MudGrid>
 
-                @* Switch de Estado de Cuenta *@
-                <div class="mt-4 pa-4 rounded-lg border border-slate-100 d-flex align-center justify-space-between bg-slate-50">
-                    <div class="d-flex align-center gap-3">
-                        <div class="pa-2 rounded-full bg-indigo-50">
-                            <MudIcon Icon="@Icons.Material.Filled.VerifiedUser" Color="Color.Primary" Size="Size.Small" />
+                <!-- SWITCH -->
+                <div class="mt-4 p-4 rounded border d-flex align-items-center justify-content-between bg-light">
+                    
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="p-2 rounded-circle bg-light">
+                            <MudIcon Icon="@Icons.Material.Filled.VerifiedUser"
+                                     Color="Color.Primary"
+                                     Size="Size.Small" />
                         </div>
+
                         <div>
-                            <MudText Typo="Typo.body2" Class="font-bold">Estado de la Cuenta</MudText>
-                            <MudText Typo="Typo.caption" Class="text-slate-500">Define si el cliente puede solicitar servicios</MudText>
+                            <MudText Typo="Typo.body2" Class="fw-bold">
+                                Estado de la Cuenta
+                            </MudText>
+
+                            <MudText Typo="Typo.caption" Class="text-secondary">
+                                Define si el cliente puede solicitar servicios
+                            </MudText>
                         </div>
                     </div>
+
                     <MudSwitch @bind-Value="_model.IsActive" Color="Color.Primary" />
                 </div>
+
             </MudStack>
         </MudForm>
     </DialogContent>
+
     <DialogActions>
-        <div class="px-6 pb-6 d-flex gap-3 w-100 justify-end">
-            <MudButton OnClick="Cancel" Variant="Variant.Text" Class="px-8 py-2 font-bold text-slate-500">
+        <div class="px-4 pb-4 d-flex gap-3 w-100 justify-content-end">
+
+            <MudButton OnClick="Cancel"
+                       Variant="Variant.Text"
+                       Class="px-4 fw-bold text-secondary">
                 Cancelar
             </MudButton>
-            <MudButton OnClick="Submit" 
-                       Variant="Variant.Filled" 
-                       Color="Color.Primary" 
+
+            <MudButton OnClick="Submit"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary"
                        Disabled="@(!_isValid)"
                        StartIcon="@Icons.Material.Filled.Save"
-                       Class="px-8 py-2 font-bold shadow-md">
+                       Class="px-4 fw-bold shadow">
                 Actualizar Cliente
             </MudButton>
+
         </div>
     </DialogActions>
-   
+
 </MudDialog>
 
 <style>

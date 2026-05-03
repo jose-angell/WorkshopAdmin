@@ -6,52 +6,60 @@
 @inject ISnackbar Snackbar
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="py-1">
+
     @* Header Section *@
-    <div class="d-flex justify-space-between align-center mb-8">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
         <div>
-            <MudText Typo="Typo.h4" Class="font-black tracking-tighter" Style="color: #000666;">Clients</MudText>
-            <MudText Typo="Typo.body2" Class="text-slate-500">Manage your customer database and service history.</MudText>
+            <MudText Typo="Typo.h4" Class="fw-bold" Style="color: #000666;">
+                Clients
+            </MudText>
+
+            <MudText Typo="Typo.body2" Class="text-muted">
+                Manage your customer database and service history.
+            </MudText>
         </div>
-        
+
         @* Button Group *@
-        <div class="d-flex gap-3">
+        <div class="d-flex" style="gap: 0.75rem;">
+
             <MudButton Variant="Variant.Outlined"
                        Color="Color.Primary"
                        StartIcon="@Icons.Material.Filled.Description"
-                       Class="py-2 px-4 font-bold"
-                       Style="text-transform: none; border-radius: 4px; border-color: var(--slate-200); color: #000666;">
+                       Class="py-2 px-4 fw-bold"
+                       Style="text-transform: none; border-radius: 4px; border-color: #dee2e6; color: #000666;">
                 Create Report
             </MudButton>
-            
+
             <MudButton Variant="Variant.Filled"
                        Color="Color.Primary"
                        OnClick="OpenCreateCustomerDialog"
                        StartIcon="@Icons.Material.Filled.Add"
-                       Class="py-2 px-4 shadow-none font-bold"
+                       Class="py-2 px-4 fw-bold"
                        Style="text-transform: none; border-radius: 4px;">
                 Add New Client
             </MudButton>
+
         </div>
     </div>
+
     @* Statistics Grid *@
     <ClientStats />
 
     <MudGrid>
-        @* Main Content (Table and Filters) *@
+        @* Main Content *@
         <MudItem xs="12" lg="12">
+
             <ClientFilters />
-            
-            @* Aquí va tu MudDataGrid de Clientes *@
-            <MudPaper Elevation="0" Class="border border-slate-200 overflow-hidden">
-                @* ... Tu componente MudDataGrid ... *@
-                    <ClientTable/>
+
+            <MudPaper Elevation="0" Class="rounded-4 border overflow-hidden" Style="border-color: #dee2e6;">
+                <ClientTable />
             </MudPaper>
+
         </MudItem>
-
     </MudGrid>
+
 </MudContainer>
-
-
 @code {
     private async Task OpenCreateCustomerDialog()
     {

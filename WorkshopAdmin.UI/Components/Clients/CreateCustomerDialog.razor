@@ -3,16 +3,20 @@
 @using MudBlazor
 
 <MudDialog Class="custom-industrial-dialog">
-    <TitleContent >
-        <div class="d-flex align-center gap-3 py-2 px-1">
-            <MudIcon Icon="@Icons.Material.Filled.PersonAdd" Style="color: white;"  />
-            <MudText Typo="Typo.h6" Class="font-bold text-white uppercase tracking-tighter">Add New Customer</MudText>
+    <TitleContent>
+        <div class="d-flex align-items-center gap-3 py-2 px-1">
+            <MudIcon Icon="@Icons.Material.Filled.PersonAdd" Style="color: white;" />
+            <MudText Typo="Typo.h6" Class="fw-bold text-white text-uppercase">
+                Add New Customer
+            </MudText>
         </div>
     </TitleContent>
+
     <DialogContent>
         <MudForm @ref="_form" @bind-IsValid="_isValid">
             <MudStack Spacing="4" Class="mt-2">
-                @* Campo: Name *@
+
+                <!-- NAME -->
                 <MudTextField T="string"
                               Label="FULL NAME *"
                               @bind-Value="_model.Name"
@@ -24,7 +28,8 @@
                               AdornmentIcon="@Icons.Material.Filled.Badge" />
 
                 <MudGrid Spacing="2">
-                    @* Campo: Email *@
+
+                    <!-- EMAIL -->
                     <MudItem xs="12" sm="6">
                         <MudTextField T="string"
                                       Label="EMAIL ADDRESS"
@@ -34,7 +39,8 @@
                                       Adornment="Adornment.End"
                                       AdornmentIcon="@Icons.Material.Filled.Email" />
                     </MudItem>
-                    @* Campo: Phone *@
+
+                    <!-- PHONE -->
                     <MudItem xs="12" sm="6">
                         <MudTextField T="string"
                                       Label="PHONE NUMBER"
@@ -44,20 +50,29 @@
                                       Adornment="Adornment.End"
                                       AdornmentIcon="@Icons.Material.Filled.Phone" />
                     </MudItem>
+
                 </MudGrid>
             </MudStack>
         </MudForm>
     </DialogContent>
+
     <DialogActions>
-        <div class="px-4 pb-4 d-flex gap-2 w-100 justify-end">
+        <div class="px-4 pb-4 d-flex gap-2 w-100 justify-content-end">
+
             <MudButton OnClick="Cancel"
                        Variant="Variant.Text"
-                       Class="px-6">Cancel</MudButton>
+                       Class="px-4">
+                Cancel
+            </MudButton>
+
             <MudButton OnClick="Submit"
                        Variant="Variant.Filled"
                        Color="Color.Primary"
                        Disabled="@(!_isValid)"
-                       Class="px-8 font-bold shadow-none">Save Client</MudButton>
+                       Class="px-4 fw-bold shadow-none">
+                Save Client
+            </MudButton>
+
         </div>
     </DialogActions>
 </MudDialog>
