@@ -31,21 +31,15 @@
         <!-- NAME -->
         <TemplateColumn Title="Part Name" Filterable="true">
             <CellTemplate Context="context">
-                @{
-                    var item = context.Item;
-                }
-                <MudText Class="fw-bold">@item.Name</MudText>
+                <MudText Class="fw-bold">@context.Item.Name</MudText>
             </CellTemplate>
         </TemplateColumn>
 
         <!-- CATEGORY -->
         <TemplateColumn Title="Category">
             <CellTemplate Context="context">
-                @{
-                    var item = context.Item;
-                }
                 <MudChip T="string" Size="Size.Small">
-                    @item.CategoryName
+                    @context.Item.CategoryName
                 </MudChip>
             </CellTemplate>
         </TemplateColumn>
@@ -62,7 +56,9 @@
 
                     @if (isLow)
                     {
-                        <MudIcon Icon="@Icons.Material.Filled.Warning" Color="Color.Error" Size="Size.Small" />
+                        <MudIcon Icon="@Icons.Material.Filled.Warning"
+                                 Color="Color.Error"
+                                 Size="Size.Small" />
                     }
 
                     <MudText Color="@(isLow ? Color.Error : Color.Default)">
@@ -81,19 +77,16 @@
         <PropertyColumn Property="x => x.Price"
                         Title="Price"
                         Align="Align.Right"
-                        Format="C" 
+                        Format="C"
                         Filterable="false" />
 
         <!-- LOCATION -->
         <TemplateColumn Title="Location">
             <CellTemplate Context="context">
-                @{
-                    var item = context.Item;
-                }
                 <MudChip T="string"
                          StartIcon="@Icons.Material.Filled.LocationOn"
                          Size="Size.Small">
-                    @item.WarehouseLocation
+                    @context.Item.WarehouseLocation
                 </MudChip>
             </CellTemplate>
         </TemplateColumn>
@@ -101,11 +94,8 @@
         <!-- STATUS -->
         <TemplateColumn Title="Status" Align="Align.Center">
             <CellTemplate Context="context">
-                @{
-                    var item = context.Item;
-                }
                 <MudIcon Icon="@Icons.Material.Filled.Circle"
-                         Color="@(item.IsActive ? Color.Success : Color.Default)"
+                         Color="@(context.Item.IsActive ? Color.Success : Color.Default)"
                          Size="Size.Small" />
             </CellTemplate>
         </TemplateColumn>
@@ -113,33 +103,41 @@
         <!-- ACTIONS -->
         <TemplateColumn Title="Actions" Align="Align.Right">
             <CellTemplate Context="context">
-                <MudStack Row Justify="Justify.FlexEnd">
+                <MudStack Row Justify="Justify.FlexEnd" Spacing="1">
+
                     <MudIconButton Icon="@Icons.Material.Filled.Edit"
                                    Size="Size.Small"
                                    Color="Color.Primary"
                                    OnClick="@(() => OpenEditDialog(context.Item))" />
-                    <MudIconButton Icon="@Icons.Material.Outlined.History" Size="Size.Small" />
-                    <MudIconButton Icon="@Icons.Material.Outlined.Inventory" Size="Size.Small" />
+
+                    <MudIconButton Icon="@Icons.Material.Outlined.History"
+                                   Size="Size.Small" />
+
+                    <MudIconButton Icon="@Icons.Material.Outlined.Inventory"
+                                   Size="Size.Small" />
+
                 </MudStack>
             </CellTemplate>
         </TemplateColumn>
 
     </Columns>
-    <PagerContent>
-        <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="pa-3">
 
-            <!-- INFO -->
+    <!-- PAGER -->
+    <PagerContent>
+        <MudStack Row Justify="Justify.SpaceBetween"
+                  AlignItems="AlignItems.Center"
+                  Class="p-3">
+
             <MudText Typo="Typo.caption">
                 Showing @($"{_from}-{_to} of {PartsList.Count} items")
             </MudText>
 
-            <!-- PAGER -->
             <MudDataGridPager T="PartDto" />
 
         </MudStack>
     </PagerContent>
-</MudDataGrid>
 
+</MudDataGrid>
 @code {
     private string _searchString = "";
     

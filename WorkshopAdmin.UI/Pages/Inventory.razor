@@ -5,50 +5,65 @@
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 
-<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="py-5">
-    @* Header Section *@
-    <div class="d-flex justify-space-between align-center mb-8">
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="py-4">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
         <div>
-            <MudText Typo="Typo.h4" Class="font-black tracking-tighter" Style="color: #000666;">Inventory &amp; Parts</MudText>
-            <MudText Typo="Typo.body2" Class="text-slate-500">Manage component stock levels, pricing, and technical catalog.</MudText>
+            <MudText Typo="Typo.h4" Class="fw-bold" Style="color: #000666;">
+                Inventory & Parts
+            </MudText>
+
+            <MudText Typo="Typo.body2" Class="text-secondary">
+                Manage component stock levels, pricing, and technical catalog.
+            </MudText>
         </div>
-        
-        @* Button Group *@
-        <div class="d-flex gap-3">
+
+        <!-- BUTTONS -->
+        <div class="d-flex gap-2">
+
             <MudButton Variant="Variant.Outlined"
-                        Color="Color.Primary"
-                        StartIcon="@Icons.Material.Filled.Description"
-                        Class="py-2 px-4 font-bold"
-                        Style="text-transform: none; border-radius: 4px; border-color: var(--slate-200); color: #000666;">
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Description"
+                       Class="py-2 px-3 fw-bold"
+                       Style="text-transform: none; border-radius: 4px; border-color: var(--slate-200); color: #000666;">
                 Create Report
             </MudButton>
-            
+
             <MudButton Variant="Variant.Filled"
-                        Color="Color.Primary"
+                       Color="Color.Primary"
                        OnClick="OpenCreatePartDialog"
-                        StartIcon="@Icons.Material.Filled.Add"
-                        Class="py-2 px-4 shadow-none font-bold"
-                        Style="text-transform: none; border-radius: 4px;">
+                       StartIcon="@Icons.Material.Filled.Add"
+                       Class="py-2 px-3 fw-bold"
+                       Style="text-transform: none; border-radius: 4px;">
                 Add New Part
             </MudButton>
+
         </div>
+
     </div>
-    @* Statistics Grid *@
+
+    <!-- STATS -->
     <InventoryStats />
 
     <MudGrid>
-        @* Main Content (Table and Filters) *@
+
         <MudItem xs="12" lg="12">
+
             <InventoryFilters />
-            
-            @* Aquí va tu MudDataGrid de Inventario *@
-            <MudPaper Elevation="0" Class="border border-slate-200 overflow-hidden">
-                @* ... Tu componente MudDataGrid ... *@
-                    <InventoryTable/>
+
+            <!-- TABLE -->
+            <MudPaper Elevation="0" Class="border overflow-hidden">
+
+                <InventoryTable />
+
             </MudPaper>
+
         </MudItem>
 
     </MudGrid>
+
 </MudContainer>
 @code {
     private async Task OpenCreatePartDialog()

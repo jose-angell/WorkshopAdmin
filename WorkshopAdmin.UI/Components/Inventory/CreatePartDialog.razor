@@ -6,9 +6,10 @@
 
     <!-- HEADER -->
     <TitleContent>
-        <div class="d-flex align-center gap-3 py-2 px-1">
+        <div class="d-flex align-items-center py-2 px-1" style="gap: 0.75rem;">
             <MudIcon Icon="@Icons.Material.Filled.Inventory2" Style="color: white;" />
-            <MudText Typo="Typo.h6" Class="font-bold text-white uppercase tracking-tighter">
+
+            <MudText Typo="Typo.h6" Class="fw-bold text-white text-uppercase">
                 Add New Part
             </MudText>
         </div>
@@ -70,7 +71,6 @@
                     </MudItem>
 
                     <MudItem xs="12" sm="6">
-                        
                         <MudNumericField T="decimal"
                                          Label="UNIT PRICE ($) *"
                                          @bind-Value="_model.Price"
@@ -86,7 +86,7 @@
 
                 </MudGrid>
 
-                <!-- PRICE + STOCK -->
+                <!-- UNIT / STOCK -->
                 <MudGrid Spacing="2">
 
                     <MudItem xs="12" sm="4">
@@ -137,11 +137,11 @@
 
     <!-- FOOTER -->
     <DialogActions>
-        <div class="px-4 pb-4 d-flex gap-2 w-100 justify-end">
+        <div class="px-4 pb-4 d-flex w-100 justify-content-end" style="gap: 0.5rem;">
 
             <MudButton OnClick="Cancel"
                        Variant="Variant.Text"
-                       Class="px-6">
+                       Class="px-4">
                 Cancel
             </MudButton>
 
@@ -149,7 +149,7 @@
                        Variant="Variant.Filled"
                        Color="Color.Primary"
                        Disabled="@(!_isValid)"
-                       Class="px-8 font-bold shadow-none"
+                       Class="px-4 fw-bold"
                        StartIcon="@Icons.Material.Filled.Save">
                 Save Part
             </MudButton>
@@ -158,7 +158,6 @@
     </DialogActions>
 
 </MudDialog>
-
 @code {
     [CascadingParameter]
     private IMudDialogInstance MudDialog { get; set; } = default!;
