@@ -31,7 +31,7 @@
                         </MudText>
 
                         <MudText Typo="Typo.caption"
-                                 Style="color: var(--mud-palette-text-secondary);">
+                                 Class="text-muted">
                             @item.CreatedAt.ToLocalTime().ToString("dd MMM yyyy - hh:mm tt")
                         </MudText>
                     </MudStack>
@@ -69,7 +69,7 @@
             <TemplateColumn Title="Falla">
                 <CellTemplate Context="context">
                     <MudText Typo="Typo.body2"
-                             Class="text-truncate"
+                             Class="text-truncate d-inline-block"
                              Style="max-width: 220px;">
                         @context.Item.FailureDescription
                     </MudText>
@@ -130,7 +130,7 @@
 
         <!-- PAGER -->
         <PagerContent>
-            <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="pa-3">
+            <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="p-3">
 
                 <MudText Typo="Typo.caption">
                     Mostrando @($"{_from}-{_to} de {Items?.Count() ?? 0} órdenes")
@@ -144,7 +144,6 @@
     </MudDataGrid>
 
 </MudPaper>
-
 
 @code {
 

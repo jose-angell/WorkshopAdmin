@@ -2,45 +2,47 @@
 @using WorkshopAdmin.Shared.Dtos.ServiceOrders
 @using WorkshopAdmin.Shared.Enums
 
-<MudPaper Class="detail-container rounded-xl border" Elevation="0">
+<MudPaper Class="detail-container rounded border" Elevation="0">
 
     @if (_loading)
     {
         <!-- LOADING -->
-        <MudStack AlignItems="AlignItems.Center" Class="pa-6">
+        <MudStack AlignItems="AlignItems.Center" Class="p-4">
             <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
             <MudText Typo="Typo.caption" Class="mt-2">Cargando orden...</MudText>
         </MudStack>
     }
     else if (_order is not null)
     {
-        <MudPaper Class="pa-4 bg-slate-50" Style=" color: whitesmoke;">
-        <!-- HEADER -->
-            <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class=" detail-header mb-4 pa-3 rounded-lg">
+       
+            <!-- HEADER -->
+            <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center"
+                      Class="detail-header mb-4 p-3 rounded text-white pb-3 pt-4 mt-5">
 
-            <MudStack Spacing="0">
-                <MudText Typo="Typo.h6" Class="fw-bold">
-                    Orden #ORD-@_order.Id.ToString()[..6]
-                </MudText>
-                <MudText Typo="Typo.caption">
-                    @_order.CreatedAt.ToLocalTime().ToString("dd MMM yyyy - hh:mm tt")
-                </MudText>
+                <MudStack Spacing="0">
+                    <MudText Typo="Typo.h6" Class="fw-bold">
+                        Orden #ORD-@_order.Id.ToString()[..6]
+                    </MudText>
+                    <MudText Typo="Typo.caption">
+                        @_order.CreatedAt.ToLocalTime().ToString("dd MMM yyyy - hh:mm tt")
+                    </MudText>
+                </MudStack>
+
+                <MudChip T="ServiceOrderStatus"
+                         Color="@GetStatusColor(_order.Status)"
+                         Variant="Variant.Filled"
+                         Class="fw-bold">
+                    @_order.Status.ToFriendlyName()
+                </MudChip>
+
             </MudStack>
 
-            <MudChip T="ServiceOrderStatus" Color="@GetStatusColor(_order.Status)"
-                     Variant="Variant.Filled"
-                     Class="fw-bold">
-                @_order.Status.ToFriendlyName()
-            </MudChip>
-
-        </MudStack>
-
-        <!-- GRID -->
-            <MudGrid class="detail-body" >
+            <!-- GRID -->
+            <MudGrid Class="detail-body">
 
                 <!-- CLIENTE -->
                 <MudItem xs="12" md="6">
-                    <MudPaper Class="pa-3 rounded-lg border">
+                    <MudPaper Class="p-3 rounded border">
                         <MudText Typo="Typo.caption">Cliente</MudText>
                         <MudText Class="fw-bold">@_order.CustomerName</MudText>
                     </MudPaper>
@@ -48,7 +50,7 @@
 
                 <!-- EQUIPO -->
                 <MudItem xs="12" md="6">
-                    <MudPaper Class="pa-3 rounded-lg border">
+                    <MudPaper Class="p-3 rounded border">
                         <MudText Typo="Typo.caption">Equipo</MudText>
                         <MudText Class="fw-bold">
                             @_order.EquipmentBrand @_order.EquipmentModel
@@ -61,7 +63,7 @@
 
                 <!-- FALLA -->
                 <MudItem xs="12">
-                    <MudPaper Class="pa-3 rounded-lg border">
+                    <MudPaper Class="p-3 rounded border">
                         <MudText Typo="Typo.caption">Falla reportada</MudText>
                         <MudText>@_order.FailureDescription</MudText>
                     </MudPaper>
@@ -71,7 +73,7 @@
                 @if (!string.IsNullOrWhiteSpace(_order.Diagnosis))
                 {
                     <MudItem xs="12">
-                        <MudPaper Class="pa-3 rounded-lg border">
+                        <MudPaper Class="p-3 rounded border">
                             <MudText Typo="Typo.caption">Diagnóstico</MudText>
                             <MudText>@_order.Diagnosis</MudText>
                         </MudPaper>
@@ -80,7 +82,7 @@
 
                 <!-- COSTOS -->
                 <MudItem xs="12" md="6">
-                    <MudPaper Class="pa-3 rounded-lg border">
+                    <MudPaper Class="p-3 rounded border">
                         <MudText Typo="Typo.caption">Mano de obra</MudText>
                         <MudText Class="fw-bold">
                             @_order.LaborCost.ToString("C")
@@ -89,7 +91,7 @@
                 </MudItem>
 
                 <MudItem xs="12" md="6">
-                    <MudPaper Class="pa-3 rounded-lg border">
+                    <MudPaper Class="p-3 rounded border">
                         <MudText Typo="Typo.caption">Total</MudText>
                         <MudText Class="fw-bold">
                             @_order.TotalCost.ToString("C")
@@ -99,10 +101,10 @@
 
                 <!-- PARTES -->
                 <MudItem xs="12">
-                    <MudPaper Class="pa-3 rounded-lg border">
+                    <MudPaper Class="p-3 rounded border">
                         <MudStack Row Justify="Justify.SpaceBetween" Class="mb-2">
                             <MudText Typo="Typo.caption">Refacciones</MudText>
-                            <MudChip T="int" Size="Size.Small" >
+                            <MudChip T="int" Size="Size.Small">
                                 @_order.OrderPart.Count()
                             </MudChip>
                         </MudStack>
@@ -128,7 +130,8 @@
                 </MudItem>
 
             </MudGrid>
-    </MudPaper>
+
+        
     }
 
 </MudPaper>

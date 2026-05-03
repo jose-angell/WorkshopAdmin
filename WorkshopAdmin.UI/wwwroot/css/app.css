@@ -262,9 +262,7 @@ code {
 }
 
 .detail-header {
-    position: sticky;
-    top: 0;
-    z-index: 10;
+    
     background: var(--mud-palette-primary);
 }
 
@@ -273,6 +271,7 @@ code {
     overflow-y: auto;
     flex-grow: 1;
     padding-right: 4px;
+    min-height: 0;
 }
 .detail-body::-webkit-scrollbar {
     width: 6px;
