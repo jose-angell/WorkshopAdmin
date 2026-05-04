@@ -17,12 +17,14 @@ public class EquipmentRepository : IEquipmentRepository
     public async Task<Equipment?> GetByIdAsync(Guid id)
     {
         return await _context.Equipments
+            .Include(e => e.Customer)
             .FirstOrDefaultAsync(e => e.Id == id);
     }
 
     public async Task<IEnumerable<Equipment>> GetAllAsync()
     {
         return await _context.Equipments
+            .Include(e => e.Customer)
             .OrderByDescending(e => e.CreatedAt)
             .ToListAsync();
     }
@@ -30,6 +32,7 @@ public class EquipmentRepository : IEquipmentRepository
     public async Task<IEnumerable<Equipment>> GetByBrandAndModelAsync(string brand, string model)
     {
         return await _context.Equipments
+            .Include(e => e.Customer)
             .Where(e => e.Brand.Contains(brand) && e.Model.Contains(model))
             .ToListAsync();
     }

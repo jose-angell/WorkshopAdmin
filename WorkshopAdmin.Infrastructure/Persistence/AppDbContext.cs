@@ -19,12 +19,9 @@ public class AppDbContext : DbContext
 
         // Aplica todas las configuraciones que implementan IEntityTypeConfiguration 
         // definidas en este ensamblado 
-        modelBuilder.HasSequence<int>("service_order_seq")
-                .StartsAt(1)
-                .IncrementsBy(1);
-        modelBuilder.HasSequence<int>("customer_seq")
-                .StartsAt(1)
-                .IncrementsBy(1);
+        modelBuilder.HasSequence<int>("service_order_seq").StartsAt(1).IncrementsBy(1);
+        modelBuilder.HasSequence<int>("customer_seq").StartsAt(1).IncrementsBy(1);
+        modelBuilder.HasSequence<int>("equipment_seq").StartsAt(1).IncrementsBy(1);
 
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
     }

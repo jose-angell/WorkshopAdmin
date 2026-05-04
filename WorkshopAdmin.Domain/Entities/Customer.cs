@@ -13,4 +13,5 @@ public class Customer
 
     // Propiedades de navegación
     public virtual ICollection<ServiceOrder> ServiceOrders { get; set; } = new List<ServiceOrder>(); // Relación 1:N 
+    public virtual ICollection<Equipment> Equipments { get; set; } = new List<Equipment>(); // Relación 1:N 
 }

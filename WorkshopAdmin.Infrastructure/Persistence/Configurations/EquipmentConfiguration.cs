@@ -48,6 +48,20 @@ public class EquipmentConfiguration : IEntityTypeConfiguration<Equipment>
             .HasColumnType("timestamptz")
             .HasDefaultValueSql("now()");
 
+        builder.HasOne(e => e.Customer)
+        .WithMany(c => c.Equipments)
+        .HasForeignKey(e => e.CustomerId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Property(e => e.EquipmentNumber)
+        .HasColumnName("equipment_number")
+        .HasDefaultValueSql("nextval('\"equipment_seq\"')");
+
+        // 2. FriendlyId (EQ-00001)
+        builder.Property(e => e.FriendlyId)
+            .HasColumnName("friendly_id")
+            .HasComputedColumnSql("'EQ-' || lpad(equipment_number::text, 5, '0')", stored: true);
+
         builder.HasIndex(x => new { x.Brand, x.Model });
     }
 }

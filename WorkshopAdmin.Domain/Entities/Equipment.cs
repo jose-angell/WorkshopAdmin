@@ -5,7 +5,13 @@ namespace WorkshopAdmin.Domain.Entities;
 public class Equipment
 {
     public Guid Id { get; set; } // PK: uuid 
+    public string FriendlyId { get; private set; } = string.Empty; // EQ-00001
+    public int EquipmentNumber { get; private set; } // Secuencial
     public EquipmentType EquipmentTypeId { get; set; } // smallint en DB 
+
+    public Guid CustomerId { get; set; }
+    public virtual Customer Customer { get; set; } = null!;
+
     public string DescriptionType { get; set; } = string.Empty; // varchar(100) Subtipo/Descripción:
     public string Brand { get; set; } = string.Empty; // varchar(100) 
     public string Model { get; set; } = string.Empty; // varchar(100) 

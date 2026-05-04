@@ -78,12 +78,16 @@ public class EquipmentService : IEquipmentService
         new EquipmentDto
         {
             Id = equipment.Id,
+            FriendlyId = equipment.FriendlyId,
             TypeId = equipment.EquipmentTypeId,
             TypeName = equipment.EquipmentTypeId.ToFriendlyName(), 
             DescriptionType = equipment.DescriptionType,
             Brand = equipment.Brand,
             Model = equipment.Model,
             TechnicalSpecifications = equipment.TechnicalSpecifications,
+            CustomerId = equipment.CustomerId,
+            CustomerName = equipment.Customer.Name,
+            IsActive = equipment.IsActive,
             CreatedAt = equipment.CreatedAt
         };
 }
