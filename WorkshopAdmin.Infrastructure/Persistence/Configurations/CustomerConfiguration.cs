@@ -40,6 +40,16 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
             .HasDefaultValueSql("now()")
             .IsRequired();
 
+        builder.Property(c => c.CustomerNumber)
+            .HasColumnName("customer_number")
+            .HasDefaultValueSql("nextval('\"customer_seq\"')");
+
+        // Formato: CUST-00001
+        builder.Property(c => c.FriendlyId)
+            .HasColumnName("friendly_id")
+            .HasComputedColumnSql(" 'CUST-' || lpad(customer_number::text, 5, '0') ", stored: true);
+       
+        builder.HasIndex(c => c.FriendlyId).IsUnique();
         builder.HasIndex(x => x.Name);
     }
 }

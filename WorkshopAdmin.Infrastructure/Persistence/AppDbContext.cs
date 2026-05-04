@@ -22,6 +22,9 @@ public class AppDbContext : DbContext
         modelBuilder.HasSequence<int>("service_order_seq")
                 .StartsAt(1)
                 .IncrementsBy(1);
+        modelBuilder.HasSequence<int>("customer_seq")
+                .StartsAt(1)
+                .IncrementsBy(1);
 
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
     }

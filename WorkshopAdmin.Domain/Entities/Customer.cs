@@ -7,6 +7,8 @@ public class Customer
     public string Phone { get; set; } = string.Empty; // varchar(20) 
     public string Email { get; set; } = string.Empty; // varchar(150) 
     public bool IsActive { get; set; } = true; // boolean, default true
+    public int CustomerNumber { get; private set; } // El número secuencial (ej: 1, 2, 3)
+    public string FriendlyId { get; private set; } = string.Empty; // El código (ej: CUST-00001)
     public DateTimeOffset CreatedAt { get; set; } // timestamptz 
 
     // Propiedades de navegación

@@ -76,6 +76,7 @@ public class CustomerService : ICustomerService
      new CustomerDto
      {
          Id = customer.Id,
+         FriendlyId = customer.FriendlyId,
          Name = customer.Name,
          Email = customer.Email,
          Phone = customer.Phone,

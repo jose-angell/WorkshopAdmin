@@ -15,7 +15,7 @@ public class ServiceOrder
     public DateTimeOffset CreatedAt { get; set; } // timestamptz 
     public DateTimeOffset UpdatedAt { get; set; } // timestamptz 
     public int OrderNumber { get; private set; } // El número secuencial (ej: 1, 2, 3)
-    public string FriendlyId { get; private set; } = string.Empty; // El código (ej: ORD-2605-00001)
+    public string FriendlyId { get; private set; } = string.Empty; // El código (ej: ORD-00001)
 
     // Propiedades de navegación
     public virtual Customer Customer { get; set; } = null!; // Relación 1:N 
