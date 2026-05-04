@@ -61,6 +61,7 @@ public class ServiceOrderService : IServiceOrderService
         return new ServiceOrderDto
         {
             Id = order.Id,
+            FriendlyId = order.FriendlyId,
             CustomerId = order.CustomerId,
             CustomerName = customer.Name,
             EquipmentId = order.EquipmentId,
@@ -217,6 +218,7 @@ public class ServiceOrderService : IServiceOrderService
     private static ServiceOrderDto MapToDto(ServiceOrder order) => new ServiceOrderDto
     {
         Id = order.Id,
+        FriendlyId = order.FriendlyId,
         CustomerId = order.CustomerId,
         CustomerName = order.Customer?.Name ?? "N/A",
         EquipmentId = order.EquipmentId,

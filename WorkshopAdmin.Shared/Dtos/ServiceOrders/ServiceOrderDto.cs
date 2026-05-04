@@ -6,6 +6,8 @@ public class ServiceOrderDto
 {
     public Guid Id { get; set; }
 
+    public string FriendlyId { get; set; } = string.Empty; // Código legible (ej: ORD-2605-00001)
+
     // Datos del Cliente (Aplanados)
     public Guid CustomerId { get; set; }
     public string CustomerName { get; set; } = string.Empty;

@@ -50,6 +50,21 @@ public class ServiceOrderConfiguration : IEntityTypeConfiguration<ServiceOrder>
             .HasColumnType("timestamptz")
             .HasDefaultValueSql("now()");
 
+        // 1. Configurar el número secuencial
+        builder.Property(so => so.OrderNumber)
+            .HasColumnName("order_number")
+            .HasDefaultValueSql("nextval('\"service_order_seq\"')");
+
+        // 2. Configurar el FriendlyId como columna calculada persistente
+        // Formato: ORD-YYMM-00001
+        builder.Property(so => so.FriendlyId)
+            .HasColumnName("friendly_id")
+            // La fórmula de Postgres para generar el código al vuelo
+            .HasComputedColumnSql(" 'ORD-' || lpad(order_number::text, 5, '0') ", stored: true);
+
+        // 3. Índice único para búsquedas rápidas por el código amigable
+        builder.HasIndex(so => so.FriendlyId).IsUnique();
+
         // Relaciones
         builder.HasOne(so => so.Customer)
             .WithMany(c => c.ServiceOrders)
