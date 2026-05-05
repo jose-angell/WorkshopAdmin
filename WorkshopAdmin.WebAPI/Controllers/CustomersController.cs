@@ -5,7 +5,7 @@ using WorkshopAdmin.Shared.Dtos.Customers;
 namespace WorkshopAdmin.WebAPI.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/customers")]
 public class CustomersController : ControllerBase
 {
     private readonly ICustomerService _customerService;

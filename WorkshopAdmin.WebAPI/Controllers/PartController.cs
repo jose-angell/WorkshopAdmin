@@ -5,7 +5,7 @@ using WorkshopAdmin.Shared.Dtos.Parts;
 namespace WorkshopAdmin.WebAPI.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/inventory")]
 public class PartController : ControllerBase
 {
     private readonly IPartService _partService;

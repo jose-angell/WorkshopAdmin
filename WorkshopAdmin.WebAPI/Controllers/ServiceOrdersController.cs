@@ -6,7 +6,7 @@ using WorkshopAdmin.Shared.Enums;
 namespace WorkshopAdmin.WebAPI.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/service-orders")]
 public class ServiceOrdersController : ControllerBase
 {
     private readonly IServiceOrderService _serviceOrderService;

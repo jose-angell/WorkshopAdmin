@@ -5,7 +5,7 @@ using WorkshopAdmin.Shared.Dtos.Equipments;
 namespace WorkshopAdmin.WebAPI.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/equipment")]
 public class EquipmentController : ControllerBase
 {
     private readonly IEquipmentService _equipmentService;

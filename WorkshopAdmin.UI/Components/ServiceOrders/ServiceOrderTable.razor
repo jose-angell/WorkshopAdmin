@@ -1,13 +1,16 @@
 ﻿@using MudBlazor
 @using WorkshopAdmin.Shared.Dtos.ServiceOrders
 @using WorkshopAdmin.Shared.Enums
+@using WorkshopAdmin.UI.Services
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject ServiceOrderClient OrderClient
 
 <MudPaper Elevation="0" Class="border rounded-4">
 
     <MudDataGrid T="ServiceOrderDto"
-                 Items="@ServiceOrders"
+                 Items="@_orders"
+                 Loading="@_loading"
                  Dense="true"
                  Hover="true"
                  Filterable="true"
@@ -28,7 +31,7 @@
                     <MudStack Spacing="0">
                         <MudText Class="fw-bold"
                                  Style="font-family: monospace; color: var(--mud-palette-primary);">
-                            #ORD-@item.Id.ToString()[..6]
+                            @item.FriendlyId
                         </MudText>
 
                         <MudText Typo="Typo.caption"
@@ -134,7 +137,7 @@
             <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="p-3">
 
                 <MudText Typo="Typo.caption">
-                    Mostrando @($"{_from}-{_to} de {Items?.Count() ?? 0} órdenes")
+                    Mostrando @($"{_from}-{_to} de {_orders?.Count() ?? 0} órdenes")
                 </MudText>
 
                 <MudDataGridPager T="ServiceOrderDto" />
@@ -148,27 +151,52 @@
 
 @code {
 
-    [Parameter] public IEnumerable<ServiceOrderDto> Items { get; set; } = Enumerable.Empty<ServiceOrderDto>();
+    private List<ServiceOrderDto> _orders = new();
+    private bool _loading = true;
+    private string _searchString = "";
+    private Guid? _selectedOrderId;
+    private bool _openDialog;
 
-    
+    // Mantenemos tus parámetros por si este componente se usa dentro de otro
     [Parameter] public EventCallback<ServiceOrderDto> OnView { get; set; }
     [Parameter] public EventCallback<ServiceOrderDto> OnEdit { get; set; }
     [Parameter] public EventCallback<ServiceOrderDto> OnTrace { get; set; }
 
-    private Guid? _selectedOrderId;
-    private bool _openDialog;
-    private string _searchString = "";
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
 
+   
+    private async Task LoadData(ServiceOrderStatus? filterStatus = null, Guid? filterCustomer = null)
+    {
+        try
+        {
+            _loading = true;
+            // Ahora pasamos los filtros al servicio
+            _orders = await OrderClient.GetAllAsync(filterStatus, filterCustomer);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Error al sincronizar con el servidor", Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    // Filtro rápido actualizado
     private Func<ServiceOrderDto, bool> _quickFilter => x =>
-     {
-         if (string.IsNullOrWhiteSpace(_searchString)) return true;
-         if (x.CustomerName.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
-         if (x.EquipmentDescription.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
-         return false;
-     };
+    {
+        if (string.IsNullOrWhiteSpace(_searchString)) return true;
+        return x.CustomerName.Contains(_searchString, StringComparison.OrdinalIgnoreCase) ||
+               x.FriendlyId.Contains(_searchString, StringComparison.OrdinalIgnoreCase) ||
+               x.EquipmentModel.Contains(_searchString, StringComparison.OrdinalIgnoreCase);
+    };
 
     private int _from => 1;
-    private int _to => Items?.Count() ?? 0;
+    private int _to => _orders?.Count() ?? 0;
     private string RowClass(ServiceOrderDto item, int index)
        => "hover-row";
 
@@ -202,137 +230,5 @@
         var result = await dialog.Result;
 
     }
-    public List<ServiceOrderDto> ServiceOrders = new()
-    {
-        new ServiceOrderDto
-        {
-            Id = Guid.NewGuid(),
-            CustomerId = Guid.NewGuid(),
-            CustomerName = "Juan Pérez",
-
-            EquipmentId = Guid.NewGuid(),
-            EquipmentTypeName = "Laptop",
-            EquipmentBrand = "Dell",
-            EquipmentModel = "XPS 15",
-            EquipmentDescription = "Laptop no enciende",
-
-            FailureDescription = "No responde al presionar power",
-            Diagnosis = "Falla en tarjeta madre",
-            Status = ServiceOrderStatus.Diagnosing,
-
-            LaborCost = 800,
-            TotalCost = 1500,
-
-            ServiceTypeDescription = "Reparación",
-            CreatedAt = DateTimeOffset.Now.AddDays(-2),
-            UpdatedAt = DateTimeOffset.Now.AddHours(-5),
-
-            OrderPart = new List<OrderPartDto?> { new(), new() }
-        },
-
-        new ServiceOrderDto
-        {
-            Id = Guid.NewGuid(),
-            CustomerId = Guid.NewGuid(),
-            CustomerName = "María López",
-
-            EquipmentId = Guid.NewGuid(),
-            EquipmentTypeName = "Smartphone",
-            EquipmentBrand = "Samsung",
-            EquipmentModel = "Galaxy S21",
-            EquipmentDescription = "Pantalla rota",
-
-            FailureDescription = "Golpe frontal",
-            Diagnosis = "Pantalla dañada",
-            Status = ServiceOrderStatus.Repairing,
-
-            LaborCost = 500,
-            TotalCost = 2200,
-
-            ServiceTypeDescription = "Cambio de pantalla",
-            CreatedAt = DateTimeOffset.Now.AddDays(-5),
-            UpdatedAt = DateTimeOffset.Now.AddHours(-2),
-
-            OrderPart = new List<OrderPartDto?> { new() }
-        },
-
-        new ServiceOrderDto
-        {
-            Id = Guid.NewGuid(),
-            CustomerId = Guid.NewGuid(),
-            CustomerName = "Carlos Hernández",
-
-            EquipmentId = Guid.NewGuid(),
-            EquipmentTypeName = "Tablet",
-            EquipmentBrand = "Apple",
-            EquipmentModel = "iPad Air",
-            EquipmentDescription = "No carga",
-
-            FailureDescription = "Puerto dañado",
-            Diagnosis = "Requiere cambio de puerto",
-            Status = ServiceOrderStatus.Completed,
-
-            LaborCost = 700,
-            TotalCost = 1800,
-
-            ServiceTypeDescription = "Reparación",
-            CreatedAt = DateTimeOffset.Now.AddDays(-10),
-            UpdatedAt = DateTimeOffset.Now.AddDays(-1),
-
-            OrderPart = new List<OrderPartDto?> { new(), new(), new() }
-        },
-
-        new ServiceOrderDto
-        {
-            Id = Guid.NewGuid(),
-            CustomerId = Guid.NewGuid(),
-            CustomerName = "Ana Torres",
-
-            EquipmentId = Guid.NewGuid(),
-            EquipmentTypeName = "Laptop",
-            EquipmentBrand = "HP",
-            EquipmentModel = "Pavilion",
-            EquipmentDescription = "Lenta",
-
-            FailureDescription = "Rendimiento bajo",
-            Diagnosis = null,
-            Status = ServiceOrderStatus.Received,
-
-            LaborCost = 0,
-            TotalCost = 0,
-
-            ServiceTypeDescription = "Diagnóstico",
-            CreatedAt = DateTimeOffset.Now.AddHours(-6),
-            UpdatedAt = DateTimeOffset.Now.AddHours(-6),
-
-            OrderPart = new List<OrderPartDto?>()
-        },
-
-        new ServiceOrderDto
-        {
-            Id = Guid.NewGuid(),
-            CustomerId = Guid.NewGuid(),
-            CustomerName = "Luis Martínez",
-
-            EquipmentId = Guid.NewGuid(),
-            EquipmentTypeName = "PC Escritorio",
-            EquipmentBrand = "Custom",
-            EquipmentModel = "Ryzen 7",
-            EquipmentDescription = "No da video",
-
-            FailureDescription = "Pantalla negra",
-            Diagnosis = "GPU dañada",
-            Status = ServiceOrderStatus.Delivered,
-
-            LaborCost = 1200,
-            TotalCost = 4500,
-
-            ServiceTypeDescription = "Reparación avanzada",
-            CreatedAt = DateTimeOffset.Now.AddDays(-15),
-            UpdatedAt = DateTimeOffset.Now.AddDays(-3),
-
-            OrderPart = new List<OrderPartDto?> { new() }
-        }
-    };
-
+    
 }

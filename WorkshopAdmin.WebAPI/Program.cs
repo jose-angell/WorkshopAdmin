@@ -16,7 +16,19 @@ builder.Services.AddSwaggerGen();  // La parte de Swashbuckle para generar el UI
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin() // En producción cambia esto por tu URL real
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
+
+app.UseCors();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
