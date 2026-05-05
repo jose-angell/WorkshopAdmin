@@ -1,6 +1,8 @@
-﻿@using WorkshopAdmin.Shared.Dtos.Customers
-@* Asegúrate de tener este namespace para los iconos y componentes *@
-@using MudBlazor
+﻿@using MudBlazor
+@using WorkshopAdmin.Shared.Dtos.Customers
+@using WorkshopAdmin.UI.Services
+@inject ISnackbar Snackbar
+@inject CustomerClient CustomerClient
 
 <MudDialog Class="custom-industrial-dialog">
     <TitleContent>
@@ -81,7 +83,7 @@
     // CORRECCIÓN: Usar IMudDialogInstance con la 'I'
     [CascadingParameter]
     private IMudDialogInstance MudDialog { get; set; } = default!;
-    
+
     // Modelo solicitado
     private CreateCustomerRequest _model = new();
     private MudForm _form = default!;
@@ -89,9 +91,21 @@
 
     private void Cancel() => MudDialog.Cancel();
 
-    private void Submit()
+    private async Task Submit()
     {
-        // Al cerrar, devolvemos el objeto _model ya lleno
-        MudDialog.Close(DialogResult.Ok(_model));
+        if (_isValid)
+        {
+            
+            var result = await CustomerClient.CreateAsync(_model);
+        
+            if (result != null) 
+            {
+                MudDialog.Close(DialogResult.Ok(result));
+            }
+            else
+            {
+                Snackbar.Add("Could not save customer. Please check the data.", Severity.Error);
+            }
+        }
     }
 }

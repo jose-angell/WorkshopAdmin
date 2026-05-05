@@ -1,10 +1,13 @@
 ﻿@* Components/Clients/ClientTable.razor *@
 @using WorkshopAdmin.Shared.Dtos.Customers
+@using WorkshopAdmin.UI.Services
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject CustomerClient CustomerClient
 
 <MudDataGrid T="CustomerDto"
              Items="@_clients"
+             Loading="@_loading"
              Hover="true"
              Striped="false"
              Elevation="0"
@@ -17,7 +20,7 @@
         <PropertyColumn Property="x => x.Id" Title="ID">
             <CellTemplate>
                 <MudText Typo="Typo.caption" Class="font-mono text-slate-400" Style="font-size: 11px;">
-                    #@context.Item.Id.ToString().Substring(0, 8).ToUpper()
+                    #@context.Item.FriendlyId
                 </MudText>
             </CellTemplate>
         </PropertyColumn>
@@ -104,39 +107,30 @@
 @code {
     private List<CustomerDto> _clients = new();
     private string _searchString = "";
-
-    protected override void OnInitialized()
+    private bool _loading = true;
+    protected override async Task OnInitializedAsync()
     {
-        // Datos duros basados en el DTO proporcionado
-        _clients = new List<CustomerDto>
-        {
-            new CustomerDto {
-                Id = Guid.NewGuid(), Name = "Industrias Metalmecánicas S.A.",
-                Email = "mantenimiento@metalmecanica.mx", Phone = "+52 229 100 2030",
-                IsActive = true, ActiveOrders = 3, CreatedAt = DateTimeOffset.Now.AddMonths(-5)
-            },
-            new CustomerDto {
-                Id = Guid.NewGuid(), Name = "Logística Express Veracruz",
-                Email = "fleet@logisticaver.com", Phone = "+52 229 450 6070",
-                IsActive = true, ActiveOrders = 1, CreatedAt = DateTimeOffset.Now.AddMonths(-2)
-            },
-            new CustomerDto {
-                Id = Guid.NewGuid(), Name = "Constructora del Golfo",
-                Email = "admin@golfoconstruye.com", Phone = "+52 228 123 4567",
-                IsActive = false, ActiveOrders = 0, CreatedAt = DateTimeOffset.Now.AddYears(-1)
-            },
-            new CustomerDto {
-                Id = Guid.NewGuid(), Name = "Taller Central Diesel",
-                Email = "jorge.perez@centraldiesel.mx", Phone = "+52 229 987 6543",
-                IsActive = true, ActiveOrders = 5, CreatedAt = DateTimeOffset.Now.AddMonths(-8)
-            },
-            new CustomerDto {
-                Id = Guid.NewGuid(), Name = "Servicios Portuarios Integrales",
-                Email = "operaciones@spi-ver.com", Phone = "+52 229 555 0199",
-                IsActive = true, ActiveOrders = 0, CreatedAt = DateTimeOffset.Now.AddDays(-15)
-            }
-        };
+        await LoadDataClient();
     }
+    public async Task LoadDataClient()
+    {
+        try
+        {
+            _loading = true;
+           
+            _clients = await CustomerClient.GetAllAsync();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Error al sincronizar con el servidor", Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+            StateHasChanged();
+        }
+    }
+
 
     // Filtro rápido para el buscador del TopBar o ClientFilters
     private Func<CustomerDto, bool> _quickFilter => x =>
@@ -179,20 +173,8 @@
 
         if (!result.Canceled && result.Data is UpdateCustomerRequest updated)
         {
-            // 2. Aquí llamarías a tu servicio: await CustomerService.UpdateAsync(updated);
-
-            // 3. Actualizamos la lista local para que la UI refleje el cambio inmediatamente
-            var clientInList = _clients.FirstOrDefault(c => c.Id == updated.Id);
-            if (clientInList != null)
-            {
-                clientInList.Name = updated.Name;
-                clientInList.Email = updated.Email;
-                clientInList.Phone = updated.Phone;
-                clientInList.IsActive = updated.IsActive;
-                
-                Snackbar.Add("Cliente actualizado correctamente", Severity.Success);
-                StateHasChanged(); // Forzamos el renderizado del DataGrid
-            }
+            Snackbar.Add("Cliente actualizado correctamente", Severity.Success);
+            await LoadDataClient();
         }
     }
 }

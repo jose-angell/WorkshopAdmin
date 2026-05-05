@@ -1,5 +1,7 @@
 ﻿@using WorkshopAdmin.Shared.Dtos.Customers
 @using MudBlazor
+@using WorkshopAdmin.UI.Services
+@inject CustomerClient CustomerClient
 
 <MudDialog Class="custom-industrial-dialog">
     <TitleContent>
@@ -158,9 +160,13 @@
 
     private void Cancel() => MudDialog.Cancel();
 
-    private void Submit()
+    private async Task Submit()
     {
+
         if (_isValid)
+        {
+            await CustomerClient.UpdateAsync(_model);
             MudDialog.Close(DialogResult.Ok(_model));
+        }
     }
 }

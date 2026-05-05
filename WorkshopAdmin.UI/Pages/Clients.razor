@@ -53,7 +53,7 @@
             <ClientFilters />
 
             <MudPaper Elevation="0" Class="rounded-4 border overflow-hidden" Style="border-color: #dee2e6;">
-                <ClientTable />
+                <ClientTable @ref="_clientTable" />
             </MudPaper>
 
         </MudItem>
@@ -61,6 +61,8 @@
 
 </MudContainer>
 @code {
+    private ClientTable _clientTable = default!;
+
     private async Task OpenCreateCustomerDialog()
     {
         var options = new DialogOptions
@@ -74,22 +76,10 @@
         var dialog = await DialogService.ShowAsync<CreateCustomerDialog>(" ", options);
         var result = await dialog.Result;
 
-        if (!result.Canceled && result.Data is CreateCustomerRequest newClient)
+        if (!result.Canceled && result.Data is CustomerDto newClient)
         {
-            try
-            {
-                // Aquí es donde conectas con tu servicio de aplicación
-                // await CustomerService.CreateAsync(newClient);
-                
-                Snackbar.Add($"Client {newClient.Name} added to the system.", Severity.Success);
-                
-                // Opcional: Recargar la lista de la tabla
-                // await LoadClients();
-            }
-            catch (Exception ex)
-            {
-                Snackbar.Add("Error saving client: " + ex.Message, Severity.Error);
-            }
+            await _clientTable.LoadDataClient();
+            Snackbar.Add($"Client {newClient.Name} added to the system.", Severity.Success);
         }
     }
 }

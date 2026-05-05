@@ -19,5 +19,6 @@ builder.Services.AddScoped(sp => new HttpClient
 });
 
 builder.Services.AddScoped<ServiceOrderClient>();
+builder.Services.AddScoped<CustomerClient>();
 
 await builder.Build().RunAsync();
