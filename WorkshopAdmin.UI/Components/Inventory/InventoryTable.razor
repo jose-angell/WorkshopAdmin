@@ -1,11 +1,14 @@
 ﻿@using MudBlazor
 @using WorkshopAdmin.Shared.Dtos.Parts
+@using WorkshopAdmin.UI.Services
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject InventoryClient InventoryClient
 
 
 <MudDataGrid T="PartDto"
              Items="@PartsList"
+             Loading="@_loading"
              Dense="true"
              Hover="true"
              Elevation="0"
@@ -122,25 +125,47 @@
 
     </Columns>
 
-    <!-- PAGER -->
     <PagerContent>
-        <MudStack Row Justify="Justify.SpaceBetween"
-                  AlignItems="AlignItems.Center"
-                  Class="p-3">
-
-            <MudText Typo="Typo.caption">
-                Showing @($"{_from}-{_to} of {PartsList.Count} items")
-            </MudText>
-
-            <MudDataGridPager T="PartDto" />
-
-        </MudStack>
+        <MudDataGridPager T="PartDto" />
     </PagerContent>
 
 </MudDataGrid>
 @code {
+    [Parameter] public bool ReloadTrigger { get; set; }
+    private List<PartDto> PartsList = new();
     private string _searchString = "";
-    
+    private bool _loading = true;
+    private bool _lastReloadTrigger;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_lastReloadTrigger != ReloadTrigger)
+        {
+            _lastReloadTrigger = ReloadTrigger;
+            await LoadDataInventory();
+        }
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDataInventory();
+    }
+    public async Task LoadDataInventory()
+    {
+        try
+        {
+            _loading = true;
+
+            PartsList = await InventoryClient.GetAllAsync();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Error al sincronizar con el servidor", Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
     // Lógica de búsqueda rápida de MudBlazor
     private Func<PartDto, bool> _quickFilter => x =>
     {
@@ -150,16 +175,7 @@
         return false;
     };
 
-    private List<PartDto> PartsList = new()
-    {
-        new PartDto { Sku = "#SKU-FLTR-001", Brand = "WIX Filters", Name = "Heavy Duty Oil Filter XL-500",CategoryId= Shared.Enums.PartCategory.General, CategoryName = "Consumables", Stock = 4, UnitOfMeasure = "Pz", Price = 185.00m, IsActive = true, MinStock = 5, WarehouseLocation = "WH-E/SAFE-1" },
-        new PartDto { Sku = "#SKU-BRK-4421", Brand = "Bosch", Name = "Ceramic Brake Pad Set - Rear",CategoryId= Shared.Enums.PartCategory.Engine, CategoryName = "Mechanical", Stock = 24, UnitOfMeasure = "Kits", Price = 342.99m, IsActive = false, MinStock = 5,  WarehouseLocation = "WH-E/BIN-09"  }
-    };
-    private int _currentPage = 0;
-    private int _rowsPerPage = 5;
 
-    private int _from => (_currentPage * _rowsPerPage) + 1;
-    private int _to => Math.Min((_currentPage + 1) * _rowsPerPage, PartsList.Count);
 
     private async Task OpenEditDialog(PartDto part)
     {
@@ -195,28 +211,10 @@
         var dialog = await DialogService.ShowAsync<EditPartDialog>(" ", parameters, options);
         var result = await dialog.Result;
 
-        if (!result.Canceled && result.Data is UpdatePartRequest updated)
+        if (!result.Canceled)
         {
-            // 2. Aquí llamarías a tu servicio: await PartService.UpdateAsync(updated);
-
-            // 3. Actualizamos la lista local para que la UI refleje el cambio inmediatamente
-            var partInList = PartsList.FirstOrDefault(c => c.Id == updated.Id);
-            if (partInList != null)
-            {
-                partInList.Sku = updated.Sku;
-                partInList.Name = updated.Name;
-                partInList.Brand = updated.Brand;
-                partInList.CategoryId = updated.CategoryId;
-                partInList.Price = updated.Price;
-                partInList.UnitOfMeasure = updated.UnitOfMeasure;
-                partInList.Stock = updated.Stock;
-                partInList.MinStock = updated.MinStock;
-                partInList.WarehouseLocation = updated.WarehouseLocation;
-                partInList.IsActive = updated.IsActive;
-                
-                Snackbar.Add("Parte actualizada correctamente", Severity.Success);
-                StateHasChanged(); // Forzamos el renderizado del DataGrid
-            }
+            Snackbar.Add("Parte actualizada correctamente", Severity.Success);
+            await LoadDataInventory();
         }
     }
 }

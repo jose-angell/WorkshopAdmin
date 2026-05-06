@@ -1,6 +1,9 @@
 ﻿@using MudBlazor
 @using WorkshopAdmin.Shared.Dtos.Parts
 @using WorkshopAdmin.Shared.Enums
+@using WorkshopAdmin.UI.Services
+@inject InventoryClient InventoryClient
+@inject ISnackbar Snackbar
 
 <MudDialog Class="custom-industrial-dialog">
 
@@ -168,9 +171,21 @@
 
     private void Cancel() => MudDialog.Cancel();
 
-    private void Submit()
+    private async Task Submit()
     {
-        MudDialog.Close(DialogResult.Ok(_model));
+        if (_isValid)
+        {
+            var result = await InventoryClient.CreateAsync(_model);
+        
+            if (result != null)
+            {
+                MudDialog.Close(DialogResult.Ok(result));
+            }
+            else
+            {
+                Snackbar.Add("Could not save customer. Please check the data.", Severity.Error);
+            }
+        }
     }
 
   

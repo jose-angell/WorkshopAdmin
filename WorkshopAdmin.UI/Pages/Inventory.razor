@@ -56,7 +56,7 @@
             <!-- TABLE -->
             <MudPaper Elevation="0" Class="border rounded-4 overflow-hidden">
 
-                <InventoryTable />
+                <InventoryTable ReloadTrigger="_reloadFlag" />
 
             </MudPaper>
 
@@ -66,6 +66,7 @@
 
 </MudContainer>
 @code {
+    private bool _reloadFlag;
     private async Task OpenCreatePartDialog()
     {
         var options = new DialogOptions
@@ -79,22 +80,10 @@
         var dialog = await DialogService.ShowAsync<CreatePartDialog>(" ", options);
         var result = await dialog.Result;
 
-        if (!result.Canceled && result.Data is CreatePartRequest newPart)
+        if (!result.Canceled && result.Data is PartDto newPart)
         {
-            try
-            {
-                // Aquí es donde conectas con tu servicio de aplicación
-                // await CustomerService.CreateAsync(newPart);
-                
-                Snackbar.Add($"Part {newPart.Name} added to the system.", Severity.Success);
-                
-                // Opcional: Recargar la lista de la tabla
-                // await LoadClients();
-            }
-            catch (Exception ex)
-            {
-                Snackbar.Add("Error saving part: " + ex.Message, Severity.Error);
-            }
+            _reloadFlag = !_reloadFlag;
+            Snackbar.Add($"Part {newPart.Name} added to the system.", Severity.Success);           
         }
     }
 }

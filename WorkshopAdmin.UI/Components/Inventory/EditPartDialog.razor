@@ -2,6 +2,8 @@
 @using System.Globalization
 @using WorkshopAdmin.Shared.Dtos.Parts
 @using WorkshopAdmin.Shared.Enums
+@using WorkshopAdmin.UI.Services
+@inject InventoryClient InventoryClient
 
 <MudDialog Class="custom-industrial-dialog">
 
@@ -222,9 +224,12 @@
 
     private void Cancel() => MudDialog.Cancel();
 
-    private void Submit()
+    private async Task Submit()
     {
         if (_isValid)
+        {
+            await InventoryClient.UpdateAsync(_model);
             MudDialog.Close(DialogResult.Ok(_model));
+        }
     }
 }
