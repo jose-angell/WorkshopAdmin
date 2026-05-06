@@ -53,7 +53,7 @@
             <ClientFilters />
 
             <MudPaper Elevation="0" Class="rounded-4 border overflow-hidden" Style="border-color: #dee2e6;">
-                <ClientTable @ref="_clientTable" />
+                <ClientTable ReloadTrigger="_reloadFlag" />
             </MudPaper>
 
         </MudItem>
@@ -61,7 +61,7 @@
 
 </MudContainer>
 @code {
-    private ClientTable _clientTable = default!;
+    private bool _reloadFlag;
 
     private async Task OpenCreateCustomerDialog()
     {
@@ -78,7 +78,7 @@
 
         if (!result.Canceled && result.Data is CustomerDto newClient)
         {
-            await _clientTable.LoadDataClient();
+            _reloadFlag = !_reloadFlag; 
             Snackbar.Add($"Client {newClient.Name} added to the system.", Severity.Success);
         }
     }

@@ -132,10 +132,16 @@
 </MudDataGrid>
 @code {
     [Parameter] public bool ReloadTrigger { get; set; }
+
     private List<PartDto> PartsList = new();
     private string _searchString = "";
     private bool _loading = true;
     private bool _lastReloadTrigger;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDataInventory();
+    }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -144,10 +150,6 @@
             _lastReloadTrigger = ReloadTrigger;
             await LoadDataInventory();
         }
-    }
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadDataInventory();
     }
     public async Task LoadDataInventory()
     {

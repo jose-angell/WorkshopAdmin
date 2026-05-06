@@ -105,14 +105,26 @@
 </MudDataGrid>
 
 @code {
+    [Parameter] public bool ReloadTrigger { get; set; }
     private List<CustomerDto> _clients = new();
     private string _searchString = "";
     private bool _loading = true;
+    private bool _lastReloadTrigger;
+    
     protected override async Task OnInitializedAsync()
     {
         await LoadDataClient();
     }
-    public async Task LoadDataClient()
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_lastReloadTrigger != ReloadTrigger)
+        {
+            _lastReloadTrigger = ReloadTrigger;
+            await LoadDataClient();
+        }
+    }
+    private async Task LoadDataClient()
     {
         try
         {
