@@ -46,8 +46,9 @@ public class EquipmentService : IEquipmentService
 
         await _repository.AddAsync(equipment);
 
+        var createdEquipment = await _repository.GetByIdAsync(equipment.Id);
         // Retorna el DTO resultante tras la persistencia
-        return MapToDto(equipment);
+        return MapToDto(createdEquipment);
     }
 
     public async Task UpdateAsync(UpdateEquipmentRequest request)
@@ -87,8 +88,8 @@ public class EquipmentService : IEquipmentService
             Model = equipment.Model,
             TechnicalSpecifications = equipment.TechnicalSpecifications,
             CustomerId = equipment.CustomerId,
-            CustomerName = equipment.Customer.Name,
-            CustomerFriendlyId = equipment.Customer.FriendlyId,
+            CustomerName = equipment.Customer.Name ?? "N/A",
+            CustomerFriendlyId = equipment.Customer.FriendlyId ?? "N/A",
             IsActive = equipment.IsActive,
             CreatedAt = equipment.CreatedAt
         };

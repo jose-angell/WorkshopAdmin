@@ -107,9 +107,10 @@
 
 
 @code {
-
+    [Parameter] public bool ReloadTrigger { get; set; }
     public List<EquipmentDto> _equipment  = new();
     private bool _loading = true;
+    private bool _lastReloadTrigger;
 
     [Parameter] public EventCallback<EquipmentDto> OnEdit { get; set; }
     [Parameter] public EventCallback<EquipmentDto> OnHistory { get; set; }
@@ -120,7 +121,14 @@
     {
         await LoadDataEquipment();
     }
-
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_lastReloadTrigger != ReloadTrigger)
+        {
+            _lastReloadTrigger = ReloadTrigger;
+            await LoadDataEquipment();
+        }
+    }
     private async Task LoadDataEquipment()
     {
         try

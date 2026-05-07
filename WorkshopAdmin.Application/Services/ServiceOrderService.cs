@@ -53,7 +53,6 @@ public class ServiceOrderService : IServiceOrderService
             CreatedAt = DateTimeOffset.UtcNow,
             UpdatedAt = DateTimeOffset.UtcNow
         };
-
         // 3. Persistencia [6]
         await _orderRepository.AddAsync(order);
 

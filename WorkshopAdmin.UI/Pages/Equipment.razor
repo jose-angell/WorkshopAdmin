@@ -53,7 +53,7 @@
             <MudPaper Elevation="0"
                       Class="border rounded-4 overflow-hidden">
 
-                <EquipmentTable />
+                <EquipmentTable ReloadTrigger="_reloadFlag"/>
 
             </MudPaper>
 
@@ -62,6 +62,7 @@
 
 </MudContainer>
 @code {
+    private bool _reloadFlag;
     private async Task OpenCreateEquipmentDialog()
     {
         var options = new DialogOptions
@@ -75,22 +76,10 @@
         var dialog = await DialogService.ShowAsync<CreateEquipmentDialog>(" ", options);
         var result = await dialog.Result;
 
-        if (!result.Canceled && result.Data is CreateEquipmentRequest newEquipment)
+        if (!result.Canceled && result.Data is EquipmentDto newEquipment)
         {
-            try
-            {
-                // Aquí es donde conectas con tu servicio de aplicación
-                // await CustomerService.CreateAsync(newEquipment);
-                
-                Snackbar.Add($"Equipment {newEquipment.DescriptionType} added to the system.", Severity.Success);
-                
-                // Opcional: Recargar la lista de la tabla
-                // await LoadClients();
-            }
-            catch (Exception ex)
-            {
-                Snackbar.Add("Error saving part: " + ex.Message, Severity.Error);
-            }
+            _reloadFlag = !_reloadFlag;
+            Snackbar.Add($"Client {newEquipment.FriendlyId} added to the system.", Severity.Success);
         }
     }
 }

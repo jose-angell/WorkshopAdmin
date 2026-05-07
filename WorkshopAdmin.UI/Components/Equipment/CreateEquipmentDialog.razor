@@ -1,6 +1,11 @@
 ﻿@using MudBlazor
+@using WorkshopAdmin.Shared.Dtos.Customers
 @using WorkshopAdmin.Shared.Dtos.Equipments
 @using WorkshopAdmin.Shared.Enums
+@using WorkshopAdmin.UI.Services
+@inject ISnackbar Snackbar
+@inject EquipmentClient EquipmentClient
+@inject CustomerClient CustomerClient
 
 <MudDialog Class="custom-industrial-dialog">
 
@@ -19,7 +24,16 @@
         <MudForm @ref="_form" @bind-IsValid="_isValid">
 
             <MudStack Spacing="4" Class="mt-2">
-
+                <MudAutocomplete T="CustomerDto"
+                                 Value="_selectedCustomer"
+                                 ValueChanged="OnCustomerChanged"
+                                 SearchFunc="SearchCustomers"
+                                 ToStringFunc="@(c => c?.Name)"
+                                 Variant="Variant.Outlined"
+                                 AdornmentIcon="@Icons.Material.Filled.Search"
+                                 Placeholder="Search by name, ID or phone..."
+                                 Class="w-100"
+                                 Required="true" />
                 <MudGrid Spacing="2">
 
                     <MudItem xs="12" sm="6">
@@ -120,11 +134,41 @@
     private MudForm _form = default!;
     private bool _isValid;
 
+    private CustomerDto? _selectedCustomer;
+    private async Task OnCustomerChanged(CustomerDto? value)
+    {
+        _selectedCustomer = value;
+
+        _model.CustomerId = value?.Id ?? Guid.Empty;
+    }
+    private async Task<IEnumerable<CustomerDto>> SearchCustomers(string value, CancellationToken token)
+    {
+        var data = await CustomerClient.GetAllAsync();
+
+        var result = data
+            .Where(x => string.IsNullOrWhiteSpace(value)
+                     || x.Name.Contains(value, StringComparison.OrdinalIgnoreCase));
+
+        return result;
+    }
     private void Cancel() => MudDialog.Cancel();
 
-    private void Submit()
+    private async Task Submit()
     {
-        MudDialog.Close(DialogResult.Ok(_model));
+        if (_isValid)
+        {
+            
+            var result = await EquipmentClient.CreateAsync(_model);
+        
+            if (result != null)
+            {
+                MudDialog.Close(DialogResult.Ok(result));
+            }
+            else
+            {
+                Snackbar.Add("Could not save equipment. Please check the data.", Severity.Error);
+            }
+        }
     }
 
   
