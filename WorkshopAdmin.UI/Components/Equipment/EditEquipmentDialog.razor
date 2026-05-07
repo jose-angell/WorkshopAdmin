@@ -1,6 +1,9 @@
 ﻿@using MudBlazor
+@using WorkshopAdmin.Shared.Dtos.Customers
 @using WorkshopAdmin.Shared.Dtos.Equipments
 @using WorkshopAdmin.Shared.Enums
+@using WorkshopAdmin.UI.Services
+@inject EquipmentClient EquipmentClient
 
 <MudDialog Class="custom-industrial-dialog">
 
@@ -19,6 +22,14 @@
         <MudForm @ref="_form" @bind-IsValid="_isValid">
 
             <MudStack Spacing="4" Class="mt-2">
+                <MudTextField T="string"
+                              Label="Customer "
+                              @bind-Value="_model.CustomerInfo"
+                              Required="true"
+                              ReadOnly="true"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                              Adornment="Adornment.End" />
 
                 <MudGrid Spacing="2">
                     
@@ -150,6 +161,7 @@
         _model = new UpdateEquipmentRequest
         {
             Id = InitialData.Id,
+            CustomerInfo = InitialData.CustomerInfo,
             TypeId = InitialData.TypeId,
             DescriptionType = InitialData.DescriptionType,
             Brand = InitialData.Brand,
@@ -157,14 +169,18 @@
             TechnicalSpecifications = InitialData.TechnicalSpecifications,
             IsActive = InitialData.IsActive
         };
-        
+
     }
 
     private void Cancel() => MudDialog.Cancel();
 
-    private void Submit()
+    private async Task Submit()
     {
-        MudDialog.Close(DialogResult.Ok(_model));
+        if (_isValid)
+        {
+            await EquipmentClient.UpdateAsync(_model);
+            MudDialog.Close(DialogResult.Ok(_model));
+        }
     }
 
   

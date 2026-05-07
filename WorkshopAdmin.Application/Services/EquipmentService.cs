@@ -34,6 +34,7 @@ public class EquipmentService : IEquipmentService
         var equipment = new Equipment
         {
             Id = Guid.NewGuid(), // PK: uuid 
+            CustomerId = request.CustomerId,
             EquipmentTypeId = request.TypeId,
             DescriptionType = request.DescriptionType,
             Brand = request.Brand,
@@ -87,6 +88,7 @@ public class EquipmentService : IEquipmentService
             TechnicalSpecifications = equipment.TechnicalSpecifications,
             CustomerId = equipment.CustomerId,
             CustomerName = equipment.Customer.Name,
+            CustomerFriendlyId = equipment.Customer.FriendlyId,
             IsActive = equipment.IsActive,
             CreatedAt = equipment.CreatedAt
         };

@@ -5,6 +5,7 @@ namespace WorkshopAdmin.Shared.Dtos.Equipments;
 public class UpdateEquipmentRequest
 {
     public Guid Id { get; set; }
+    public string CustomerInfo { get; set; } = string.Empty;
     public EquipmentType TypeId { get; set; }
     public string DescriptionType { get; set; } = string.Empty;
     public string Brand { get; set; } = string.Empty;

@@ -7,6 +7,7 @@ public class EquipmentDto
     public Guid Id { get; set; }
     public string FriendlyId { get; set; } = string.Empty;
     public Guid CustomerId { get; set; }
+    public string CustomerFriendlyId { get; set; } = string.Empty;
     public string CustomerName { get; set; } = string.Empty;
     public EquipmentType TypeId { get; set; }
     public string TypeName { get; set; } = string.Empty;
