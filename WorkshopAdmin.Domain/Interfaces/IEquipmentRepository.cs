@@ -5,6 +5,7 @@ namespace WorkshopAdmin.Domain.Interfaces;
 public interface IEquipmentRepository
 {
     Task<Equipment?> GetByIdAsync(Guid id);
+    Task<IEnumerable<Equipment>> GetByCustomerIdAsync(Guid CustomerId);
     Task<IEnumerable<Equipment>> GetAllAsync();
     Task AddAsync(Equipment equipment);
     Task UpdateAsync(Equipment equipment);

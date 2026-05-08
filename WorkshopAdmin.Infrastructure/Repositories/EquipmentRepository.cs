@@ -36,6 +36,13 @@ public class EquipmentRepository : IEquipmentRepository
             .Where(e => e.Brand.Contains(brand) && e.Model.Contains(model))
             .ToListAsync();
     }
+    public async Task<IEnumerable<Equipment>> GetByCustomerIdAsync(Guid customerId)
+    {
+        return await _context.Equipments
+            .Include(e => e.Customer)
+            .Where(e => e.CustomerId == customerId)
+            .ToListAsync();
+    }
 
     public async Task AddAsync(Equipment equipment)
     {

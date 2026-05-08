@@ -42,6 +42,22 @@ public class EquipmentController : ControllerBase
     }
 
     /// <summary>
+    /// Obtiene un equipo específico por ID de cliente(FK: uuid).
+    /// </summary>
+    [HttpGet("customer/{id:guid}")]
+    public async Task<IActionResult> GetByCustomerId(Guid id)
+    {
+        var equipment = await _equipmentService.GetByCustomerAsync(id);
+
+        if (equipment == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(equipment);
+    }
+
+    /// <summary>
     /// Registra un nuevo equipo en el sistema (US 4).
     /// </summary>
     [HttpPost]

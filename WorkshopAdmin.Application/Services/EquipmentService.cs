@@ -27,7 +27,11 @@ public class EquipmentService : IEquipmentService
         var equipments = await _repository.GetAllAsync();
         return equipments.Select(MapToDto);
     }
-
+    public async Task<IEnumerable<EquipmentDto>> GetByCustomerAsync(Guid customerId)
+    {
+        var equipments = await _repository.GetByCustomerIdAsync(customerId);
+        return equipments.Select(MapToDto);
+    }
     public async Task<EquipmentDto> CreateAsync(CreateEquipmentRequest request)
     {
         // Lógica de Mapeo: CreateEquipmentRequest -> Entidad Equipment (Domain)
