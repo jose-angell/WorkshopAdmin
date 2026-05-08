@@ -59,7 +59,7 @@
                                      Value="_selectedCustomer"
                                      ValueChanged="OnCustomerChanged"
                                      SearchFunc="SearchCustomers"
-                                     ToStringFunc="@(c => c?.Name)"
+                                     ToStringFunc="@(c =>c is null ? string.Empty : $"{c.Name} ({c.Phone})")"
                                      Variant="Variant.Outlined"
                                      AdornmentIcon="@Icons.Material.Filled.Search"
                                      Placeholder="Search by name, ID or phone..."
@@ -67,7 +67,7 @@
                                      Required="true" />
 
                     <!-- CARD -->
-                    <div class="bg-light rounded border p-3 d-flex align-items-center gap-3 mt-3">
+                    <div class="bg-light rounded border p-3 d-flex align-items-start gap-3 mt-3">
 
                         <!-- ICON -->
                         <div class="border rounded d-flex align-items-center justify-content-center flex-shrink-0"
@@ -78,14 +78,23 @@
 
                         <!-- INFO -->
                         <div class="flex-grow-1 overflow-hidden">
+
                             @if (_selectedCustomer != null)
                             {
-                                <div class="fw-bold text-truncate" style="color:#000666;">
-                                    @_selectedCustomer.Name
+                                <!-- ROW 1 -->
+                                <div class="fw-bold text-truncate"
+                                     style="color:#000666;">
+
+                                    @_selectedCustomer.FriendlyId - @_selectedCustomer.Name
+
                                 </div>
 
-                                <div class="text-muted" style="font-size:11px;">
-                                    ID: @_selectedCustomer.Id.ToString()[..8]
+                                <!-- ROW 2 -->
+                                <div class="text-muted text-truncate"
+                                     style="font-size:11px;">
+
+                                    (@_selectedCustomer.Phone) @_selectedCustomer.Email
+
                                 </div>
                             }
                             else
@@ -94,17 +103,18 @@
                                     No customer selected
                                 </div>
                             }
-                        </div>
 
-                        <!-- ACTION -->
-                        <MudButton Variant="Variant.Outlined"
-                                   Color="Color.Primary"
-                                   Size="Size.Small">
-                            Change
-                        </MudButton>
+                        </div>
+                        <!-- RESET -->
+                        @if (_selectedCustomer != null)
+                        {
+                            <MudIconButton Icon="@Icons.Material.Filled.Close"
+                                           Color="Color.Error"
+                                           Size="Size.Small"
+                                           OnClick="ResetCustomerSelection" />
+                        }
 
                     </div>
-
                 </div>
 
                 <!-- ===================== -->
@@ -128,7 +138,8 @@
 
                     <!-- SELECT -->
                     <MudSelect T="Guid"
-                               @bind-Value="_request.EquipmentId"
+                               Value="_request.EquipmentId"
+                               ValueChanged="OnEquipmentChanged"
                                Variant="Variant.Outlined"
                                Disabled="@(_selectedCustomer == null)"
                                Required="true"
@@ -139,31 +150,44 @@
                         @foreach (var eq in _customerEquipments)
                         {
                             <MudSelectItem Value="@eq.Id">
-                                @eq.Brand @eq.Model
+                                @eq.FriendlyId - @eq.Brand - @eq.Model (@eq.DescriptionType)
                             </MudSelectItem>
                         }
 
                     </MudSelect>
 
                     <!-- CARD -->
-                    <div class="bg-light rounded border p-3 d-flex align-items-center gap-3 mt-3">
+                    <div class="bg-light rounded border p-3 d-flex align-items-start gap-3 mt-3">
 
+                        <!-- ICON -->
                         <div class="border rounded d-flex align-items-center justify-content-center flex-shrink-0"
                              style="width:48px; height:48px; background:white;">
-                            <MudIcon Icon="@Icons.Material.Filled.Construction" Color="Color.Primary" />
+                            <MudIcon Icon="@Icons.Material.Filled.Construction"
+                                     Color="Color.Primary" />
                         </div>
 
+                        <!-- INFO -->
                         <div class="flex-grow-1 overflow-hidden">
-                            @if (_request.EquipmentId != Guid.Empty)
-                            {
-                                var eq = _customerEquipments.FirstOrDefault(x => x.Id == _request.EquipmentId);
 
-                                <div class="fw-bold text-truncate" style="color:#000666;">
-                                    @eq?.Brand @eq?.Model
+                            @if (_selectedEquipment != null)
+                            {
+                                <!-- ROW 1 -->
+                                <div class="fw-bold text-truncate"
+                                     style="color:#000666;">
+
+                                    @_selectedEquipment.FriendlyId -
+                                    @_selectedEquipment.Brand -
+                                    @_selectedEquipment.Model
+                                    (@_selectedEquipment.DescriptionType)
+
                                 </div>
 
-                                <div class="text-muted" style="font-size:11px;">
-                                    SN: --- • ---
+                                <!-- ROW 2 -->
+                                <div class="text-muted text-truncate"
+                                     style="font-size:11px;">
+
+                                    @_selectedEquipment.TechnicalSpecifications
+
                                 </div>
                             }
                             else
@@ -172,16 +196,19 @@
                                     No equipment selected
                                 </div>
                             }
+
                         </div>
 
-                        <MudButton Variant="Variant.Outlined"
-                                   Color="Color.Primary"
-                                   Size="Size.Small">
-                            Change
-                        </MudButton>
+                        <!-- RESET -->
+                        @if (_selectedEquipment != null)
+                        {
+                            <MudIconButton Icon="@Icons.Material.Filled.Close"
+                                           Color="Color.Error"
+                                           Size="Size.Small"
+                                           OnClick="ResetEquipmentSelection" />
+                        }
 
                     </div>
-
                 </div>
 
             </div>
@@ -280,6 +307,7 @@
     private CreateServiceOrderRequest _request = new();
 
     private CustomerDto? _selectedCustomer;
+    private EquipmentDto? _selectedEquipment;
 
     private List<EquipmentDto> _customerEquipments = new();
 
@@ -291,6 +319,7 @@
         _request.CustomerId = value?.Id ?? Guid.Empty;
         _request.EquipmentId = Guid.Empty;
 
+        _selectedEquipment = null;
         _customerEquipments.Clear();
 
         if (value != null)
@@ -306,7 +335,9 @@
 
         var result = data
             .Where(x => string.IsNullOrWhiteSpace(value)
-                     || x.Name.Contains(value, StringComparison.OrdinalIgnoreCase));
+                    || x.Name.Contains(value, StringComparison.OrdinalIgnoreCase)
+                    || x.Phone.Contains(value, StringComparison.OrdinalIgnoreCase)
+                    || x.FriendlyId.Contains(value, StringComparison.OrdinalIgnoreCase));
 
         return result;
     }
@@ -317,7 +348,31 @@
 
         _customerEquipments = await EquipmentClient.GetByCustomerIdAsync(customerId);
     }
+    private void ResetCustomerSelection()
+    {
+        _selectedCustomer = null;
 
+        _request.CustomerId = Guid.Empty;
+        _request.EquipmentId = Guid.Empty;
+
+        _customerEquipments.Clear();
+        ResetEquipmentSelection();
+    }
+
+    private Task OnEquipmentChanged(Guid value)
+    {
+        _request.EquipmentId = value;
+
+        _selectedEquipment = _customerEquipments
+            .FirstOrDefault(x => x.Id == value);
+
+        return Task.CompletedTask;
+    }
+    private void ResetEquipmentSelection()
+    {
+        _request.EquipmentId = Guid.Empty;
+        _selectedEquipment = null;
+    }
     private async Task SubmitOrder()
     {
         await _form!.Validate();
