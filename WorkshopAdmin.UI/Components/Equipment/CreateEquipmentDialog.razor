@@ -28,12 +28,13 @@
                                  Value="_selectedCustomer"
                                  ValueChanged="OnCustomerChanged"
                                  SearchFunc="SearchCustomers"
-                                 ToStringFunc="@(c => c?.Name)"
+                                 ToStringFunc="@(c => c is null ? string.Empty : $"{c.Name} ({c.Phone})")"
                                  Variant="Variant.Outlined"
                                  AdornmentIcon="@Icons.Material.Filled.Search"
                                  Placeholder="Search by name, ID or phone..."
                                  Class="w-100"
-                                 Required="true" />
+                                 Required="true"
+                                 Disabled="@(Customer != null)" />
                 <MudGrid Spacing="2">
 
                     <MudItem xs="12" sm="6">
@@ -86,12 +87,13 @@
 
                     <MudItem xs="12">
                         <MudTextField T="string"
-                                      Label="Technical Specifications *"
+                                      Label="Technical Specifications"
                                       @bind-Value="_model.TechnicalSpecifications"
                                       Variant="Variant.Outlined"
                                       Margin="Margin.Dense"
                                       Adornment="Adornment.End"
                                       AdornmentIcon="@Icons.Material.Filled.Engineering"
+                                      TextArea="true"
                                       Lines="5"
                                       AutoGrow="true" />
                     </MudItem>
@@ -119,7 +121,7 @@
                        Disabled="@(!_isValid)"
                        Class="px-4 fw-bold shadow-none"
                        StartIcon="@Icons.Material.Filled.Save">
-                Save Part
+                Save Equipment
             </MudButton>
 
         </div>
@@ -129,12 +131,25 @@
 @code {
     [CascadingParameter]
     private IMudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter]
+    public CustomerDto? Customer { get; set; }
 
     private CreateEquipmentRequest _model = new();
     private MudForm _form = default!;
     private bool _isValid;
 
     private CustomerDto? _selectedCustomer;
+
+
+    protected override void OnInitialized()
+    {
+        if (Customer != null)
+        {
+            _selectedCustomer = Customer;
+            _model.CustomerId = Customer.Id;
+        }
+    }
+
     private async Task OnCustomerChanged(CustomerDto? value)
     {
         _selectedCustomer = value;
@@ -147,7 +162,9 @@
 
         var result = data
             .Where(x => string.IsNullOrWhiteSpace(value)
-                     || x.Name.Contains(value, StringComparison.OrdinalIgnoreCase));
+                    || x.Name.Contains(value, StringComparison.OrdinalIgnoreCase)
+                    || x.Phone.Contains(value, StringComparison.OrdinalIgnoreCase)
+                    || x.FriendlyId.Contains(value, StringComparison.OrdinalIgnoreCase));
 
         return result;
     }

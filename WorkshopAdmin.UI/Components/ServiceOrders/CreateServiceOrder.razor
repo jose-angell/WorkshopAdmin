@@ -407,6 +407,7 @@
             try
             {
                 Snackbar.Add($"Client {newClient.Name} added to the system.", Severity.Success);
+                await OnCustomerChanged(newClient);
             }
             catch (Exception ex)
             {
@@ -423,8 +424,12 @@
             FullWidth = true,
             CloseButton = true
         };
-
-        var dialog = await DialogService.ShowAsync<CreateEquipmentDialog>(" ", options);
+        var parameters = new DialogParameters<CreateEquipmentDialog>();
+        if (_selectedCustomer != null)
+        {
+            parameters.Add(x => x.Customer, _selectedCustomer);
+        }
+        var dialog = await DialogService.ShowAsync<CreateEquipmentDialog>(" ", parameters, options);
         var result = await dialog.Result;
 
         if (!result.Canceled && result.Data is EquipmentDto newEquipment)
@@ -432,7 +437,11 @@
             try
             {
                 Snackbar.Add($"Equipment {newEquipment.DescriptionType} added to the system.", Severity.Success);
-                
+                await LoadEquipments(_selectedCustomer!.Id);
+
+                _request.EquipmentId = newEquipment.Id;
+
+                _selectedEquipment = newEquipment;
             }
             catch (Exception ex)
             {
