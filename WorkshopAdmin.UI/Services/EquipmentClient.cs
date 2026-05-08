@@ -34,6 +34,27 @@ public class EquipmentClient
             return new();
         }
     }
+
+    /// <summary>
+    /// Obtiene todos los equipos registrados para un cliente específico (US 5).
+    /// </summary>
+    public async Task<List<EquipmentDto>> GetByCustomerIdAsync(Guid customerId)
+    {
+        try
+        {
+            var response = await _http.GetAsync($"{BaseRoute}/customer/{customerId}");
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<List<EquipmentDto>>(_options) ?? new();
+            }
+            return new();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error en GetAllAsync: {ex.Message}");
+            return new();
+        }
+    }
     /// <summary>
     /// Obtiene un equipo por su GUID
     /// </summary>

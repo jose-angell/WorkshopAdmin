@@ -6,8 +6,13 @@
 @using WorkshopAdmin.Shared.Enums
 @using WorkshopAdmin.UI.Components.Clients
 @using WorkshopAdmin.UI.Components.Equipment
+@using WorkshopAdmin.UI.Services
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject CustomerClient CustomerClient
+@inject EquipmentClient EquipmentClient
+@inject ServiceOrderClient ServiceOrderClient
+@inject NavigationManager Navigation
 
 <MudForm @ref="_form">
 
@@ -256,6 +261,7 @@
 
             <MudButton Variant="Variant.Filled"
                        Color="Color.Primary"
+                       OnClick="SubmitOrder"
                        StartIcon="@Icons.Material.Filled.Save">
                 Save
             </MudButton>
@@ -270,7 +276,7 @@
 @code {
 
     private MudForm? _form;
-
+    private bool _isValid;
     private CreateServiceOrderRequest _request = new();
 
     private CustomerDto? _selectedCustomer;
@@ -294,31 +300,22 @@
     }
 
     //  DATA FAKE REALISTA
-    private Task<IEnumerable<CustomerDto>> SearchCustomers(string value, CancellationToken token)
+    private async Task<IEnumerable<CustomerDto>> SearchCustomers(string value, CancellationToken token)
     {
-        var data = new List<CustomerDto>
-        {
-            new() { Id = Guid.NewGuid(), Name = "Constructora Horizon", Phone = "555-1111" },
-            new() { Id = Guid.NewGuid(), Name = "Minera San Juan", Phone = "555-2222" },
-            new() { Id = Guid.NewGuid(), Name = "Logística S.A.", Phone = "555-3333" }
-        };
+        var data = await CustomerClient.GetAllAsync();
 
         var result = data
             .Where(x => string.IsNullOrWhiteSpace(value)
                      || x.Name.Contains(value, StringComparison.OrdinalIgnoreCase));
 
-        return Task.FromResult(result);
+        return result;
     }
 
     private async Task LoadEquipments(Guid customerId)
     {
         await Task.Delay(300); // simula API
 
-        _customerEquipments = new List<EquipmentDto>
-        {
-            new() { Id = Guid.NewGuid(), Brand = "Caterpillar", Model = "320G" },
-            new() { Id = Guid.NewGuid(), Brand = "Volvo", Model = "FH16" }
-        };
+        _customerEquipments = await EquipmentClient.GetByCustomerIdAsync(customerId);
     }
 
     private async Task SubmitOrder()
@@ -332,9 +329,10 @@
         }
 
         //  aquí iría tu API
-        await Task.Delay(500);
+        await ServiceOrderClient.CreateAsync(_request);
 
         Snackbar.Add("Service Order Created", Severity.Success);
+        GoToOrders();
     }
     private async Task OpenCreateCustomerDialog()
     {
@@ -349,17 +347,11 @@
         var dialog = await DialogService.ShowAsync<CreateCustomerDialog>(" ", options);
         var result = await dialog.Result;
 
-        if (!result.Canceled && result.Data is CreateCustomerRequest newClient)
+        if (!result.Canceled && result.Data is CustomerDto newClient)
         {
             try
             {
-                // Aquí es donde conectas con tu servicio de aplicación
-                // await CustomerService.CreateAsync(newClient);
-                
                 Snackbar.Add($"Client {newClient.Name} added to the system.", Severity.Success);
-                
-                // Opcional: Recargar la lista de la tabla
-                // await LoadClients();
             }
             catch (Exception ex)
             {
@@ -380,22 +372,21 @@
         var dialog = await DialogService.ShowAsync<CreateEquipmentDialog>(" ", options);
         var result = await dialog.Result;
 
-        if (!result.Canceled && result.Data is CreateEquipmentRequest newEquipment)
+        if (!result.Canceled && result.Data is EquipmentDto newEquipment)
         {
             try
             {
-                // Aquí es donde conectas con tu servicio de aplicación
-                // await CustomerService.CreateAsync(newEquipment);
-                
                 Snackbar.Add($"Equipment {newEquipment.DescriptionType} added to the system.", Severity.Success);
                 
-                // Opcional: Recargar la lista de la tabla
-                // await LoadClients();
             }
             catch (Exception ex)
             {
                 Snackbar.Add("Error saving part: " + ex.Message, Severity.Error);
             }
         }
+    }
+    private void GoToOrders()
+    {
+        Navigation.NavigateTo("/orders");
     }
 }
