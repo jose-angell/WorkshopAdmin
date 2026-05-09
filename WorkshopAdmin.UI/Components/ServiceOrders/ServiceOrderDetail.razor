@@ -1,6 +1,8 @@
 ﻿@using MudBlazor
 @using WorkshopAdmin.Shared.Dtos.ServiceOrders
 @using WorkshopAdmin.Shared.Enums
+@using WorkshopAdmin.UI.Services
+@inject ServiceOrderClient ServiceOrderClient
 
 <MudPaper Class="detail-container rounded border" Elevation="0">
 
@@ -21,7 +23,7 @@
 
                 <MudStack Spacing="0">
                     <MudText Typo="Typo.h6" Class="fw-bold">
-                        Orden #ORD-@_order.Id.ToString()[..6]
+                        Orden @_order.FriendlyId
                     </MudText>
                     <MudText Typo="Typo.caption">
                         @_order.CreatedAt.ToLocalTime().ToString("dd MMM yyyy - hh:mm tt")
@@ -31,7 +33,7 @@
                 <MudChip T="ServiceOrderStatus"
                          Color="@GetStatusColor(_order.Status)"
                          Variant="Variant.Filled"
-                         Class="fw-bold">
+                         Class="fw-bold ">
                     @_order.Status.ToFriendlyName()
                 </MudChip>
 
@@ -143,51 +145,24 @@
 
     private ServiceOrderDto? _order;
     private bool _loading = true;
-    public static ServiceOrderDto GetOrder(Guid id)
+
+    public async Task<ServiceOrderDto> GetOrder(Guid id)
     {
-        return new ServiceOrderDto
-        {
-            Id = id,
-            CustomerName = "Constructora Horizon",
-
-            EquipmentBrand = "Caterpillar",
-            EquipmentModel = "320G",
-            EquipmentTypeName = "Excavadora",
-
-            FailureDescription = "Pérdida de potencia en sistema hidráulico, falla en el sistema de arranque, tira aceite.",
-            Diagnosis = "Bomba hidráulica dañada, requiere reemplazo, requiere cambio de juntas en el motor, ajuste en el arrancador.",
-
-            Status = ServiceOrderStatus.Repairing,
-
-            LaborCost = 1200,
-            TotalCost = 2450,
-
-            CreatedAt = DateTimeOffset.Now.AddDays(-2),
-            UpdatedAt = DateTimeOffset.Now,
-
-            OrderPart = new List<OrderPartDto?>
-            {
-                new(),
-                new(),
-                new(),
-                new()
-            }
-        };
+        return await ServiceOrderClient.GetByIdAsync(id);
     }
     protected override async Task OnParametersSetAsync()
     {
         _loading = true;
 
-        await Task.Delay(800); // Simula API
 
-        _order = GetOrder(OrderId);
+        _order = await GetOrder(OrderId);
 
         _loading = false;
     }
 
     private Color GetStatusColor(ServiceOrderStatus status) => status switch
     {
-        ServiceOrderStatus.Received => Color.Default,
+        ServiceOrderStatus.Received => Color.Secondary,
         ServiceOrderStatus.Diagnosing => Color.Info,
         ServiceOrderStatus.Repairing => Color.Warning,
         ServiceOrderStatus.Completed => Color.Success,
