@@ -7,6 +7,7 @@ public class OrderPartDto
 {
     public Guid ServiceOrderId { get; set; }
     public Guid PartId { get; set; }
+    public string Sku { get; set; } = string.Empty;
     public string PartName { get; set; } = string.Empty;
     public int Quantity { get; set; }
     public decimal UnitPrice { get; set; }

@@ -282,7 +282,8 @@
 
         <div class="d-flex gap-3">
 
-            <MudButton Variant="Variant.Text">
+            <MudButton Variant="Variant.Text"
+            OnClick="GoToOrders">
                 Cancel
             </MudButton>
 
@@ -344,8 +345,6 @@
 
     private async Task LoadEquipments(Guid customerId)
     {
-        await Task.Delay(300); // simula API
-
         _customerEquipments = await EquipmentClient.GetByCustomerIdAsync(customerId);
     }
     private void ResetCustomerSelection()

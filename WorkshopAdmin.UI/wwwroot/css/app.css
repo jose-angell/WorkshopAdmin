@@ -272,6 +272,8 @@ code {
     flex-grow: 1;
     padding-right: 4px;
     min-height: 0;
+    margin: 1rem;
+    padding: 1rem;
 }
 .detail-body::-webkit-scrollbar {
     width: 6px;

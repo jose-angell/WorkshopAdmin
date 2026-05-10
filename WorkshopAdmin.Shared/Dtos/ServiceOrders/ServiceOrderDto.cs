@@ -1,4 +1,6 @@
-﻿using WorkshopAdmin.Shared.Enums;
+﻿using WorkshopAdmin.Shared.Dtos.Customers;
+using WorkshopAdmin.Shared.Dtos.Equipments;
+using WorkshopAdmin.Shared.Enums;
 
 namespace WorkshopAdmin.Shared.Dtos.ServiceOrders;
 
@@ -9,16 +11,10 @@ public class ServiceOrderDto
     public string FriendlyId { get; set; } = string.Empty; // Código legible (ej: ORD-2605-00001)
 
     // Datos del Cliente (Aplanados)
-    public Guid CustomerId { get; set; }
-    public string CustomerName { get; set; } = string.Empty;
+    public CustomerDto Customer { get; set; } = new CustomerDto();
 
     // Datos del Equipo (Aplanados)
-    public Guid EquipmentId { get; set; }
-    public EquipmentType EquipmentTypeId { get; set; }
-    public string EquipmentTypeName { get; set; } = string.Empty;
-    public string EquipmentDescription { get; set; } = string.Empty;
-    public string EquipmentBrand { get; set; } = string.Empty;
-    public string EquipmentModel { get; set; } = string.Empty;
+    public EquipmentDto Equipment { get; set; } = new EquipmentDto();
 
     // Información de la Orden
     public string FailureDescription { get; set; } = string.Empty;

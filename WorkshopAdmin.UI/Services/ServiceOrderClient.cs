@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Json;
 using System.Text.Json;
+using WorkshopAdmin.Shared.Dtos.Customers;
 using WorkshopAdmin.Shared.Dtos.ServiceOrders;
 using WorkshopAdmin.Shared.Enums;
 
@@ -47,6 +48,23 @@ public class ServiceOrderClient
     public async Task<bool> CreateAsync(CreateServiceOrderRequest order)
     {
         var response = await _http.PostAsJsonAsync(BaseRoute, order);
+        return response.IsSuccessStatusCode;
+    }
+
+    /// <summary>
+    /// Actualiza el estatus de la orden de servicio
+    /// </summary>
+    public async Task<bool> UpdateStatusAsync(UpdateServiceOrderStatusRequest request)
+    {
+        var response = await _http.PatchAsJsonAsync($"{BaseRoute}/{request.Id}/status", request);
+        return response.IsSuccessStatusCode;
+    }
+    /// <summary>
+    /// Actualiza los datos técnicos de la orden de servicio
+    /// </summary>
+    public async Task<bool> UpdateTechnicalDataAsync(UpdateServiceOrderTechnicalDataRequest request)
+    {
+        var response = await _http.PatchAsJsonAsync($"{BaseRoute}/{request.Id}/technical-data", request);
         return response.IsSuccessStatusCode;
     }
 }

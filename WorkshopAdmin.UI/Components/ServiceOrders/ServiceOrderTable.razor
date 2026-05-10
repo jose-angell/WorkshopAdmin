@@ -47,7 +47,7 @@
                 <CellTemplate Context="context">
                     <MudText Class="fw-bold"
                              Style="color: var(--mud-palette-primary-dark);">
-                        @context.Item.CustomerName
+                        @context.Item.Customer.Name
                     </MudText>
                 </CellTemplate>
             </TemplateColumn>
@@ -60,11 +60,11 @@
                     }
 
                     <MudText Typo="Typo.body2" Class="fw-bold">
-                        @item.EquipmentBrand @item.EquipmentModel
+                        @item.Equipment.Brand @item.Equipment.Model
                     </MudText>
 
                     <MudText Typo="Typo.caption">
-                        @item.EquipmentTypeName
+                        @item.Equipment.TypeName
                     </MudText>
                 </CellTemplate>
             </TemplateColumn>
@@ -167,7 +167,7 @@
         await LoadData();
     }
 
-   
+
     private async Task LoadData(ServiceOrderStatus? filterStatus = null, Guid? filterCustomer = null)
     {
         try
@@ -190,9 +190,9 @@
     private Func<ServiceOrderDto, bool> _quickFilter => x =>
     {
         if (string.IsNullOrWhiteSpace(_searchString)) return true;
-        return x.CustomerName.Contains(_searchString, StringComparison.OrdinalIgnoreCase) ||
+        return x.Customer.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase) ||
                x.FriendlyId.Contains(_searchString, StringComparison.OrdinalIgnoreCase) ||
-               x.EquipmentModel.Contains(_searchString, StringComparison.OrdinalIgnoreCase);
+               x.Equipment.Model.Contains(_searchString, StringComparison.OrdinalIgnoreCase);
     };
 
     private int _from => 1;
@@ -228,7 +228,7 @@
 
         var dialog = await DialogService.ShowAsync<ServiceOrderDetail>(" ", parameters, options);
         var result = await dialog.Result;
-
+        await LoadData();
     }
     
 }

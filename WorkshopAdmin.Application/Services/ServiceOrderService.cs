@@ -61,14 +61,22 @@ public class ServiceOrderService : IServiceOrderService
         {
             Id = order.Id,
             FriendlyId = order.FriendlyId,
-            CustomerId = order.CustomerId,
-            CustomerName = customer.Name,
-            EquipmentId = order.EquipmentId,
-            EquipmentTypeId = equipment.EquipmentTypeId,
-            EquipmentTypeName = equipment.EquipmentTypeId.ToFriendlyName(),
-            EquipmentDescription = equipment.DescriptionType,
-            EquipmentBrand = equipment.Brand,
-            EquipmentModel = equipment.Model,
+            Customer = new Shared.Dtos.Customers.CustomerDto
+            {
+                Id = customer.Id,
+                Name = customer.Name,
+                Email = customer.Email,
+                Phone = customer.Phone
+            },
+            Equipment = new Shared.Dtos.Equipments.EquipmentDto
+            {
+                Id = equipment.Id,
+                TypeId = equipment.EquipmentTypeId,
+                TypeName = equipment.EquipmentTypeId.ToFriendlyName(),
+                DescriptionType = equipment.DescriptionType,
+                Brand = equipment.Brand,
+                Model = equipment.Model
+            },
             FailureDescription = order.FailureDescription,
             Status = order.Status,
             ServiceTypeId= order.ServiceTypeId,
@@ -124,6 +132,31 @@ public class ServiceOrderService : IServiceOrderService
         order.FailureDescription = request.FailureDescription;
         order.Diagnosis = request.Diagnosis;
         order.LaborCost = request.LaborCost;
+        order.UpdatedAt = DateTimeOffset.UtcNow; // Actualización de timestamptz [4]
+
+        await _orderRepository.UpdateAsync(order);
+    }
+    /// <summary>
+    /// Actualiza información de diagnóstico de la orden (US 16, 17).
+    /// </summary>
+    public async Task UpdateTechnicalDataAsync(UpdateServiceOrderTechnicalDataRequest request)
+    {
+        var order = await _orderRepository.GetByIdAsync(request.Id);
+
+        if (order == null) throw new NotFoundException($"Orden con ID {request.Id} no encontrada.");
+
+        // Regla 5.6: No se puede modificar una orden en estado Delivered [3]
+        if (order.Status == ServiceOrderStatus.Delivered)
+            throw new DomainException("No se pueden realizar cambios en una orden ya entregada.");
+
+        // Regla 5.4: El costo de mano de obra no puede ser negativo [2, 5]
+        if (request.LaborCost < 0)
+            throw new DomainException("El costo de mano de obra debe ser mayor o igual a cero.");
+
+        order.FailureDescription = request.FailureDescription;
+        order.Diagnosis = request.Diagnosis;
+        order.LaborCost = request.LaborCost;
+        order.Status = request.NewStatus; 
         order.UpdatedAt = DateTimeOffset.UtcNow; // Actualización de timestamptz [4]
 
         await _orderRepository.UpdateAsync(order);
@@ -218,25 +251,38 @@ public class ServiceOrderService : IServiceOrderService
     {
         Id = order.Id,
         FriendlyId = order.FriendlyId,
-        CustomerId = order.CustomerId,
-        CustomerName = order.Customer?.Name ?? "N/A",
-        EquipmentId = order.EquipmentId,
-        EquipmentTypeId = order.Equipment?.EquipmentTypeId ?? EquipmentType.Unknown,
-        EquipmentTypeName = order.Equipment?.EquipmentTypeId.ToFriendlyName() ?? "N/A",
-        EquipmentDescription = order.Equipment?.DescriptionType ?? "N/A",
-        EquipmentBrand = order.Equipment?.Brand ?? "N/A",
-        EquipmentModel = order.Equipment?.Model ?? "N/A",
+        Customer = new Shared.Dtos.Customers.CustomerDto
+        {
+            Id = order.CustomerId,
+            FriendlyId = order.FriendlyId,
+            Name = order.Customer?.Name ?? "N/A",
+            Email = order.Customer?.Email ?? "N/A",
+            Phone = order.Customer?.Phone ?? "N/A"
+        },
+        Equipment = new Shared.Dtos.Equipments.EquipmentDto
+        {
+            Id = order.EquipmentId,
+            FriendlyId = order.FriendlyId,
+            TypeId = order.Equipment?.EquipmentTypeId ?? EquipmentType.Unknown,
+            TypeName = order.Equipment?.EquipmentTypeId.ToFriendlyName() ?? "N/A",
+            DescriptionType = order.Equipment?.DescriptionType ?? "N/A",
+            Brand = order.Equipment?.Brand ?? "N/A",
+            Model = order.Equipment?.Model ?? "N/A",
+            TechnicalSpecifications = order.Equipment?.TechnicalSpecifications ?? "N/A"
+        },
         FailureDescription = order.FailureDescription,
         Diagnosis = order.Diagnosis,
         Status = order.Status,
         ServiceTypeId = order.ServiceTypeId,
         ServiceTypeDescription = order.ServiceTypeId.ToFriendlyName(),
         LaborCost = order.LaborCost,
+        TotalCost = order.LaborCost + (order.OrderParts?.Sum(op => op.Quantity * op.UnitPrice) ?? 0m),
         CreatedAt = order.CreatedAt,
         UpdatedAt = order.UpdatedAt,
         OrderPart = order.OrderParts?.Select(op => new OrderPartDto
         {
             PartId = op.PartId,
+            Sku = op.Part?.Sku ?? "N/A",
             PartName = op.Part?.Name ?? "N/A", // Esto requiere el ThenInclude anterior
             Quantity = op.Quantity,
             UnitPrice = op.UnitPrice,

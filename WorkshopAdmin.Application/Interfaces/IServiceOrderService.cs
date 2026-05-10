@@ -14,4 +14,5 @@ public interface IServiceOrderService
     Task UpdateDiagnosisAsync(Guid id, string diagnosis);
     Task AddPartToOrderAsync(CreateOrderPartRequest request);
     Task UpdatePartToOrderAsync(UpdateOrderPartRequest request);
+    Task UpdateTechnicalDataAsync(UpdateServiceOrderTechnicalDataRequest request);
 }

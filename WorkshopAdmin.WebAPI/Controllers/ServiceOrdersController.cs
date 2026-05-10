@@ -95,6 +95,16 @@ public class ServiceOrdersController : ControllerBase
         return NoContent();
     }
     /// <summary>
+    /// Actualiza el campo de diagnostico de la order de sevicio.
+    /// No permite modificar órdenes en estado distinto a 'Diagnosting' [7].
+    /// </summary>
+    [HttpPatch("{id:guid}/technical-data")]
+    public async Task<IActionResult> UpdateTechnicalData(Guid id, [FromBody] UpdateServiceOrderTechnicalDataRequest request)
+    {
+        await _serviceOrderService.UpdateTechnicalDataAsync(request);
+        return NoContent();
+    }
+    /// <summary>
     /// Asigna una refacción a la orden de servicio (US 15).
     /// Registra el precio histórico y descuenta el stock (Regla 5.3).
     /// </summary>
