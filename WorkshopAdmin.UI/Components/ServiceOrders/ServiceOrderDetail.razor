@@ -62,8 +62,14 @@
                     }
                     else if (_order.Status == ServiceOrderStatus.Repairing)
                     {
-                        <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="() => UpdateStatus(ServiceOrderStatus.Completed)">
+                        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="() => UpdateStatus(ServiceOrderStatus.Completed)">
                             Completar Reparación
+                        </MudButton>
+                    }
+                    else if (_order.Status == ServiceOrderStatus.Completed)
+                    {
+                        <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="() => UpdateStatus(ServiceOrderStatus.Delivered)">
+                            Entregar Reparación
                         </MudButton>
                     }
                 </div>
@@ -451,7 +457,7 @@
         ServiceOrderStatus.Diagnosing => Color.Info,
         ServiceOrderStatus.Repairing => Color.Warning,
         ServiceOrderStatus.Completed => Color.Success,
-        ServiceOrderStatus.Delivered => Color.Primary,
+        ServiceOrderStatus.Delivered => Color.Secondary,
         _ => Color.Default
     };
     private async Task UpdateStatus(ServiceOrderStatus newStatus)
