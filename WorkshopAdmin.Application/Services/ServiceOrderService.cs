@@ -184,6 +184,19 @@ public class ServiceOrderService : IServiceOrderService
             throw new DomainException("La orden debe marcarse como Completada antes de proceder a la Entrega.");
         await _orderRepository.UpdateStatusAsync(request.Id, request.NewStatus);
     }
+    public async Task<OrderPartDto?> GetOrderPartAsync(Guid serviceOrderId, Guid partId)
+    {
+        var order = await _orderRepository.GetOrderPartAsync(serviceOrderId, partId);
+        if (order == null) return null;
+
+        return new OrderPartDto
+        {
+            ServiceOrderId = order.ServiceOrderId,
+            PartId = order.PartId,
+            Quantity = order.Quantity,
+            UnitPrice = order.UnitPrice
+        };
+    }
     public async Task AddPartToOrderAsync(CreateOrderPartRequest request)
     {
         var orderPart = await _orderRepository.GetOrderPartAsync(request.ServiceOrderId, request.PartId);
@@ -200,8 +213,7 @@ public class ServiceOrderService : IServiceOrderService
         var part = await _partRepository.GetByIdAsync(request.PartId);
         if (part == null) throw new NotFoundException($"Refacción con ID {request.PartId} no encontrada.");
 
-        int difference = request.Quantity - orderPart.Quantity;
-        if (difference > 0 && part.Stock < difference)
+        if (part.Stock < request.Quantity)
             throw new DomainException("Stock insuficiente para realizar la asignación.");
 
         var newOrderPart = new OrderPart
@@ -246,6 +258,16 @@ public class ServiceOrderService : IServiceOrderService
             throw new NotFoundException($"La orden con ID {id} no fue encontrada.");
         if (order.Status != ServiceOrderStatus.Diagnosing) throw new DomainException($"La actualizacion del diagnostico debe hacerde en la etapa de diagnostico");
         await _orderRepository.UpdateDiagnosisAsync(id, diagnosis); 
+    }
+
+    public async Task DeletePartToOrderAsync(Guid serviceOrderId, Guid partId)
+    {
+        var order = await _orderRepository.GetByIdAsync(serviceOrderId);
+        if (order == null) throw new NotFoundException($"La orden con ID {serviceOrderId}");
+        if (order.Status >= ServiceOrderStatus.Completed)
+            throw new DomainException("No se pueden agregar refacciones a una orden completada o entregada.");
+
+        await _orderRepository.DeletePartToOrderAsync(serviceOrderId, partId);
     }
     private static ServiceOrderDto MapToDto(ServiceOrder order) => new ServiceOrderDto
     {

@@ -13,6 +13,9 @@ public class ServiceOrderClient
 
     public ServiceOrderClient(HttpClient http) => _http = http;
 
+    /// <summary>
+    /// Consultar todas las órdenes de servicio
+    /// </summary>
     public async Task<List<ServiceOrderDto>> GetAllAsync(ServiceOrderStatus? status = null, Guid? customerId = null)
     {
         var queryParams = new List<string>();
@@ -40,11 +43,15 @@ public class ServiceOrderClient
         }
     }
 
-    // Consultar uno solo por GUID
+    /// <summary>
+    /// Consulta una orden de servicio por su ID
+    /// </summary>
     public async Task<ServiceOrderDto?> GetByIdAsync(Guid id) =>
         await _http.GetFromJsonAsync<ServiceOrderDto>($"{BaseRoute}/{id}");
 
-    // Crear nueva orden (Aquí mandas los GUIDs de Cliente y Equipo)
+    /// <summary>
+    /// Crear una nueva orden de servicio
+    /// </summary>
     public async Task<bool> CreateAsync(CreateServiceOrderRequest order)
     {
         var response = await _http.PostAsJsonAsync(BaseRoute, order);
@@ -65,6 +72,37 @@ public class ServiceOrderClient
     public async Task<bool> UpdateTechnicalDataAsync(UpdateServiceOrderTechnicalDataRequest request)
     {
         var response = await _http.PatchAsJsonAsync($"{BaseRoute}/{request.Id}/technical-data", request);
+        return response.IsSuccessStatusCode;
+    }
+    /// <summary>
+    /// Consulta una orden de parte por su ID
+    /// </summary>
+    public async Task<OrderPartDto?> GetOrderPartByIdAsync(Guid serviceOrderId, Guid partId) =>
+        await _http.GetFromJsonAsync<OrderPartDto>($"{BaseRoute}/{serviceOrderId}/parts/{partId}");
+
+
+    /// <summary>
+    /// Crea una nueva parte de la orden de servicio
+    /// </summary>
+    public async Task<bool> CreateOrderPartAsync(CreateOrderPartRequest order)
+    {
+        var response = await _http.PostAsJsonAsync($"{BaseRoute}/parts", order);
+        return response.IsSuccessStatusCode;
+    }
+    /// <summary>
+    /// Actualiza una parte de la orden de servicio
+    /// </summary>
+    public async Task<bool> UpdateOrderPartAsync(UpdateOrderPartRequest order)
+    {
+        var response = await _http.PutAsJsonAsync($"{BaseRoute}/parts", order);
+        return response.IsSuccessStatusCode;
+    }
+    /// <summary>
+    /// Elimina una parte de la orden de servicio
+    /// </summary>
+    public async Task<bool> DeleteOrderPartAsync(Guid serviceOrderId, Guid partId)
+    {
+        var response = await _http.DeleteAsync($"{BaseRoute}/{serviceOrderId}/parts/{partId}");
         return response.IsSuccessStatusCode;
     }
 }

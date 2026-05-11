@@ -46,6 +46,22 @@ public class ServiceOrdersController : ControllerBase
     }
 
     /// <summary>
+    /// Obtiene el detalle completo de una orden específica (US 10).
+    /// </summary>
+    [HttpGet("{serviceOrderId:guid}/parts/{partId:guid}")]
+    public async Task<IActionResult> GetOrderPartAsync(Guid serviceOrderId, Guid partId)
+    {
+        var orderPart = await _serviceOrderService.GetOrderPartAsync(serviceOrderId, partId);
+
+        if (orderPart == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(orderPart);
+    }
+
+    /// <summary>
     /// Crea una nueva orden de servicio con estado inicial 'Received' (US 6).
     /// </summary>
     [HttpPost]
@@ -127,6 +143,17 @@ public class ServiceOrdersController : ControllerBase
         // No se permite modificar refacciones si la orden está en estado 'Completed' o 'Delivered'
         await _serviceOrderService.UpdatePartToOrderAsync(request);
 
+        return NoContent();
+    }
+    /// <summary>
+    /// Eliminar una refacción ya asignada.
+    /// Ajusta automáticamente la diferencia en el inventario (US 16).
+    /// </summary>
+    [HttpDelete("{serviceOrderId:guid}/parts/{partId:guid}")]
+    public async Task<IActionResult> DeleteleOrderPartAsync(Guid serviceOrderId, Guid partId)
+    {
+
+        await _serviceOrderService.DeletePartToOrderAsync(serviceOrderId, partId);
         return NoContent();
     }
 }

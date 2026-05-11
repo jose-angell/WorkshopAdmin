@@ -4,6 +4,7 @@
 @using WorkshopAdmin.Shared.Dtos.ServiceOrders
 @using WorkshopAdmin.Shared.Enums
 @using WorkshopAdmin.UI.Services
+@inject IDialogService DialogService
 @inject ServiceOrderClient ServiceOrderClient
 @inject ISnackbar Snackbar
 
@@ -25,8 +26,20 @@
             <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center"
                       Class="detail-header m-3 p-3 rounded text-white ">
                 <MudStack Spacing="0">
-                    <MudText Typo="Typo.h6" Class="fw-bold">Orden @_order.FriendlyId</MudText>
-                    <MudText Typo="Typo.caption">@_order.CreatedAt.ToLocalTime().ToString("g")</MudText>
+                    <div class="d-flex gap-3 ">
+                        <MudText Typo="Typo.h6" Class="fw-bold">Orden @_order.FriendlyId  </MudText>  
+                        <MudText Typo="Typo.subtitle1" Class="fw-light"> ( Orden @_order.ServiceTypeDescription )</MudText>
+                    </div>
+                    <div class="d-flex gap-3">
+                        <div>
+                            <MudText Typo="Typo.caption" Class="fw-bold">Cracion: </MudText>
+                            <MudText Typo="Typo.caption">@_order.CreatedAt.ToLocalTime().ToString("g")</MudText>
+                        </div>
+                        <div>
+                            <MudText Typo="Typo.caption" Class="fw-bold">Ultima Actualizacion: </MudText>
+                            <MudText Typo="Typo.caption">@_order.UpdatedAt.ToLocalTime().ToString("g")</MudText>
+                        </div>
+                    </div>
                 </MudStack>
 
                 <div class="d-flex align-center gap-2">
@@ -61,14 +74,15 @@
             <MudGrid Class="detail-body" >
 
                 <!-- CLIENTE -->
-                <MudItem xs="12" md="12">
+                <MudItem xs="12" md="5">
                     <div class="bg-light rounded border p-3 d-flex align-items-start gap-3 mt-3">
 
                         <!-- ICON -->
                         <div class="border rounded d-flex align-items-center justify-content-center flex-shrink-0"
                              style="width:48px; height:48px; background:white;">
                             <MudIcon Icon="@Icons.Material.Filled.Business"
-                                     Style="color:#000666;" />
+                                     Style="color:#000666;" 
+                                     Size="Size.Small" />
                         </div>
 
                         <!-- INFO -->
@@ -105,14 +119,15 @@
                 </MudItem>
 
                 <!-- EQUIPO -->
-                <MudItem xs="12" md="12">
+                <MudItem xs="12" md="7">
                     <div class="bg-light rounded border p-3 d-flex align-items-start gap-3 mt-3">
 
                         <!-- ICON -->
                         <div class="border rounded d-flex align-items-center justify-content-center flex-shrink-0"
                              style="width:48px; height:48px; background:white;">
                             <MudIcon Icon="@Icons.Material.Filled.Construction"
-                                     Color="Color.Primary" />
+                                     Color="Color.Primary" 
+                                     Size="Size.Small" />
                         </div>
 
                         <!-- INFO -->
@@ -134,7 +149,7 @@
                                 <!-- ROW 2 -->
                                 <div class="text-muted text-truncate"
                                      style="font-size:11px;">
-
+                                    @_equipment.TypeId.ToFriendlyName() -
                                     @_equipment.TechnicalSpecifications
 
                                 </div>
@@ -235,18 +250,144 @@
                         <MudPaper Class="p-3 rounded border">
                             <MudStack Row Justify="Justify.SpaceBetween" Class="mb-2">
                                 <MudText Typo="Typo.caption">Refacciones</MudText>
+                                <div>
+
                                 <MudChip T="int" Size="Size.Small">
-                                    @_order.OrderPart.Count()
+                                    @_orderPart.Count()
                                 </MudChip>
+                                <MudIconButton Icon="@Icons.Material.Filled.PlusOne"
+                                               Color="Color.Primary"
+                                               Size="Size.Small"
+                                                   OnClick="OpenCreateOrderPart" />
+                                </div>
+                                                
                             </MudStack>
 
-                            @if (_order.OrderPart.Any())
+                            @if (_orderPart.Any())
                             {
                                 <MudList T="OrderPartDto" Dense="true">
-                                    @foreach (var part in _order.OrderPart)
+                                    @foreach (var part in _orderPart)
                                     {
                                         <MudListItem>
-                                            <MudText>Refacción genérica</MudText>
+                                            <div class="bg-light rounded border p-3 d-flex align-items-start gap-3 mt-3">
+
+                                                <!-- ICON -->
+                                                <div class="border rounded d-flex align-items-center justify-content-center flex-shrink-0"
+                                                     style="width:48px; height:48px; background:white;">
+                                                    <MudIcon Icon="@Icons.Material.Filled.Construction"
+                                                             Color="Color.Primary" />
+                                                </div>
+
+                                                <!-- INFO -->
+                                                <div class="flex-grow-1 overflow-hidden">
+
+                                                    
+                                                    <!-- ROW 1 -->
+                                                    <div class="fw-bold text-truncate"
+                                                            style="color:#000666;">
+
+                                                        @part.Sku -
+                                                        @part.PartName 
+
+
+                                                    </div>
+
+                                                    <!-- ROW 2 -->
+                                                    <div class="text-muted text-truncate"
+                                                            style="font-size:11px;">
+
+                                                        @part.Quantity x @part.UnitPrice.ToString("C") = @part.Subtotal.ToString("C")
+
+                                                    </div>
+                                                    
+
+                                                </div>
+
+                                                <!-- RESET -->
+                                                
+                                                <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                                               Color="Color.Secondary"
+                                                               Size="Size.Small"
+                                                               OnClick="() => OpenUpdateOrderPart(part.PartId)" />
+
+                                                <MudIconButton Icon="@Icons.Material.Filled.Close"
+                                                               Color="Color.Error"
+                                                               Size="Size.Small" 
+                                                               OnClick="() => DeleteOrderPart(part.PartId)" />
+
+                                                
+
+                                            </div>
+                                        </MudListItem>
+                                    }
+                                </MudList>
+                            }
+                            else
+                            {
+                                <MudText Typo="Typo.caption">
+                                    Sin refacciones registradas
+                                </MudText>
+                            }
+                        </MudPaper>
+                    </MudItem>
+                }
+                @if (_order.Status > ServiceOrderStatus.Repairing)
+                {
+                    <!-- PARTES -->
+                    <MudItem xs="12">
+                        <MudPaper Class="p-3 rounded border">
+                            <MudStack Row Justify="Justify.SpaceBetween" Class="mb-2">
+                                <MudText Typo="Typo.caption">Refacciones</MudText>
+                                <div>
+
+                                    <MudChip T="int" Size="Size.Small">
+                                        @_orderPart.Count()
+                                    </MudChip>
+                                    
+                                </div>
+                                                
+                            </MudStack>
+
+                            @if (_orderPart.Any())
+                            {
+                                <MudList T="OrderPartDto" Dense="true">
+                                    @foreach (var part in _orderPart)
+                                    {
+                                        <MudListItem>
+                                            <div class="bg-light rounded border p-3 d-flex align-items-start gap-3 mt-3">
+
+                                                <!-- ICON -->
+                                                <div class="border rounded d-flex align-items-center justify-content-center flex-shrink-0"
+                                                     style="width:48px; height:48px; background:white;">
+                                                    <MudIcon Icon="@Icons.Material.Filled.Construction"
+                                                             Color="Color.Primary" />
+                                                </div>
+
+                                                <!-- INFO -->
+                                                <div class="flex-grow-1 overflow-hidden">
+
+                                                    
+                                                    <!-- ROW 1 -->
+                                                    <div class="fw-bold text-truncate"
+                                                         style="color:#000666;">
+
+                                                        @part.Sku -
+                                                        @part.PartName
+
+
+                                                    </div>
+
+                                                    <!-- ROW 2 -->
+                                                    <div class="text-muted text-truncate"
+                                                         style="font-size:11px;">
+
+                                                        @part.Quantity x @part.UnitPrice.ToString("C") = @part.Subtotal.ToString("C")
+
+                                                    </div>
+
+                                                    
+                                                </div>
+                                            </div>
                                         </MudListItem>
                                     }
                                 </MudList>
@@ -278,25 +419,31 @@
     private bool _loading = true;
     private CustomerDto? _customer;
     private EquipmentDto? _equipment;
+    private IEnumerable<OrderPartDto?> _orderPart;
 
     private UpdateServiceOrderTechnicalDataRequest techData = new();
 
-    public async Task<ServiceOrderDto> GetOrder(Guid id)
-    {
-        return await ServiceOrderClient.GetByIdAsync(id);
-    }
-    protected override async Task OnParametersSetAsync()
+    public async Task GetOrder(Guid id)
     {
         _loading = true;
 
 
-        _order = await GetOrder(OrderId);
+        _order = await ServiceOrderClient.GetByIdAsync(id);
+        if(_order is null)
+        {
+            Snackbar.Add("Orden no encontrada.", Severity.Error);
+            return;
+        }
         _customer = _order.Customer;
         _equipment = _order.Equipment;
+        _orderPart = _order.OrderPart;
 
         _loading = false;
     }
-
+    protected override async Task OnParametersSetAsync()
+    {
+        await GetOrder(OrderId);
+    }
 
     private Color GetStatusColor(ServiceOrderStatus status) => status switch
     {
@@ -347,4 +494,81 @@
         }
     }
 
+    private async Task OpenCreateOrderPart()
+    {
+        
+
+        var parameters = new DialogParameters<CreateOrderPart>
+        {
+            { x => x.ServiceOrderId, OrderId }
+        };
+
+        var options = new DialogOptions
+        {
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true,
+            CloseButton = true,
+            BackdropClick = false // Evita que se cierre por error al dar click fuera
+        };
+
+        var dialog = await DialogService.ShowAsync<CreateOrderPart>(" ", parameters, options);
+        var result = await dialog.Result;
+        await GetOrder(OrderId);
+    }
+
+    private async Task OpenUpdateOrderPart(Guid partId)
+    {
+
+        
+        var parameters = new DialogParameters<EditOrderPart>
+        {
+            { x => x.ServiceOrderId, OrderId },
+            { x => x.PartId, partId } 
+        };
+
+        var options = new DialogOptions
+        {
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true,
+            CloseButton = true,
+            BackdropClick = false // Evita que se cierre por error al dar click fuera
+        };
+
+        var dialog = await DialogService.ShowAsync<EditOrderPart>(" ", parameters, options);
+        var result = await dialog.Result;
+        await GetOrder(OrderId);
+    }
+    private async Task DeleteOrderPart(Guid partId)
+    {
+        // 1. Configurar los parámetros del diálogo
+        var parameters = new DialogParameters<ConfirmDialog>
+    {
+        { x => x.ContentText, "¿Realmente desea eliminar esta refacción de la orden? El stock se devolverá automáticamente al inventario." },
+        { x => x.ButtonText, "Eliminar" },
+        { x => x.Color, Color.Error }
+    };
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        // 2. Mostrar el diálogo y esperar el resultado
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>("Confirmar Eliminación", parameters, options);
+        var result = await dialog.Result;
+
+        // 3. Si el usuario no canceló (hizo clic en el botón de confirmación)
+        if (result is not null && !result.Canceled)
+        {
+            try
+            {
+                await ServiceOrderClient.DeleteOrderPartAsync(OrderId, partId);
+                Snackbar.Add("Refacción eliminada y stock actualizado.", Severity.Info);
+            
+                // 4. Refrescar la información de la orden
+                await GetOrder(OrderId);
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add($"Error al eliminar: {ex.Message}", Severity.Error);
+            }
+        }
+    }
 }

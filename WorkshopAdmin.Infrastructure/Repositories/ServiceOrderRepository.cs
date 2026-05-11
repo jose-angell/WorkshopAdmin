@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Collections;
 using WorkshopAdmin.Domain.Entities;
+using WorkshopAdmin.Domain.Exceptions;
 using WorkshopAdmin.Domain.Interfaces;
 using WorkshopAdmin.Infrastructure.Persistence;
 using WorkshopAdmin.Shared.Enums;
@@ -124,14 +125,20 @@ public class ServiceOrderRepository : IServiceOrderRepository
     }
     public async Task AddPartToOrderAsync(OrderPart orderPart)
     {
+        var part = await _context.Parts
+            .FirstOrDefaultAsync(p => p.Id == orderPart.PartId);
+
+        if (part == null)
+            throw new NotFoundException($"La refacción con ID {orderPart.PartId} no existe.");
+
+        if (part.Stock < orderPart.Quantity)
+            throw new InsufficientStockException();
+
         // Descontar del inventario 
-        var part = await _context.Parts.FindAsync(orderPart.PartId);
-        if (part != null)
-        {
-            part.Stock -= orderPart.Quantity; // El sistema debe garantizar stock >= 0 previo a esto [5]
-        }
+        part.Stock -= orderPart.Quantity;
 
         await _context.OrderParts.AddAsync(orderPart);
+
         await _context.SaveChangesAsync();
     }
     public async Task UpdateDiagnosisAsync(Guid serviceOrderId, string diagnosis)
@@ -148,25 +155,22 @@ public class ServiceOrderRepository : IServiceOrderRepository
     }
     public async Task UpdatePartToOrderAsync(Guid serviceOrderId, Guid partId, int newQuantity)
     {
-        // 1. Buscar la relación existente
         var orderPart = await _context.OrderParts
-            .FirstOrDefaultAsync(op => op.ServiceOrderId == serviceOrderId && op.PartId == partId);
+         .FirstOrDefaultAsync(op => op.ServiceOrderId == serviceOrderId && op.PartId == partId)
+         ?? throw new NotFoundException("Relación Orden-Pieza no encontrada.");
 
-        if (orderPart != null)
-        {
-            var part = await _context.Parts.FindAsync(partId);
-            if (part != null)
-            {
-                // 2. Ajustar el stock basado en la diferencia de cantidad
-                int difference = newQuantity - orderPart.Quantity;
-                part.Stock -= difference;
-            }
+        var part = await _context.Parts.FindAsync(partId)
+            ?? throw new NotFoundException("La refacción ya no existe en el catálogo.");
 
-            // 3. Actualizar cantidad (el precio histórico NO es editable según Regla 16) [5]
-            orderPart.Quantity = newQuantity;
+        int difference = newQuantity - orderPart.Quantity;
 
-            await _context.SaveChangesAsync();
-        }
+        if (part.Stock < difference)
+            throw new InsufficientStockException();
+
+        part.Stock -= difference;
+        orderPart.Quantity = newQuantity;
+
+        await _context.SaveChangesAsync();
     }
     public async Task<OrderPart?> GetOrderPartAsync(Guid serviceOrderId, Guid partId)
     {
@@ -180,5 +184,20 @@ public class ServiceOrderRepository : IServiceOrderRepository
             .Include(op => op.Part)
             .Where(op => op.ServiceOrderId == serviceOrderId)
             .ToListAsync();
+    }
+    public async Task DeletePartToOrderAsync(Guid serviceOrderId, Guid partId)
+    {
+        var orderPart = await _context.OrderParts
+        .FirstOrDefaultAsync(op => op.ServiceOrderId == serviceOrderId && op.PartId == partId)
+        ?? throw new NotFoundException("Relación Orden-Pieza no encontrada.");
+
+        var part = await _context.Parts.FindAsync(partId)
+            ?? throw new NotFoundException("La refacción ya no existe en el catálogo.");
+
+        part.Stock += orderPart.Quantity;
+
+        _context.OrderParts.Remove(orderPart);
+        await _context.SaveChangesAsync();
+
     }
 }

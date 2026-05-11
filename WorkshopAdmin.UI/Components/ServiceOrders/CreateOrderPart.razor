@@ -1,0 +1,218 @@
+﻿@using WorkshopAdmin.Shared.Dtos.Parts
+@using WorkshopAdmin.Shared.Dtos.ServiceOrders
+@using WorkshopAdmin.Shared.Enums
+@using WorkshopAdmin.UI.Services
+@inject ServiceOrderClient ServiceOrderClient
+@inject InventoryClient InventoryClient
+@inject ISnackbar Snackbar
+
+<MudDialog Class="custom-industrial-dialog">
+
+    <!-- HEADER -->
+    <TitleContent>
+        <div class="d-flex align-items-center py-2 px-1" style="gap: 0.75rem;">
+            <MudIcon Icon="@Icons.Material.Filled.Inventory2" Style="color: white;" />
+
+            <MudText Typo="Typo.h6" Class="fw-bold text-white text-uppercase">
+                Add New Part
+            </MudText>
+        </div>
+    </TitleContent>
+
+    <!-- CONTENT -->
+    <DialogContent>
+        <MudForm @ref="_form" @bind-IsValid="_isValid">
+
+            <MudStack Spacing="4" Class="mt-2">
+
+                <div class="col-12 col-md-12">
+
+                   
+
+                    <!-- SELECT -->
+                    <MudSelect T="Guid"
+                               Value="_model.PartId"
+                               ValueChanged="OnPartChanged"
+                               Variant="Variant.Outlined"
+                               
+                               Required="true"
+                               Adornment="Adornment.Start"
+                               AdornmentIcon="@Icons.Material.Filled.QrCodeScanner"
+                               Class="w-100">
+
+                        @foreach (var eq in _partStock)
+                        {
+                            <MudSelectItem Value="@eq.Id">
+                                @eq.Sku - @eq.Brand - @eq.Name (@eq.Stock/@eq.UnitOfMeasure)
+                            </MudSelectItem>
+                        }
+
+                    </MudSelect>
+
+
+                    <!-- CARD -->
+                    <div class="bg-light rounded border p-3 d-flex align-items-start gap-3 mt-3">
+
+                        <!-- ICON -->
+                        <div class="border rounded d-flex align-items-center justify-content-center flex-shrink-0"
+                             style="width:48px; height:48px; background:white;">
+                            <MudIcon Icon="@Icons.Material.Filled.Construction"
+                                     Color="Color.Primary" />
+                        </div>
+
+                        <!-- INFO -->
+                        <div class="flex-grow-1 overflow-hidden">
+
+                            @if (_selectedPart != null)
+                            {
+                                <!-- ROW 1 -->
+                                <div class="fw-bold text-truncate"
+                                     style="color:#000666;">
+
+                                    @_selectedPart.Sku -
+                                    @_selectedPart.Brand -
+                                    @_selectedPart.Name
+                                    (@_selectedPart.CategoryName)
+
+                                </div>
+
+                                <!-- ROW 2 -->
+                                <div class="text-muted text-truncate"
+                                     style="font-size:11px;">
+                                    Cantidad en stock: @_selectedPart.Stock
+                                    (@_selectedPart.UnitOfMeasure)
+
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-muted">
+                                    No equipment selected
+                                </div>
+                            }
+
+                        </div>
+
+                        <!-- RESET -->
+                        @if (_selectedPart != null)
+                        {
+                            <MudIconButton Icon="@Icons.Material.Filled.Close"
+                                           Color="Color.Error"
+                                           Size="Size.Small"
+                                           OnClick="ResetPartSelection" />
+                        }
+
+                    </div>
+                </div>
+
+             
+                <MudGrid Spacing="2">
+                    <MudItem xs="12" sm="6">
+                        <MudNumericField T="decimal"
+                                         Label="UNIT PRICE ($) *"
+                                         @bind-Value="_model.UnitPrice"
+                                         Min="1"
+                                         Required="true"
+                                         ReadOnly="true"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         Adornment="Adornment.Start"
+                                         AdornmentText="$"
+                                         HelperText="Value must be ≥ 0"
+                                         Error="@(_model.UnitPrice < 0)" />
+                    </MudItem>
+
+                    <MudItem xs="12" sm="6">
+                        <MudNumericField T="int"
+                                         Label="STOCK"
+                                         @bind-Value="_model.Quantity"
+                                         Min="1"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense" />
+                    </MudItem>
+
+                </MudGrid>
+            </MudStack>
+
+        </MudForm>
+    </DialogContent>
+
+    <!-- FOOTER -->
+    <DialogActions>
+        <div class="px-4 pb-4 d-flex w-100 justify-content-end" style="gap: 0.5rem;">
+
+            <MudButton OnClick="Cancel"
+                       Variant="Variant.Text"
+                       Class="px-4">
+                Cancel
+            </MudButton>
+
+            <MudButton OnClick="Submit"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       Disabled="@(!_isValid)"
+                       Class="px-4 fw-bold"
+                       StartIcon="@Icons.Material.Filled.Save">
+                Save Order Part
+            </MudButton>
+
+        </div>
+    </DialogActions>
+
+</MudDialog>
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+    private PartDto? _selectedPart;
+    [Parameter] public Guid ServiceOrderId { get; set; }
+
+    private List<PartDto> _partStock = new();
+
+    private CreateOrderPartRequest _model = new();
+    private MudForm _form = default!;
+    private bool _isValid;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _model.ServiceOrderId = ServiceOrderId;
+        await LoadPartStock();
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+    private async Task LoadPartStock()
+    {
+        _partStock = await InventoryClient.GetAllAsync();
+    }
+    private Task OnPartChanged(Guid value)
+    {
+        _model.PartId = value;
+
+        _selectedPart = _partStock
+            .FirstOrDefault(x => x.Id == value);
+        _model.UnitPrice = _selectedPart?.Price ?? 0;
+        return Task.CompletedTask;
+    }
+    private void ResetPartSelection()
+    {
+        _model.PartId = Guid.Empty;
+        _selectedPart = null;
+    }
+    private async Task Submit()
+    {
+        if (_isValid)
+        {
+            var result = await ServiceOrderClient.CreateOrderPartAsync(_model);
+        
+            if (result != null)
+            {
+                MudDialog.Close(DialogResult.Ok(result));
+            }
+            else
+            {
+                Snackbar.Add("Could not save customer. Please check the data.", Severity.Error);
+            }
+        }
+    }
+
+  
+}

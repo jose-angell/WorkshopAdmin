@@ -12,7 +12,9 @@ public interface IServiceOrderService
     Task UpdateStatusAsync(UpdateServiceOrderStatusRequest request);
     Task UpdateAsync(UpdateServiceOrderRequest request);
     Task UpdateDiagnosisAsync(Guid id, string diagnosis);
+    Task<OrderPartDto?> GetOrderPartAsync(Guid serviceOrderId, Guid partId);
     Task AddPartToOrderAsync(CreateOrderPartRequest request);
     Task UpdatePartToOrderAsync(UpdateOrderPartRequest request);
+    Task DeletePartToOrderAsync(Guid serviceOrderId, Guid partId);
     Task UpdateTechnicalDataAsync(UpdateServiceOrderTechnicalDataRequest request);
 }
