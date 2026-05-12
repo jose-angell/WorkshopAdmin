@@ -35,6 +35,18 @@ public class ServiceOrderConfiguration : IEntityTypeConfiguration<ServiceOrder>
             .HasColumnType("numeric(12,2)")
             .HasDefaultValue(0);
 
+        builder.Property(so => so.EstimatedTime)
+            .HasColumnName("estimated_time")
+            .HasColumnType("interval");
+
+        builder.Property(so => so.RepairStartedAt)
+            .HasColumnName("repair_started_at")
+            .HasColumnType("timestamptz");
+
+        builder.Property(so => so.RepairFinishedAt)
+            .HasColumnName("repair_finished_at")
+            .HasColumnType("timestamptz");
+
         builder.Property(so => so.ServiceTypeId)
             .HasColumnName("service_type_id")
             .HasColumnType("smallint")

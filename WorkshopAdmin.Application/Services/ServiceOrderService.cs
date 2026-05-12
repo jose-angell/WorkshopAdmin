@@ -153,7 +153,7 @@ public class ServiceOrderService : IServiceOrderService
         if (request.LaborCost < 0)
             throw new DomainException("El costo de mano de obra debe ser mayor o igual a cero.");
 
-        order.FailureDescription = request.FailureDescription;
+        order.EstimatedTime = request.EstimatedTime;
         order.Diagnosis = request.Diagnosis;
         order.LaborCost = request.LaborCost;
         order.Status = request.NewStatus; 
@@ -182,6 +182,19 @@ public class ServiceOrderService : IServiceOrderService
         // 2. No se puede marcar como Delivered si no está en estado Completed [1]
         if (request.NewStatus == ServiceOrderStatus.Delivered && order.Status != ServiceOrderStatus.Completed)
             throw new DomainException("La orden debe marcarse como Completada antes de proceder a la Entrega.");
+
+        // Si pasamos a Reparación, marcamos el inicio
+        if (request.NewStatus == ServiceOrderStatus.Repairing && order.Status != ServiceOrderStatus.Repairing)
+        {
+            order.RepairStartedAt = DateTime.UtcNow;
+        }
+
+        // Si terminamos la reparación, marcamos el fin
+        if (request.NewStatus == ServiceOrderStatus.Completed && order.Status == ServiceOrderStatus.Repairing)
+        {
+            order.RepairFinishedAt = DateTime.UtcNow;
+        }
+
         await _orderRepository.UpdateStatusAsync(request.Id, request.NewStatus);
     }
     public async Task<OrderPartDto?> GetOrderPartAsync(Guid serviceOrderId, Guid partId)
@@ -299,6 +312,9 @@ public class ServiceOrderService : IServiceOrderService
         ServiceTypeDescription = order.ServiceTypeId.ToFriendlyName(),
         LaborCost = order.LaborCost,
         TotalCost = order.LaborCost + (order.OrderParts?.Sum(op => op.Quantity * op.UnitPrice) ?? 0m),
+        EstimatedTime = order.EstimatedTime,
+        RepairStartedAt = order.RepairStartedAt,
+        RepairFinishedAt = order.RepairFinishedAt,
         CreatedAt = order.CreatedAt,
         UpdatedAt = order.UpdatedAt,
         OrderPart = order.OrderParts?.Select(op => new OrderPartDto

@@ -1,4 +1,5 @@
 ﻿@using MudBlazor
+@using System.Globalization
 @using WorkshopAdmin.Shared.Dtos.Customers
 @using WorkshopAdmin.Shared.Dtos.Equipments
 @using WorkshopAdmin.Shared.Dtos.ServiceOrders
@@ -56,8 +57,8 @@
                     }
                     else if (_order.Status == ServiceOrderStatus.Diagnosing)
                     {
-                        <MudButton Variant="Variant.Filled" Color="Color.Warning" OnClick="SaveTechnicalData">
-                            Finalizar Diagnóstico
+                        <MudButton Variant="Variant.Filled" Color="Color.Warning" OnClick="() => SaveTechnicalData(ServiceOrderStatus.Repairing)">
+                            Iniciar Reparación
                         </MudButton>
                     }
                     else if (_order.Status == ServiceOrderStatus.Repairing)
@@ -193,32 +194,86 @@
                                                   Variant="Variant.Outlined"
                                                   Margin="Margin.Dense"
                                                   Lines="5"
+                                                  TextArea="true"
                                                   AutoGrow="true" />
                                 </MudItem>
                 
-                                <MudItem xs="12" sm="6">
+                                <MudItem xs="12" sm="3">
                                     <MudNumericField T="decimal"
-                                                     Label="Mano de obra ($) *"
+                                                     Label="UNIT PRICE ($) *"
                                                      @bind-Value="techData.LaborCost"
-                                                     Min="1"
+                                                     Min="0"
                                                      Required="true"
+                                                     Immediate="true"
                                                      Variant="Variant.Outlined"
                                                      Margin="Margin.Dense"
                                                      Adornment="Adornment.Start"
-                                                     AdornmentText="$" />
+                                                     AdornmentText="$"
+                                                     HelperText="Value must be ≥ 0"
+                                                     Culture="@CultureInfo.GetCultureInfo("es-MX")"
+                                                     Error="@(techData.LaborCost < 0)" />
                                 </MudItem>
                 
-                                <MudItem xs="12" sm="6">
+                                <MudItem xs="6" sm="3">
+                                    <MudSelect T="int"
+                                               Label="Hours"
+                                               Value="_hours"
+                                               ValueChanged="UpdateEstimatedTime"
+                                               Variant="Variant.Outlined"
+                                               Margin="Margin.Dense">
+
+                                        @for (int i = 0; i <= 24; i++)
+                                        {
+                                            var hour = i;
+
+                                            <MudSelectItem T="int" Value="@hour">
+                                                @hour h
+                                            </MudSelectItem>
+                                        }
+
+                                    </MudSelect>
+                                </MudItem>
+
+                                <MudItem xs="6" sm="3">
+                                    <MudSelect T="int"
+                                               Label="Minutes"
+                                               Value="_minutes"
+                                               ValueChanged="UpdateEstimatedMinutes"
+                                               Variant="Variant.Outlined"
+                                               Margin="Margin.Dense">
+
+                                        @for (int i = 0; i < 60; i += 5)
+                                        {
+                                            var minute = i;
+
+                                            <MudSelectItem T="int" Value="@minute">
+                                                @minute min
+                                            </MudSelectItem>
+                                        }
+
+                                    </MudSelect>
+                                </MudItem>
+                                <MudItem xs="12" sm="3">
+                                    
                                     <MudNumericField T="decimal"
-                                                     Label="Total *"
+                                                     Label="Total ($) *"
+                                                     @bind-Value="techData.LaborCost"
                                                      ReadOnly
+                                                     Immediate="true"
                                                      Variant="Variant.Outlined"
                                                      Margin="Margin.Dense"
                                                      Adornment="Adornment.Start"
-                                                     AdornmentText="$" />
+                                                     AdornmentText="$"
+                                                     Culture="@CultureInfo.GetCultureInfo("es-MX")"
+                                                      />
                                 </MudItem>
                             </MudGrid>
                         </MudForm>
+                    </MudItem>
+                    <MudItem xs="12" sm="12" Class="d-flex justify-content-end">
+                        <MudButton Variant="Variant.Filled" Color="Color.Warning" OnClick="() => SaveTechnicalData(ServiceOrderStatus.Diagnosing)">
+                            Guardar Diagnóstico
+                        </MudButton>
                     </MudItem>
                 }
                 else
@@ -231,7 +286,7 @@
                     </MudItem>
 
                     <!-- COSTOS -->
-                    <MudItem xs="12" md="6">
+                    <MudItem xs="12" md="4">
                         <MudPaper Class="p-3 rounded border">
                             <MudText Typo="Typo.caption">Mano de obra</MudText>
                             <MudText Class="fw-bold">
@@ -240,7 +295,15 @@
                         </MudPaper>
                     </MudItem>
 
-                    <MudItem xs="12" md="6">
+                    <MudItem xs="12" md="4">
+                        <MudPaper Class="p-3 rounded border">
+                            <MudText Typo="Typo.caption">Tiempo estimado</MudText>
+                            <MudText Class="fw-bold">
+                                @_order.EstimatedTimeDisplay
+                            </MudText>
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="12" md="4">
                         <MudPaper Class="p-3 rounded border">
                             <MudText Typo="Typo.caption">Total</MudText>
                             <MudText Class="fw-bold">
@@ -426,7 +489,8 @@
     private CustomerDto? _customer;
     private EquipmentDto? _equipment;
     private IEnumerable<OrderPartDto?> _orderPart;
-
+    private int _hours;
+    private int _minutes;
     private UpdateServiceOrderTechnicalDataRequest techData = new();
 
     public async Task GetOrder(Guid id)
@@ -444,13 +508,25 @@
         _equipment = _order.Equipment;
         _orderPart = _order.OrderPart;
 
+        if (_order.Status == ServiceOrderStatus.Diagnosing)
+        {
+            fillTechData();
+        }
         _loading = false;
     }
     protected override async Task OnParametersSetAsync()
     {
         await GetOrder(OrderId);
     }
+    private void fillTechData()
+    {
+        techData.Diagnosis = _order?.Diagnosis ?? "";
+        techData.LaborCost = _order?.LaborCost ?? 0;
+        _hours = (int)_order?.EstimatedTime.Value.TotalHours;
+        _minutes = (int)_order?.EstimatedTime.Value.Minutes;
+        techData.EstimatedTime = _order?.EstimatedTime ?? new TimeSpan(_hours, _minutes, 0);
 
+    }
     private Color GetStatusColor(ServiceOrderStatus status) => status switch
     {
         ServiceOrderStatus.Received => Color.Secondary,
@@ -472,27 +548,34 @@
         Snackbar.Add($"Estado actualizado a: {newStatus.ToFriendlyName()}", Severity.Info);
     }
 
-    private async Task SaveTechnicalData()
+    private async Task SaveTechnicalData(ServiceOrderStatus status)
     {
         // Al guardar el diagnóstico, movemos automáticamente a Repairing
         if (_isValid)
         {   
-            _order!.Status = ServiceOrderStatus.Repairing;
-            techData.NewStatus = ServiceOrderStatus.Repairing;
+
             var request = new UpdateServiceOrderTechnicalDataRequest
             {
-                Id = _order.Id,
+                Id = OrderId,
                 Diagnosis = techData.Diagnosis,
                 LaborCost = techData.LaborCost,
-                NewStatus = techData.NewStatus
+                NewStatus = status,
+                EstimatedTime = techData.EstimatedTime
             };
 
             await ServiceOrderClient.UpdateTechnicalDataAsync(request);
 
             _order.Diagnosis = techData.Diagnosis;
             _order.LaborCost = techData.LaborCost;
-
-            Snackbar.Add("Información técnica guardada. Iniciando reparación.", Severity.Success);
+            if (status == ServiceOrderStatus.Repairing)
+            {
+                _order!.Status = status;
+                Snackbar.Add("Información técnica guardada. Iniciando reparación.", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add("Información técnica guardada. Continua con el diagnostico.", Severity.Success);
+            }
         }
         else
         {
@@ -576,5 +659,20 @@
                 Snackbar.Add($"Error al eliminar: {ex.Message}", Severity.Error);
             }
         }
+    }
+    private void SyncEstimatedTime()
+    {
+        techData.EstimatedTime = new TimeSpan(_hours, _minutes, 0);
+    }
+    private void UpdateEstimatedTime(int h)
+    {
+        _hours = h;
+        SyncEstimatedTime();
+    }
+
+    private void UpdateEstimatedMinutes(int m)
+    {
+        _minutes = m;
+        SyncEstimatedTime();
     }
 }
