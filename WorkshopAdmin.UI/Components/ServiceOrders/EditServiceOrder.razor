@@ -1,0 +1,480 @@
+﻿@using WorkshopAdmin.Shared.Dtos.Customers
+@using WorkshopAdmin.Shared.Dtos.Equipments
+@using WorkshopAdmin.Shared.Dtos.ServiceOrders
+@using WorkshopAdmin.Shared.Enums
+@using WorkshopAdmin.UI.Components.Clients
+@using WorkshopAdmin.UI.Components.Equipment
+@using WorkshopAdmin.UI.Services
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@inject CustomerClient CustomerClient
+@inject EquipmentClient EquipmentClient
+@inject ServiceOrderClient ServiceOrderClient
+@inject NavigationManager Navigation
+<MudDialog >
+    <DialogContent>
+    <MudForm @ref="_formGeneral">
+
+        <main class="container" style="max-width:1440px;">
+
+            <!-- ===================== -->
+            <!-- ENTITY + ASSET -->
+            <!-- ===================== -->
+            <section class="bg-white border rounded shadow-sm overflow-hidden mb-4">
+
+                <!-- HEADER -->
+                <div class="bg-light px-3 py-2 border-bottom d-flex align-items-center">
+                    <h3 class="fw-bold text-uppercase d-flex align-items-center gap-2 m-0" style="font-size:14px; color:#000666;">
+                        <MudIcon Icon="@Icons.Material.Filled.Badge" Size="Size.Small" />
+                        Entity & Asset Selection
+                    </h3>
+                </div>
+
+                <div class="row g-3 p-3">
+
+                    <!-- ===================== -->
+                    <!-- CUSTOMER -->
+                    <!-- ===================== -->
+                    <div class="col-12 col-md-5">
+
+                        <!-- HEADER -->
+                        <div class="d-flex justify-content-between align-items-end mb-2">
+                            <label class="text-uppercase fw-bold text-muted" style="font-size:11px;">
+                                Customer Selection
+                            </label>
+                            <MudButton Variant="Variant.Text"
+                                   Color="Color.Primary"
+                                   Disabled="true"
+                                   StartIcon="@Icons.Material.Filled.Add"
+                                   OnClick="OpenCreateCustomerDialog"
+                                   Class="fw-bold"
+                                   Style="font-size:11px;">
+                                New Customer
+                            </MudButton>
+                           
+                        </div>
+
+                        <!-- INPUT -->
+                        <MudAutocomplete T="CustomerDto"
+                                         Value="_selectedCustomer"
+                                         Disabled="true"
+                                         ValueChanged="OnCustomerChanged"
+                                         SearchFunc="SearchCustomers"
+                                         ToStringFunc="@(c =>c is null ? string.Empty : $"{c.Name} ({c.Phone})")"
+                                         Variant="Variant.Outlined"
+                                         AdornmentIcon="@Icons.Material.Filled.Search"
+                                         Placeholder="Search by name, ID or phone..."
+                                         Class="w-100"
+                                         Required="true" />
+
+                        <!-- CARD -->
+                        <div class="bg-light rounded border p-3 d-flex align-items-start gap-3 mt-3">
+
+                            <!-- ICON -->
+                            <div class="border rounded d-flex align-items-center justify-content-center flex-shrink-0"
+                                 style="width:48px; height:48px; background:white;">
+                                <MudIcon Icon="@Icons.Material.Filled.Business"
+                                         Style="color:#000666;" />
+                            </div>
+
+                            <!-- INFO -->
+                            <div class="flex-grow-1 overflow-hidden">
+
+                                @if (_selectedCustomer != null)
+                                {
+                                    <!-- ROW 1 -->
+                                    <div class="fw-bold text-truncate"
+                                         style="color:#000666;">
+
+                                        @_selectedCustomer.FriendlyId - @_selectedCustomer.Name
+
+                                    </div>
+
+                                    <!-- ROW 2 -->
+                                    <div class="text-muted text-truncate"
+                                         style="font-size:11px;">
+
+                                        (@_selectedCustomer.Phone) @_selectedCustomer.Email
+
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="text-muted">
+                                        No customer selected
+                                    </div>
+                                }
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- ===================== -->
+                    <!-- EQUIPMENT -->
+                    <!-- ===================== -->
+                    <div class="col-12 col-md-7">
+
+                        <div class="d-flex justify-content-between align-items-end mb-2">
+                            <label class="text-uppercase fw-bold text-muted" style="font-size:11px;">
+                                Equipment Selection
+                            </label>
+
+                            <MudButton Variant="Variant.Text"
+                                       Color="Color.Primary"
+                                       OnClick="OpenCreateEquipmentDialog"
+                                       StartIcon="@Icons.Material.Filled.Add"
+                                       Style="font-size:11px;">
+                                Register Equipment
+                            </MudButton>
+                        </div>
+
+                        <!-- SELECT -->
+                        <MudSelect T="Guid"
+                                   Value="_request.EquipmentId"
+                                   ValueChanged="OnEquipmentChanged"
+                                   Variant="Variant.Outlined"
+                                   Disabled="@(_selectedCustomer == null)"
+                                   Required="true"
+                                   Adornment="Adornment.Start"
+                                   AdornmentIcon="@Icons.Material.Filled.QrCodeScanner"
+                                   Class="w-100">
+
+                            @foreach (var eq in _customerEquipments)
+                            {
+                                <MudSelectItem Value="@eq.Id">
+                                    @eq.FriendlyId - @eq.Brand - @eq.Model (@eq.DescriptionType)
+                                </MudSelectItem>
+                            }
+
+                        </MudSelect>
+
+                        <!-- CARD -->
+                        <div class="bg-light rounded border p-3 d-flex align-items-start gap-3 mt-3">
+
+                            <!-- ICON -->
+                            <div class="border rounded d-flex align-items-center justify-content-center flex-shrink-0"
+                                 style="width:48px; height:48px; background:white;">
+                                <MudIcon Icon="@Icons.Material.Filled.Construction"
+                                         Color="Color.Primary" />
+                            </div>
+
+                            <!-- INFO -->
+                            <div class="flex-grow-1 overflow-hidden">
+
+                                @if (_selectedEquipment != null)
+                                {
+                                    <!-- ROW 1 -->
+                                    <div class="fw-bold text-truncate"
+                                         style="color:#000666;">
+
+                                        @_selectedEquipment.FriendlyId -
+                                        @_selectedEquipment.Brand -
+                                        @_selectedEquipment.Model
+                                        (@_selectedEquipment.DescriptionType)
+
+                                    </div>
+
+                                    <!-- ROW 2 -->
+                                    <div class="text-muted text-truncate"
+                                         style="font-size:11px;">
+
+                                        @_selectedEquipment.TechnicalSpecifications
+
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="text-muted">
+                                        No equipment selected
+                                    </div>
+                                }
+
+                            </div>
+
+                            <!-- RESET -->
+                            @if (_selectedEquipment != null)
+                            {
+                                <MudIconButton Icon="@Icons.Material.Filled.Close"
+                                               Color="Color.Error"
+                                               Size="Size.Small"
+                                               OnClick="ResetEquipmentSelection" />
+                            }
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- ===================== -->
+            <!-- SERVICE -->
+            <!-- ===================== -->
+            <section class="bg-white border rounded shadow-sm overflow-hidden mb-4">
+
+                <div class="bg-light px-3 py-2 border-bottom">
+                    <h3 class="fw-bold text-uppercase d-flex align-items-center gap-2 m-0"
+                        style="font-size:14px; color:#000666;">
+                        <MudIcon Icon="@Icons.Material.Filled.Handyman" Size="Size.Small" />
+                        Service Details
+                    </h3>
+                </div>
+
+                <div class="p-3">
+
+                    <!-- SERVICE TYPE -->
+                    <div class="mb-4">
+                        <label class="text-uppercase fw-bold text-muted d-block mb-2" style="font-size:11px;">
+                            Service Type
+                        </label>
+
+                        <div class="row g-2">
+                            @foreach (var type in Enum.GetValues<ServiceType>())
+                            {
+                                var selected = _request.ServiceTypeId == type;
+
+                                <div class="col-6 col-md">
+                                    <button type="button"
+                                            class="w-100 btn @(selected ? "btn-primary" : "btn-outline-secondary")"
+                                            style="font-size:11px;"
+                                            @onclick="() => _request.ServiceTypeId = type">
+
+                                        @type.ToFriendlyName().ToUpper()
+
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- DESCRIPTION -->
+                    <div>
+                        <label class="text-uppercase fw-bold text-muted d-block mb-2" style="font-size:11px;">
+                            Failure Description
+                        </label>
+
+                        <MudTextField T="string"
+                                      @bind-Value="_request.FailureDescription"
+                                      Variant="Variant.Outlined"
+                                      Lines="8"
+                                      Class="w-100"
+                                      Required="true" />
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+        <footer class="bg-white border-top p-3 d-flex justify-content-end shadow">
+
+            <div class="d-flex gap-3">
+
+                <MudButton Variant="Variant.Filled"
+                            Color="Color.Primary"
+                            OnClick="SubmitOrder"
+                            StartIcon="@Icons.Material.Filled.Save">
+                        Actualizar orden de servicio
+                </MudButton>
+
+            </div>
+
+        </footer>
+    
+    </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <div class="px-4 pb-4 d-flex w-100 justify-content-end" style="gap: 0.5rem;">
+
+            <MudButton OnClick="Cancel"
+                       Variant="Variant.Text"
+                       Class="px-4">
+                Cerrar
+            </MudButton>
+        </div>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
+    [Parameter] public Guid OrderId { get; set; }
+    private MudForm? _formGeneral;
+    private bool _isValid;
+    private ServiceOrderDto? _order;
+    private bool _loading = true;
+    private IEnumerable<OrderPartDto?> _orderPart;
+    private UpdateServiceOrderRequest _request = new();
+
+    private CustomerDto? _selectedCustomer;
+    private EquipmentDto? _selectedEquipment;
+
+    private List<EquipmentDto> _customerEquipments = new();
+    public async Task GetOrder(Guid id)
+    {
+        _loading = true;
+
+
+        _order = await ServiceOrderClient.GetByIdAsync(id);
+        if (_order is null)
+        {
+            Snackbar.Add("Orden no encontrada.", Severity.Error);
+            return;
+        }
+
+        _selectedCustomer = _order.Customer;
+        _selectedEquipment = _order.Equipment;
+        _orderPart = _order.OrderPart;
+        InitialData();
+        await OnCustomerChanged(_selectedCustomer);
+        await OnEquipmentChanged(_order.Equipment.Id);
+        _loading = false;
+    }
+    private void InitialData()
+    {
+        _request.Id = _order.Id;
+        _request.FailureDescription = _order.FailureDescription;
+        _request.ServiceTypeId = _order.ServiceTypeId;
+    }
+    protected override async Task OnParametersSetAsync()
+    {
+        await GetOrder(OrderId);
+    }
+    //  CAMBIO IMPORTANTE: manejar cambio explícito
+    private async Task OnCustomerChanged(CustomerDto? value)
+    {
+        _selectedCustomer = value;
+
+        _request.EquipmentId = Guid.Empty;
+
+        _selectedEquipment = null;
+        _customerEquipments.Clear();
+
+        if (value != null)
+        {
+            await LoadEquipments(value.Id);
+        }
+    }
+
+    //  DATA FAKE REALISTA
+    private async Task<IEnumerable<CustomerDto>> SearchCustomers(string value, CancellationToken token)
+    {
+        var data = await CustomerClient.GetAllAsync();
+
+        var result = data
+            .Where(x => string.IsNullOrWhiteSpace(value)
+                    || x.Name.Contains(value, StringComparison.OrdinalIgnoreCase)
+                    || x.Phone.Contains(value, StringComparison.OrdinalIgnoreCase)
+                    || x.FriendlyId.Contains(value, StringComparison.OrdinalIgnoreCase));
+
+        return result;
+    }
+
+    private async Task LoadEquipments(Guid customerId)
+    {
+        _customerEquipments = await EquipmentClient.GetByCustomerIdAsync(customerId);
+    }
+    private void ResetCustomerSelection()
+    {
+        _selectedCustomer = null;
+
+        _request.EquipmentId = Guid.Empty;
+
+        _customerEquipments.Clear();
+        ResetEquipmentSelection();
+    }
+
+    private Task OnEquipmentChanged(Guid value)
+    {
+        _request.EquipmentId = value;
+
+        _selectedEquipment = _customerEquipments
+            .FirstOrDefault(x => x.Id == value);
+
+        return Task.CompletedTask;
+    }
+    private void ResetEquipmentSelection()
+    {
+        _request.EquipmentId = Guid.Empty;
+        _selectedEquipment = null;
+    }
+    private async Task SubmitOrder()
+    {
+        await _formGeneral!.Validate();
+
+        if (!_formGeneral.IsValid)
+        {
+            Snackbar.Add("Complete all required fields", Severity.Warning);
+            return;
+        }
+
+        //  aquí iría tu API
+        await ServiceOrderClient.UpdateAsync(_request);
+
+        Snackbar.Add("Service Order Updated", Severity.Success);
+    }
+    private async Task OpenCreateCustomerDialog()
+    {
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true,
+            CloseButton = true
+        };
+
+        var dialog = await DialogService.ShowAsync<CreateCustomerDialog>(" ", options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled && result.Data is CustomerDto newClient)
+        {
+            try
+            {
+                Snackbar.Add($"Client {newClient.Name} added to the system.", Severity.Success);
+                await OnCustomerChanged(newClient);
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add("Error saving client: " + ex.Message, Severity.Error);
+            }
+        }
+    }
+    private void Cancel() => MudDialog.Cancel();
+
+    private async Task OpenCreateEquipmentDialog()
+    {
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true,
+            CloseButton = true
+        };
+        var parameters = new DialogParameters<CreateEquipmentDialog>();
+        if (_selectedCustomer != null)
+        {
+            parameters.Add(x => x.Customer, _selectedCustomer);
+        }
+        var dialog = await DialogService.ShowAsync<CreateEquipmentDialog>(" ", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled && result.Data is EquipmentDto newEquipment)
+        {
+            try
+            {
+                Snackbar.Add($"Equipment {newEquipment.DescriptionType} added to the system.", Severity.Success);
+                await LoadEquipments(_selectedCustomer!.Id);
+
+                _request.EquipmentId = newEquipment.Id;
+
+                _selectedEquipment = newEquipment;
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add("Error saving part: " + ex.Message, Severity.Error);
+            }
+        }
+    }
+   
+}

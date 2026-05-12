@@ -124,7 +124,7 @@
                         <MudIconButton Icon="@Icons.Material.Filled.Edit"
                                        Size="Size.Small"
                                        Color="Color.Primary"
-                                       OnClick="@(() => OnEdit.InvokeAsync(context.Item))" />
+                                       OnClick="@(() => OpenEditDialog(context.Item))" />
 
                     </MudStack>
                 </CellTemplate>
@@ -230,5 +230,25 @@
         var result = await dialog.Result;
         await LoadData();
     }
-    
+    private async Task OpenEditDialog(ServiceOrderDto order)
+    {
+        var IdOrder = order.Id;
+
+        var parameters = new DialogParameters<EditServiceOrder>
+        {
+            { x => x.OrderId, IdOrder }
+        };
+
+        var options = new DialogOptions
+        {
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true,
+            CloseButton = true,
+            BackdropClick = false // Evita que se cierre por error al dar click fuera
+        };
+
+        var dialog = await DialogService.ShowAsync<EditServiceOrder>(" ", parameters, options);
+        var result = await dialog.Result;
+        await LoadData();
+    }
 }

@@ -57,7 +57,14 @@ public class ServiceOrderClient
         var response = await _http.PostAsJsonAsync(BaseRoute, order);
         return response.IsSuccessStatusCode;
     }
-
+    /// <summary>
+    /// Actualiza una orden de servicio existente
+    /// </summary>
+    public async Task<bool> UpdateAsync(UpdateServiceOrderRequest order)
+    {
+        var response = await _http.PutAsJsonAsync(BaseRoute, order);
+        return response.IsSuccessStatusCode;
+    }
     /// <summary>
     /// Actualiza el estatus de la orden de servicio
     /// </summary>
