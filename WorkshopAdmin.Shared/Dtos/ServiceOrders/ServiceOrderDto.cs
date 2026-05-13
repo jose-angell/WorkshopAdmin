@@ -18,18 +18,21 @@ public class ServiceOrderDto
 
     // Información de la Orden
     public string FailureDescription { get; set; } = string.Empty;
-    public string? Diagnosis { get; set; } 
+    public string? Diagnosis { get; set; }
     public ServiceOrderStatus Status { get; set; } // Enum (0-4)
     public decimal LaborCost { get; set; }
     public decimal TotalCost { get; set; } // Calculado: Σ refacciones + mano de obra
     public TimeSpan? EstimatedTime { get; set; }
 
     // Propiedad calculada útil para la UI
-    public string EstimatedTimeDisplay => EstimatedTime.HasValue
-        ? $"{(int)EstimatedTime.Value.TotalHours}h {EstimatedTime.Value.Minutes}m"
-        : "No definido";
-    public DateTimeOffset? RepairStartedAt { get; set; } 
-    public DateTimeOffset? RepairFinishedAt { get; set; } 
+    public string EstimatedTimeDisplay => EstimatedTime.HasValue ? $"{(int)EstimatedTime.Value.TotalHours}h {EstimatedTime.Value.Minutes}m" : "No definido";
+    public DateTimeOffset? RepairStartedAt { get; set; }
+    public DateTimeOffset? RepairFinishedAt { get; set; }
+    public DateTimeOffset? ExpectedFinishAt { get; set; }
+    public TimeSpan? RemainingBusinessTime { get; set; }
+    public string RemainingBusinessTimeDisplay => RemainingBusinessTime.HasValue ? $"{(int)RemainingBusinessTime.Value.TotalHours}h {RemainingBusinessTime.Value.Minutes}m" : "--";
+    public string ExpectedFinishDisplay => ExpectedFinishAt?.ToLocalTime().ToString("dd/MM/yy hh:mm tt") ?? "--";
+    public bool IsDelayed { get; set; }
     public ServiceType ServiceTypeId { get; set; }
     public string ServiceTypeDescription { get; set; } = string.Empty;
     public DateTimeOffset CreatedAt { get; set; }

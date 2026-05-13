@@ -14,6 +14,7 @@ public class ServiceOrder
     public TimeSpan? EstimatedTime { get; set; } // interval
     public DateTimeOffset? RepairStartedAt { get; set; } // timestamptz
     public DateTimeOffset? RepairFinishedAt { get; set; } // timestamptz
+    public DateTimeOffset? ExpectedFinishAt { get; set; } // timestamptz
     public ServiceType ServiceTypeId { get; set; } // Enum: Preventive, Corrective, etc. [8]
     public DateTimeOffset CreatedAt { get; set; } // timestamptz 
     public DateTimeOffset UpdatedAt { get; set; } // timestamptz 

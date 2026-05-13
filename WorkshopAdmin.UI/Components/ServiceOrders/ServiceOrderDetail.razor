@@ -31,15 +31,55 @@
                         <MudText Typo="Typo.h6" Class="fw-bold">Orden @_order.FriendlyId  </MudText>  
                         <MudText Typo="Typo.subtitle1" Class="fw-light"> ( Orden @_order.ServiceTypeDescription )</MudText>
                     </div>
-                    <div class="d-flex gap-3">
-                        <div>
-                            <MudText Typo="Typo.caption" Class="fw-bold">Cracion: </MudText>
-                            <MudText Typo="Typo.caption">@_order.CreatedAt.ToLocalTime().ToString("g")</MudText>
+                    <div class="d-flex gap-4 flex-wrap">
+
+                        <div class="d-flex flex-column">
+                            <MudText Typo="Typo.caption" Class="fw-bold">
+                                Creación:
+                            </MudText>
+
+                            <MudText Typo="Typo.caption">
+                                @_order.CreatedAt.ToLocalTime().ToString("dd/MM/yy hh:mm tt")
+                            </MudText>
                         </div>
-                        <div>
-                            <MudText Typo="Typo.caption" Class="fw-bold">Ultima Actualizacion: </MudText>
-                            <MudText Typo="Typo.caption">@_order.UpdatedAt.ToLocalTime().ToString("g")</MudText>
+
+                        <div class="d-flex flex-column">
+                            <MudText Typo="Typo.caption" Class="fw-bold">
+                                Última Actualización:
+                            </MudText>
+
+                            <MudText Typo="Typo.caption">
+                                @_order.UpdatedAt.ToLocalTime().ToString("dd/MM/yy hh:mm tt")
+                            </MudText>
                         </div>
+
+                        @if (_order.Status == ServiceOrderStatus.Repairing)
+                        {
+                            <div class="d-flex flex-column">
+                                <MudText Typo="Typo.caption" Class="fw-bold">
+                                    Finalización esperada:
+                                </MudText>
+
+                                <MudText Typo="Typo.caption">
+                                    @_order.ExpectedFinishDisplay
+                                </MudText>
+                            </div>
+                        }
+                        else if (_order.Status >= ServiceOrderStatus.Completed)
+                        {
+                            <div class="d-flex flex-column">
+                                <MudText Typo="Typo.caption" Class="fw-bold">
+                                    Finalización:
+                                </MudText>
+
+                                <MudText Typo="Typo.caption">
+                                    @_order.RepairFinishedAt?
+                                    .ToLocalTime()
+                                    .ToString("dd/MM/yy hh:mm tt")
+                                </MudText>
+                            </div>
+                        }
+
                     </div>
                 </MudStack>
 

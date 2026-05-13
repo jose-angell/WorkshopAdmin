@@ -4,6 +4,7 @@ using WorkshopAdmin.Domain.Exceptions;
 using WorkshopAdmin.Domain.Interfaces;
 using WorkshopAdmin.Shared.Dtos.ServiceOrders;
 using WorkshopAdmin.Shared.Enums;
+using WorkshopAdmin.Shared.Helpers;
 
 namespace WorkshopAdmin.Application.Services;
 
@@ -154,10 +155,13 @@ public class ServiceOrderService : IServiceOrderService
             throw new DomainException("El costo de mano de obra debe ser mayor o igual a cero.");
 
         order.EstimatedTime = request.EstimatedTime;
+        if (order.EstimatedTime.HasValue && order.RepairStartedAt.HasValue)
+        {
+            order.ExpectedFinishAt = BusinessTimeCalculator.CalculateExpectedFinish(order.RepairStartedAt.Value, order.EstimatedTime.Value);
+        }
         order.Diagnosis = request.Diagnosis;
         order.LaborCost = request.LaborCost;
         order.Status = request.NewStatus; 
-        order.UpdatedAt = DateTimeOffset.UtcNow; // Actualización de timestamptz [4]
 
         await _orderRepository.UpdateAsync(order);
     }
@@ -186,16 +190,20 @@ public class ServiceOrderService : IServiceOrderService
         // Si pasamos a Reparación, marcamos el inicio
         if (request.NewStatus == ServiceOrderStatus.Repairing && order.Status != ServiceOrderStatus.Repairing)
         {
-            order.RepairStartedAt = DateTime.UtcNow;
-        }
+            order.RepairStartedAt = DateTimeOffset.UtcNow;
 
+            if (order.EstimatedTime.HasValue)
+            {
+                order.ExpectedFinishAt = BusinessTimeCalculator.CalculateExpectedFinish(order.RepairStartedAt.Value, order.EstimatedTime.Value);
+            }
+        }
         // Si terminamos la reparación, marcamos el fin
         if (request.NewStatus == ServiceOrderStatus.Completed && order.Status == ServiceOrderStatus.Repairing)
         {
-            order.RepairFinishedAt = DateTime.UtcNow;
+            order.RepairFinishedAt = DateTimeOffset.UtcNow;
         }
 
-        await _orderRepository.UpdateStatusAsync(request.Id, request.NewStatus);
+        await _orderRepository.UpdateAsync(order);
     }
     public async Task<OrderPartDto?> GetOrderPartAsync(Guid serviceOrderId, Guid partId)
     {
@@ -315,6 +323,9 @@ public class ServiceOrderService : IServiceOrderService
         EstimatedTime = order.EstimatedTime,
         RepairStartedAt = order.RepairStartedAt,
         RepairFinishedAt = order.RepairFinishedAt,
+        ExpectedFinishAt = order.ExpectedFinishAt,
+        RemainingBusinessTime = order.ExpectedFinishAt.HasValue ? BusinessTimeCalculator.CalculateRemaining(DateTimeOffset.UtcNow, order.ExpectedFinishAt.Value) : null,
+        IsDelayed = order.ExpectedFinishAt.HasValue && DateTimeOffset.UtcNow > order.ExpectedFinishAt.Value && order.Status != ServiceOrderStatus.Completed && order.Status != ServiceOrderStatus.Delivered,
         CreatedAt = order.CreatedAt,
         UpdatedAt = order.UpdatedAt,
         OrderPart = order.OrderParts?.Select(op => new OrderPartDto

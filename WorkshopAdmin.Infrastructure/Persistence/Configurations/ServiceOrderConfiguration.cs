@@ -47,6 +47,10 @@ public class ServiceOrderConfiguration : IEntityTypeConfiguration<ServiceOrder>
             .HasColumnName("repair_finished_at")
             .HasColumnType("timestamptz");
 
+        builder.Property(so => so.ExpectedFinishAt)
+            .HasColumnName("expected_finish_at")
+            .HasColumnType("timestamptz");
+
         builder.Property(so => so.ServiceTypeId)
             .HasColumnName("service_type_id")
             .HasColumnType("smallint")
