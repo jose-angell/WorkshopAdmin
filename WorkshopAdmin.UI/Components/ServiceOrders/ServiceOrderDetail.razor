@@ -522,8 +522,10 @@
     {
         techData.Diagnosis = _order?.Diagnosis ?? "";
         techData.LaborCost = _order?.LaborCost ?? 0;
-        _hours = (int)_order?.EstimatedTime.Value.TotalHours;
-        _minutes = (int)_order?.EstimatedTime.Value.Minutes;
+        var estimated = _order?.EstimatedTime ?? TimeSpan.Zero;
+
+        _hours = (int)estimated.TotalHours;
+        _minutes = estimated.Minutes;
         techData.EstimatedTime = _order?.EstimatedTime ?? new TimeSpan(_hours, _minutes, 0);
 
     }

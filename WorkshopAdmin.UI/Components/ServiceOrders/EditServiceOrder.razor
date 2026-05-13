@@ -1,4 +1,5 @@
-﻿@using WorkshopAdmin.Shared.Dtos.Customers
+﻿@using System.Globalization
+@using WorkshopAdmin.Shared.Dtos.Customers
 @using WorkshopAdmin.Shared.Dtos.Equipments
 @using WorkshopAdmin.Shared.Dtos.ServiceOrders
 @using WorkshopAdmin.Shared.Enums
@@ -13,276 +14,512 @@
 @inject NavigationManager Navigation
 <MudDialog >
     <DialogContent>
-    <MudForm @ref="_formGeneral">
+        @if (_loading)
+        {
+            <!-- LOADING -->
+            <MudStack AlignItems="AlignItems.Center" Class="p-4">
+                <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+                <MudText Typo="Typo.caption" Class="mt-2">Cargando orden...</MudText>
+            </MudStack>
+        }
+        else
+        {
 
-        <main class="container" style="max-width:1440px;">
+            <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center"
+            Class="detail-header m-3 p-3 rounded text-white ">
+                <MudStack Spacing="0">
+                    <div class="d-flex gap-3 ">
+                        <MudText Typo="Typo.h6" Class="fw-bold">Orden @_order.FriendlyId  </MudText>
+                        <MudText Typo="Typo.subtitle1" Class="fw-light"> ( Orden @_order.ServiceTypeDescription )</MudText>
+                    </div>
+                    <div class="d-flex gap-3">
+                        <div>
+                            <MudText Typo="Typo.caption" Class="fw-bold">Cracion: </MudText>
+                            <MudText Typo="Typo.caption">@_order.CreatedAt.ToLocalTime().ToString("g")</MudText>
+                        </div>
+                        <div>
+                            <MudText Typo="Typo.caption" Class="fw-bold">Ultima Actualizacion: </MudText>
+                            <MudText Typo="Typo.caption">@_order.UpdatedAt.ToLocalTime().ToString("g")</MudText>
+                        </div>
+                    </div>
+                </MudStack>
+                <MudChip T="ServiceOrderStatus" Color="@GetStatusColor(_order.Status)" Variant="Variant.Filled">
+                @_order.Status.ToFriendlyName()
+                </MudChip>
 
-            <!-- ===================== -->
-            <!-- ENTITY + ASSET -->
-            <!-- ===================== -->
-            <section class="bg-white border rounded shadow-sm overflow-hidden mb-4">
+            </MudStack>
+            <MudForm @ref="_formGeneral">
 
-                <!-- HEADER -->
-                <div class="bg-light px-3 py-2 border-bottom d-flex align-items-center">
-                    <h3 class="fw-bold text-uppercase d-flex align-items-center gap-2 m-0" style="font-size:14px; color:#000666;">
-                        <MudIcon Icon="@Icons.Material.Filled.Badge" Size="Size.Small" />
-                        Entity & Asset Selection
-                    </h3>
-                </div>
-
-                <div class="row g-3 p-3">
+                <main class="container" style="max-width:1440px;">
 
                     <!-- ===================== -->
-                    <!-- CUSTOMER -->
+                    <!-- ENTITY + ASSET -->
                     <!-- ===================== -->
-                    <div class="col-12 col-md-5">
+                    <section class="bg-white border rounded shadow-sm overflow-hidden mb-4">
 
                         <!-- HEADER -->
-                        <div class="d-flex justify-content-between align-items-end mb-2">
-                            <label class="text-uppercase fw-bold text-muted" style="font-size:11px;">
-                                Customer Selection
-                            </label>
-                            <MudButton Variant="Variant.Text"
-                                   Color="Color.Primary"
-                                   Disabled="true"
-                                   StartIcon="@Icons.Material.Filled.Add"
-                                   OnClick="OpenCreateCustomerDialog"
-                                   Class="fw-bold"
-                                   Style="font-size:11px;">
-                                New Customer
-                            </MudButton>
-                           
+                        <div class="bg-light px-3 py-2 border-bottom d-flex align-items-center">
+                            <h3 class="fw-bold text-uppercase d-flex align-items-center gap-2 m-0" style="font-size:14px; color:#000666;">
+                                <MudIcon Icon="@Icons.Material.Filled.Badge" Size="Size.Small" />
+                                Entity & Asset Selection
+                            </h3>
                         </div>
 
-                        <!-- INPUT -->
-                        <MudAutocomplete T="CustomerDto"
-                                         Value="_selectedCustomer"
-                                         Disabled="true"
-                                         ValueChanged="OnCustomerChanged"
-                                         SearchFunc="SearchCustomers"
-                                         ToStringFunc="@(c =>c is null ? string.Empty : $"{c.Name} ({c.Phone})")"
-                                         Variant="Variant.Outlined"
-                                         AdornmentIcon="@Icons.Material.Filled.Search"
-                                         Placeholder="Search by name, ID or phone..."
-                                         Class="w-100"
-                                         Required="true" />
+                        <div class="row g-3 p-3">
 
-                        <!-- CARD -->
-                        <div class="bg-light rounded border p-3 d-flex align-items-start gap-3 mt-3">
+                            <!-- ===================== -->
+                            <!-- CUSTOMER -->
+                            <!-- ===================== -->
+                            <div class="col-12 col-md-5">
 
-                            <!-- ICON -->
-                            <div class="border rounded d-flex align-items-center justify-content-center flex-shrink-0"
-                                 style="width:48px; height:48px; background:white;">
-                                <MudIcon Icon="@Icons.Material.Filled.Business"
-                                         Style="color:#000666;" />
+                                <!-- HEADER -->
+                                <div class="d-flex justify-content-between align-items-end mb-2">
+                                    <label class="text-uppercase fw-bold text-muted" style="font-size:11px;">
+                                        Customer Selection
+                                    </label>
+                                    <MudButton Variant="Variant.Text"
+                                    Color="Color.Primary"
+                                    Disabled="true"
+                                    StartIcon="@Icons.Material.Filled.Add"
+                                    OnClick="OpenCreateCustomerDialog"
+                                    Class="fw-bold"
+                                    Style="font-size:11px;">
+                                        New Customer
+                                    </MudButton>
+
+                                </div>
+
+                                <!-- INPUT -->
+                                <MudAutocomplete T="CustomerDto"
+                                Value="_selectedCustomer"
+                                Disabled="true"
+                                ValueChanged="OnCustomerChanged"
+                                SearchFunc="SearchCustomers"
+                                ToStringFunc="@(c =>c is null ? string.Empty : $"{c.Name} ({c.Phone})")"
+                                Variant="Variant.Outlined"
+                                AdornmentIcon="@Icons.Material.Filled.Search"
+                                Placeholder="Search by name, ID or phone..."
+                                Class="w-100"
+                                Required="true" />
+
+                                <!-- CARD -->
+                                <div class="bg-light rounded border p-3 d-flex align-items-start gap-3 mt-3">
+
+                                    <!-- ICON -->
+                                    <div class="border rounded d-flex align-items-center justify-content-center flex-shrink-0"
+                                    style="width:48px; height:48px; background:white;">
+                                        <MudIcon Icon="@Icons.Material.Filled.Business"
+                                        Style="color:#000666;" />
+                                    </div>
+
+                                    <!-- INFO -->
+                                    <div class="flex-grow-1 overflow-hidden">
+
+                                        @if (_selectedCustomer != null)
+                                        {
+                                            <!-- ROW 1 -->
+                                            <div class="fw-bold text-truncate"
+                                            style="color:#000666;">
+
+                                                @_selectedCustomer.FriendlyId - @_selectedCustomer.Name
+
+                                            </div>
+
+                                            <!-- ROW 2 -->
+                                            <div class="text-muted text-truncate"
+                                            style="font-size:11px;">
+
+                                                (@_selectedCustomer.Phone) @_selectedCustomer.Email
+
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="text-muted">
+                                                No customer selected
+                                            </div>
+                                        }
+
+                                    </div>
+
+                                </div>
                             </div>
 
-                            <!-- INFO -->
-                            <div class="flex-grow-1 overflow-hidden">
+                            <!-- ===================== -->
+                            <!-- EQUIPMENT -->
+                            <!-- ===================== -->
+                            <div class="col-12 col-md-7">
 
-                                @if (_selectedCustomer != null)
-                                {
-                                    <!-- ROW 1 -->
-                                    <div class="fw-bold text-truncate"
-                                         style="color:#000666;">
+                                <div class="d-flex justify-content-between align-items-end mb-2">
+                                    <label class="text-uppercase fw-bold text-muted" style="font-size:11px;">
+                                        Equipment Selection
+                                    </label>
 
-                                        @_selectedCustomer.FriendlyId - @_selectedCustomer.Name
+                                    <MudButton Variant="Variant.Text"
+                                    Color="Color.Primary"
+                                    OnClick="OpenCreateEquipmentDialog"
+                                    StartIcon="@Icons.Material.Filled.Add"
+                                    Style="font-size:11px;">
+                                        Register Equipment
+                                    </MudButton>
+                                </div>
+
+                                <!-- SELECT -->
+                                <MudSelect T="Guid"
+                                Value="_request.EquipmentId"
+                                ValueChanged="OnEquipmentChanged"
+                                Variant="Variant.Outlined"
+                                Disabled="@(_selectedCustomer == null)"
+                                Required="true"
+                                Adornment="Adornment.Start"
+                                AdornmentIcon="@Icons.Material.Filled.QrCodeScanner"
+                                Class="w-100">
+
+                                    @foreach (var eq in _customerEquipments)
+                                    {
+                                        <MudSelectItem Value="@eq.Id">
+                                            @eq.FriendlyId - @eq.Brand - @eq.Model (@eq.DescriptionType)
+                                        </MudSelectItem>
+                                    }
+
+                                </MudSelect>
+
+                                <!-- CARD -->
+                                <div class="bg-light rounded border p-3 d-flex align-items-start gap-3 mt-3">
+
+                                    <!-- ICON -->
+                                    <div class="border rounded d-flex align-items-center justify-content-center flex-shrink-0"
+                                    style="width:48px; height:48px; background:white;">
+                                        <MudIcon Icon="@Icons.Material.Filled.Construction"
+                                        Color="Color.Primary" />
+                                    </div>
+
+                                    <!-- INFO -->
+                                    <div class="flex-grow-1 overflow-hidden">
+
+                                        @if (_selectedEquipment != null)
+                                        {
+                                            <!-- ROW 1 -->
+                                            <div class="fw-bold text-truncate"
+                                            style="color:#000666;">
+
+                                                @_selectedEquipment.FriendlyId -
+                                                @_selectedEquipment.Brand -
+                                                @_selectedEquipment.Model
+                                                (@_selectedEquipment.DescriptionType)
+
+                                            </div>
+
+                                            <!-- ROW 2 -->
+                                            <div class="text-muted text-truncate"
+                                            style="font-size:11px;">
+
+                                                @_selectedEquipment.TechnicalSpecifications
+
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="text-muted">
+                                                No equipment selected
+                                            </div>
+                                        }
 
                                     </div>
 
-                                    <!-- ROW 2 -->
-                                    <div class="text-muted text-truncate"
-                                         style="font-size:11px;">
+                                    <!-- RESET -->
+                                    @if (_selectedEquipment != null)
+                                    {
+                                        <MudIconButton Icon="@Icons.Material.Filled.Close"
+                                        Color="Color.Error"
+                                        Size="Size.Small"
+                                        OnClick="ResetEquipmentSelection" />
+                                    }
 
-                                        (@_selectedCustomer.Phone) @_selectedCustomer.Email
-
-                                    </div>
-                                }
-                                else
-                                {
-                                    <div class="text-muted">
-                                        No customer selected
-                                    </div>
-                                }
-
+                                </div>
                             </div>
 
                         </div>
-                    </div>
+
+                    </section>
 
                     <!-- ===================== -->
-                    <!-- EQUIPMENT -->
+                    <!-- SERVICE -->
                     <!-- ===================== -->
-                    <div class="col-12 col-md-7">
+                    <section class="bg-white border rounded shadow-sm overflow-hidden mb-4">
 
-                        <div class="d-flex justify-content-between align-items-end mb-2">
-                            <label class="text-uppercase fw-bold text-muted" style="font-size:11px;">
-                                Equipment Selection
-                            </label>
-
-                            <MudButton Variant="Variant.Text"
-                                       Color="Color.Primary"
-                                       OnClick="OpenCreateEquipmentDialog"
-                                       StartIcon="@Icons.Material.Filled.Add"
-                                       Style="font-size:11px;">
-                                Register Equipment
-                            </MudButton>
+                        <div class="bg-light px-3 py-2 border-bottom">
+                            <h3 class="fw-bold text-uppercase d-flex align-items-center gap-2 m-0"
+                            style="font-size:14px; color:#000666;">
+                                <MudIcon Icon="@Icons.Material.Filled.Handyman" Size="Size.Small" />
+                                Service Details
+                            </h3>
                         </div>
 
-                        <!-- SELECT -->
-                        <MudSelect T="Guid"
-                                   Value="_request.EquipmentId"
-                                   ValueChanged="OnEquipmentChanged"
-                                   Variant="Variant.Outlined"
-                                   Disabled="@(_selectedCustomer == null)"
-                                   Required="true"
-                                   Adornment="Adornment.Start"
-                                   AdornmentIcon="@Icons.Material.Filled.QrCodeScanner"
-                                   Class="w-100">
+                        <div class="p-3">
 
-                            @foreach (var eq in _customerEquipments)
-                            {
-                                <MudSelectItem Value="@eq.Id">
-                                    @eq.FriendlyId - @eq.Brand - @eq.Model (@eq.DescriptionType)
-                                </MudSelectItem>
-                            }
+                            <!-- SERVICE TYPE -->
+                            <div class="mb-4">
+                                <label class="text-uppercase fw-bold text-muted d-block mb-2" style="font-size:11px;">
+                                    Service Type
+                                </label>
 
-                        </MudSelect>
+                                <div class="row g-2">
+                                    @foreach (var type in Enum.GetValues<ServiceType>())
+                                    {
+                                        var selected = _request.ServiceTypeId == type;
 
-                        <!-- CARD -->
-                        <div class="bg-light rounded border p-3 d-flex align-items-start gap-3 mt-3">
-
-                            <!-- ICON -->
-                            <div class="border rounded d-flex align-items-center justify-content-center flex-shrink-0"
-                                 style="width:48px; height:48px; background:white;">
-                                <MudIcon Icon="@Icons.Material.Filled.Construction"
-                                         Color="Color.Primary" />
-                            </div>
-
-                            <!-- INFO -->
-                            <div class="flex-grow-1 overflow-hidden">
-
-                                @if (_selectedEquipment != null)
-                                {
-                                    <!-- ROW 1 -->
-                                    <div class="fw-bold text-truncate"
-                                         style="color:#000666;">
-
-                                        @_selectedEquipment.FriendlyId -
-                                        @_selectedEquipment.Brand -
-                                        @_selectedEquipment.Model
-                                        (@_selectedEquipment.DescriptionType)
-
-                                    </div>
-
-                                    <!-- ROW 2 -->
-                                    <div class="text-muted text-truncate"
-                                         style="font-size:11px;">
-
-                                        @_selectedEquipment.TechnicalSpecifications
-
-                                    </div>
-                                }
-                                else
-                                {
-                                    <div class="text-muted">
-                                        No equipment selected
-                                    </div>
-                                }
-
-                            </div>
-
-                            <!-- RESET -->
-                            @if (_selectedEquipment != null)
-                            {
-                                <MudIconButton Icon="@Icons.Material.Filled.Close"
-                                               Color="Color.Error"
-                                               Size="Size.Small"
-                                               OnClick="ResetEquipmentSelection" />
-                            }
-
-                        </div>
-                    </div>
-
-                </div>
-
-            </section>
-
-            <!-- ===================== -->
-            <!-- SERVICE -->
-            <!-- ===================== -->
-            <section class="bg-white border rounded shadow-sm overflow-hidden mb-4">
-
-                <div class="bg-light px-3 py-2 border-bottom">
-                    <h3 class="fw-bold text-uppercase d-flex align-items-center gap-2 m-0"
-                        style="font-size:14px; color:#000666;">
-                        <MudIcon Icon="@Icons.Material.Filled.Handyman" Size="Size.Small" />
-                        Service Details
-                    </h3>
-                </div>
-
-                <div class="p-3">
-
-                    <!-- SERVICE TYPE -->
-                    <div class="mb-4">
-                        <label class="text-uppercase fw-bold text-muted d-block mb-2" style="font-size:11px;">
-                            Service Type
-                        </label>
-
-                        <div class="row g-2">
-                            @foreach (var type in Enum.GetValues<ServiceType>())
-                            {
-                                var selected = _request.ServiceTypeId == type;
-
-                                <div class="col-6 col-md">
-                                    <button type="button"
+                                        <div class="col-6 col-md">
+                                            <button type="button"
                                             class="w-100 btn @(selected ? "btn-primary" : "btn-outline-secondary")"
                                             style="font-size:11px;"
                                             @onclick="() => _request.ServiceTypeId = type">
 
-                                        @type.ToFriendlyName().ToUpper()
+                                                @type.ToFriendlyName().ToUpper()
 
-                                    </button>
+                                            </button>
+                                        </div>
+                                    }
                                 </div>
-                            }
+                            </div>
+
+                            <!-- DESCRIPTION -->
+                            <div>
+                                <label class="text-uppercase fw-bold text-muted d-block mb-2" style="font-size:11px;">
+                                    Failure Description
+                                </label>
+
+                                <MudTextField T="string"
+                                @bind-Value="_request.FailureDescription"
+                                Variant="Variant.Outlined"
+                                Lines="8"
+                                Class="w-100"
+                                Required="true" />
+                            </div>
+
                         </div>
+
+                    </section>
+
+                </main>
+                <footer class="bg-white border-top p-3 mb-4 d-flex justify-content-end shadow">
+
+                    <div class="d-flex gap-3">
+
+                        <MudButton Variant="Variant.Filled"
+                        Color="Color.Primary"
+                        OnClick="SubmitOrder"
+                        StartIcon="@Icons.Material.Filled.Save">
+                            Actualizar orden de servicio
+                        </MudButton>
+
                     </div>
 
-                    <!-- DESCRIPTION -->
-                    <div>
-                        <label class="text-uppercase fw-bold text-muted d-block mb-2" style="font-size:11px;">
-                            Failure Description
-                        </label>
+                </footer>
 
-                        <MudTextField T="string"
-                                      @bind-Value="_request.FailureDescription"
-                                      Variant="Variant.Outlined"
-                                      Lines="8"
-                                      Class="w-100"
-                                      Required="true" />
+            </MudForm>
+            <MudForm @ref="_formDiagnostico">
+
+                <main class="container" style="max-width:1440px;">
+                    <section class="bg-white border rounded shadow-sm overflow-hidden mb-4">
+
+                        <div class="bg-light px-3 py-2 border-bottom">
+                            <h3 class="fw-bold text-uppercase d-flex align-items-center gap-2 m-0"
+                            style="font-size:14px; color:#000666;">
+                                <MudIcon Icon="@Icons.Material.Filled.Handyman" Size="Size.Small" />
+                                Detalle de Diagnóstico Técnico
+                            </h3>
+                        </div>
+
+                        <MudGrid Spacing="2">
+                            <MudItem xs="12">
+                                <MudTextField T="string"
+                                Label="Diagnóstico"
+                                @bind-Value="techData.Diagnosis"
+                                Required="true"
+                                Variant="Variant.Outlined"
+                                Margin="Margin.Dense"
+                                Lines="5"
+                                TextArea="true"
+                                AutoGrow="true" />
+                            </MudItem>
+
+                            <MudItem xs="12" sm="3">
+                                <MudNumericField T="decimal"
+                                Label="Labor Cost ($) *"
+                                @bind-Value="techData.LaborCost"
+                                @bind-Value:after="RecalculateTotal"
+                                Min="0"
+                                Required="true"
+                                Immediate="true"
+                                Variant="Variant.Outlined"
+                                Margin="Margin.Dense"
+                                Adornment="Adornment.Start"
+                                AdornmentText="$"
+                                HelperText="Value must be ≥ 0"
+                                Culture="@CultureInfo.GetCultureInfo("es-MX")"
+                                Error="@(techData.LaborCost < 0)" />
+                            </MudItem>
+
+                            <MudItem xs="6" sm="3">
+                                <MudSelect T="int"
+                                Label="Hours"
+                                Value="_hours"
+                                ValueChanged="UpdateEstimatedTime"
+                                Variant="Variant.Outlined"
+                                Margin="Margin.Dense">
+
+                                    @for (int i = 0; i <= 24; i++)
+                                    {
+                                        var hour = i;
+
+                                        <MudSelectItem T="int" Value="@hour">
+                                            @hour h
+                                        </MudSelectItem>
+                                    }
+
+                                </MudSelect>
+                            </MudItem>
+
+                            <MudItem xs="6" sm="3">
+                                <MudSelect T="int"
+                                Label="Minutes"
+                                Value="_minutes"
+                                ValueChanged="UpdateEstimatedMinutes"
+                                Variant="Variant.Outlined"
+                                Margin="Margin.Dense">
+
+                                    @for (int i = 0; i < 60; i += 5)
+                                    {
+                                        var minute = i;
+
+                                        <MudSelectItem T="int" Value="@minute">
+                                            @minute min
+                                        </MudSelectItem>
+                                    }
+
+                                </MudSelect>
+                            </MudItem>
+                            <MudItem xs="12" sm="3">
+
+                                <MudNumericField T="decimal"
+                                Label="Total ($) *"
+                                @bind-Value="_totalCost"
+                                ReadOnly
+                                Immediate="true"
+                                Variant="Variant.Outlined"
+                                Margin="Margin.Dense"
+                                Adornment="Adornment.Start"
+                                AdornmentText="$"
+                                Culture="@CultureInfo.GetCultureInfo("es-MX")" />
+                            </MudItem>
+                        </MudGrid>
+
+                    </section>
+
+                </main>
+                <footer class="bg-white border-top p-3 mb-4 d-flex justify-content-end shadow">
+
+                    <div class="d-flex gap-3">
+
+                        <MudButton Variant="Variant.Filled"
+                        Color="Color.Primary"
+                        OnClick="SaveTechnicalData"
+                        StartIcon="@Icons.Material.Filled.Save">
+                            Actualizar Diagnostico
+                        </MudButton>
+
                     </div>
 
-                </div>
+                </footer>
 
-            </section>
+            </MudForm>
+            <!-- PARTES -->
+            <MudItem xs="12">
+                <MudPaper Class="p-3 rounded border">
+                    <MudStack Row Justify="Justify.SpaceBetween" Class="mb-2">
+                        <MudText Typo="Typo.caption">Refacciones</MudText>
+                        <div>
 
-        </main>
-        <footer class="bg-white border-top p-3 d-flex justify-content-end shadow">
-
-            <div class="d-flex gap-3">
-
-                <MudButton Variant="Variant.Filled"
+                            <MudChip T="int" Size="Size.Small">
+                                @_orderPart.Count()
+                            </MudChip>
+                            <MudIconButton Icon="@Icons.Material.Filled.PlusOne"
                             Color="Color.Primary"
-                            OnClick="SubmitOrder"
-                            StartIcon="@Icons.Material.Filled.Save">
-                        Actualizar orden de servicio
-                </MudButton>
+                            Size="Size.Small"
+                            OnClick="OpenCreateOrderPart" />
+                        </div>
 
-            </div>
+                    </MudStack>
 
-        </footer>
-    
-    </MudForm>
+                    @if (_orderPart.Any())
+                    {
+                        <MudList T="OrderPartDto" Dense="true">
+                            @foreach (var part in _orderPart)
+                            {
+                                <MudListItem>
+                                    <div class="bg-light rounded border p-3 d-flex align-items-start gap-3 mt-3">
+
+                                        <!-- ICON -->
+                                        <div class="border rounded d-flex align-items-center justify-content-center flex-shrink-0"
+                                        style="width:48px; height:48px; background:white;">
+                                            <MudIcon Icon="@Icons.Material.Filled.Construction"
+                                            Color="Color.Primary" />
+                                        </div>
+
+                                        <!-- INFO -->
+                                        <div class="flex-grow-1 overflow-hidden">
+
+
+                                            <!-- ROW 1 -->
+                                            <div class="fw-bold text-truncate"
+                                            style="color:#000666;">
+
+                                                @part.Sku -
+                                                @part.PartName
+
+
+                                            </div>
+
+                                            <!-- ROW 2 -->
+                                            <div class="text-muted text-truncate"
+                                            style="font-size:11px;">
+
+                                                @part.Quantity x @part.UnitPrice.ToString("C") = @part.Subtotal.ToString("C")
+
+                                            </div>
+
+
+                                        </div>
+
+                                        <!-- RESET -->
+
+                                        <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                        Color="Color.Secondary"
+                                        Size="Size.Small"
+                                        OnClick="() => OpenUpdateOrderPart(part.PartId)" />
+
+                                        <MudIconButton Icon="@Icons.Material.Filled.Close"
+                                        Color="Color.Error"
+                                        Size="Size.Small"
+                                        OnClick="() => DeleteOrderPart(part.PartId)" />
+
+
+
+                                    </div>
+                                </MudListItem>
+                            }
+                        </MudList>
+                    }
+                    else
+                    {
+                        <MudText Typo="Typo.caption">
+                            Sin refacciones registradas
+                        </MudText>
+                    }
+                </MudPaper>
+            </MudItem>
+        }
     </DialogContent>
     <DialogActions>
         <div class="px-4 pb-4 d-flex w-100 justify-content-end" style="gap: 0.5rem;">
@@ -301,11 +538,15 @@
     private IMudDialogInstance MudDialog { get; set; } = default!;
     [Parameter] public Guid OrderId { get; set; }
     private MudForm? _formGeneral;
-    private bool _isValid;
+    private MudForm? _formDiagnostico;
     private ServiceOrderDto? _order;
     private bool _loading = true;
-    private IEnumerable<OrderPartDto?> _orderPart;
+    private IEnumerable<OrderPartDto?> _orderPart = Enumerable.Empty<OrderPartDto?>();
     private UpdateServiceOrderRequest _request = new();
+    private UpdateServiceOrderTechnicalDataRequest techData = new();
+    private int _hours;
+    private int _minutes;
+    private decimal _totalCost = 0m;
 
     private CustomerDto? _selectedCustomer;
     private EquipmentDto? _selectedEquipment;
@@ -326,9 +567,11 @@
         _selectedCustomer = _order.Customer;
         _selectedEquipment = _order.Equipment;
         _orderPart = _order.OrderPart;
+        _totalCost = _order.TotalCost;
         InitialData();
         await OnCustomerChanged(_selectedCustomer);
         await OnEquipmentChanged(_order.Equipment.Id);
+        fillTechData(_order);
         _loading = false;
     }
     private void InitialData()
@@ -341,6 +584,20 @@
     {
         await GetOrder(OrderId);
     }
+    private void fillTechData(ServiceOrderDto? data)
+    {
+        if (data is null) return;
+        techData.Id = data.Id;
+        techData.Diagnosis = data?.Diagnosis ?? "";
+        techData.LaborCost = data?.LaborCost ?? 0;
+        var estimated = data?.EstimatedTime ?? TimeSpan.Zero;
+
+        _hours = (int)estimated.TotalHours;
+        _minutes = estimated.Minutes;
+        techData.EstimatedTime = data?.EstimatedTime ?? new TimeSpan(_hours, _minutes, 0);
+
+    }
+
     //  CAMBIO IMPORTANTE: manejar cambio explícito
     private async Task OnCustomerChanged(CustomerDto? value)
     {
@@ -476,5 +733,138 @@
             }
         }
     }
-   
+
+    private async Task SaveTechnicalData()
+    {
+        await _formDiagnostico!.Validate();
+
+        if (_formDiagnostico.IsValid)
+        {
+
+            var request = new UpdateServiceOrderTechnicalDataRequest
+            {
+                Id = OrderId,
+                Diagnosis = techData.Diagnosis,
+                LaborCost = techData.LaborCost,
+                NewStatus = _order!.Status,
+                EstimatedTime = techData.EstimatedTime
+            };
+
+            await ServiceOrderClient.UpdateTechnicalDataAsync(request);
+
+
+            Snackbar.Add("Información técnica actualizada.", Severity.Success);
+
+        }
+        else
+        {
+            Snackbar.Add("Revice los campos requeridos.", Severity.Warning);
+        }
+    }
+    private async Task OpenCreateOrderPart()
+    {
+
+
+        var parameters = new DialogParameters<CreateOrderPart>
+        {
+            { x => x.ServiceOrderId, OrderId }
+        };
+
+        var options = new DialogOptions
+        {
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true,
+            CloseButton = true,
+            BackdropClick = false // Evita que se cierre por error al dar click fuera
+        };
+
+        var dialog = await DialogService.ShowAsync<CreateOrderPart>(" ", parameters, options);
+        var result = await dialog.Result;
+        await GetOrder(OrderId);
+    }
+
+    private async Task OpenUpdateOrderPart(Guid partId)
+    {
+
+
+        var parameters = new DialogParameters<EditOrderPart>
+        {
+            { x => x.ServiceOrderId, OrderId },
+            { x => x.PartId, partId }
+        };
+
+        var options = new DialogOptions
+        {
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true,
+            CloseButton = true,
+            BackdropClick = false // Evita que se cierre por error al dar click fuera
+        };
+
+        var dialog = await DialogService.ShowAsync<EditOrderPart>(" ", parameters, options);
+        var result = await dialog.Result;
+        await GetOrder(OrderId);
+    }
+    private async Task DeleteOrderPart(Guid partId)
+    {
+        // 1. Configurar los parámetros del diálogo
+        var parameters = new DialogParameters<ConfirmDialog>
+    {
+        { x => x.ContentText, "¿Realmente desea eliminar esta refacción de la orden? El stock se devolverá automáticamente al inventario." },
+        { x => x.ButtonText, "Eliminar" },
+        { x => x.Color, Color.Error }
+    };
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        // 2. Mostrar el diálogo y esperar el resultado
+        var dialog = await DialogService.ShowAsync<ConfirmDialog>("Confirmar Eliminación", parameters, options);
+        var result = await dialog.Result;
+
+        // 3. Si el usuario no canceló (hizo clic en el botón de confirmación)
+        if (result is not null && !result.Canceled)
+        {
+            try
+            {
+                await ServiceOrderClient.DeleteOrderPartAsync(OrderId, partId);
+                Snackbar.Add("Refacción eliminada y stock actualizado.", Severity.Info);
+
+                // 4. Refrescar la información de la orden
+                await GetOrder(OrderId);
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add($"Error al eliminar: {ex.Message}", Severity.Error);
+            }
+        }
+    }
+    private void RecalculateTotal()
+    {
+        _totalCost = techData.LaborCost +
+            (_orderPart?.Sum(op => op.Quantity * op.UnitPrice) ?? 0m);
+    }
+    private void SyncEstimatedTime()
+    {
+        techData.EstimatedTime = new TimeSpan(_hours, _minutes, 0);
+    }
+    private void UpdateEstimatedTime(int h)
+    {
+        _hours = h;
+        SyncEstimatedTime();
+    }
+
+    private void UpdateEstimatedMinutes(int m)
+    {
+        _minutes = m;
+        SyncEstimatedTime();
+    }
+    private Color GetStatusColor(ServiceOrderStatus status) => status switch
+    {
+        ServiceOrderStatus.Received => Color.Secondary,
+        ServiceOrderStatus.Diagnosing => Color.Info,
+        ServiceOrderStatus.Repairing => Color.Warning,
+        ServiceOrderStatus.Completed => Color.Success,
+        ServiceOrderStatus.Delivered => Color.Secondary,
+        _ => Color.Default
+    };
 }
