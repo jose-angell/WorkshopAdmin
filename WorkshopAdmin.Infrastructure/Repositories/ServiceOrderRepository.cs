@@ -35,6 +35,7 @@ public class ServiceOrderRepository : IServiceOrderRepository
             .Include(o => o.OrderParts) 
             .ThenInclude(op => op.Part)
             .OrderByDescending(so => so.CreatedAt)
+            .AsNoTracking()
             .ToListAsync();
     }
 

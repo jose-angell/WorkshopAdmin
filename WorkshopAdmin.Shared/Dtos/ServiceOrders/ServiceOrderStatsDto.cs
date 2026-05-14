@@ -3,8 +3,16 @@
 public class ServiceOrderStatsDto
 {
     public int ActiveOrders { get; set; }
+
     public int NewOrdersThisWeek { get; set; }
+
     public int PendingDiagnostics { get; set; }
-    public int AvgDiagnosticHours { get; set; }
+
+    public double AvgDiagnosticHours { get; set; }
+
     public decimal TotalRepairCost { get; set; }
+
+    public int DelayedOrders { get; set; }
+
+    public int CompletedToday { get; set; }
 }

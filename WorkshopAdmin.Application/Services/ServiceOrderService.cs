@@ -97,6 +97,55 @@ public class ServiceOrderService : IServiceOrderService
         return MapToDto(order);
     }
 
+    public async Task<ServiceOrderStatsDto?> GetStatsAsync()
+    {
+        var now = DateTimeOffset.UtcNow;
+
+        var startOfWeek = now.Date.AddDays(-(int)now.DayOfWeek);
+
+        var orders = await _orderRepository.GetAllAsync();
+        if (orders == null) return null;
+        return new ServiceOrderStatsDto
+        {
+            ActiveOrders = orders.Count(x =>
+                x.Status is ServiceOrderStatus.Received
+                or ServiceOrderStatus.Diagnosing
+                or ServiceOrderStatus.Repairing),
+
+            NewOrdersThisWeek = orders.Count(x =>
+                x.CreatedAt >= startOfWeek),
+
+            PendingDiagnostics = orders.Count(x =>
+                x.Status == ServiceOrderStatus.Diagnosing),
+
+            AvgDiagnosticHours = orders
+            .Where(x => x.RepairStartedAt != null)
+            .Select(x =>
+                (x.RepairStartedAt!.Value - x.CreatedAt)
+                .TotalHours)
+            .DefaultIfEmpty(0)
+            .Average(),
+
+            TotalRepairCost = orders
+            .Where(x =>
+                x.Status == ServiceOrderStatus.Repairing)
+            .Sum(x =>
+                x.LaborCost +
+                x.OrderParts.Sum(op =>
+                    op.Quantity * op.UnitPrice)),
+
+            DelayedOrders = orders.Count(x =>
+                x.ExpectedFinishAt != null &&
+                x.ExpectedFinishAt < now &&
+                x.Status != ServiceOrderStatus.Completed &&
+                x.Status != ServiceOrderStatus.Delivered),
+
+            CompletedToday = orders.Count(x =>
+                x.RepairFinishedAt != null &&
+                x.RepairFinishedAt.Value.Date == now.Date)
+        };
+    }
+
     public async Task<IEnumerable<ServiceOrderDto>> GetAllAsync()
     {
         var orders = await _orderRepository.GetAllAsync();

@@ -28,6 +28,16 @@ public class ServiceOrdersController : ControllerBase
         var orders = await _serviceOrderService.GetAllFilteredAsync(status, customerId);
         return Ok(orders);
     }
+    /// <summary>
+    /// Obtiene las estadísticas de las órdenes de servicio (US 9).
+    /// </summary>
+    [HttpGet("stats")]
+    public async Task<IActionResult> GetStats()
+    {
+        // El servicio maneja la lógica de filtrado basada en los Query Parameters
+        var stats = await _serviceOrderService.GetStatsAsync();
+        return Ok(stats);
+    }
 
     /// <summary>
     /// Obtiene el detalle completo de una orden específica (US 10).

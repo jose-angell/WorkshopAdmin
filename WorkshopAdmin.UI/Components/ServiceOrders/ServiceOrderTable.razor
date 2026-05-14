@@ -113,13 +113,10 @@
                     <MudStack Row Justify="Justify.FlexEnd"
                               Class="action-group">
 
-                        <MudIconButton Icon="@Icons.Material.Filled.Visibility"
-                                       Size="Size.Small"
-                                       OnClick="@(() => OpenViewDialog(context.Item))" />
 
                         <MudIconButton Icon="@Icons.Material.Filled.AccountTree"
                                        Size="Size.Small"
-                                       OnClick="@(() => OnTrace.InvokeAsync(context.Item))" />
+                                       OnClick="@(() => OpenViewDialog(context.Item))" />
 
                         <MudIconButton Icon="@Icons.Material.Filled.Edit"
                                        Size="Size.Small"
@@ -150,7 +147,8 @@
 </MudPaper>
 
 @code {
-
+    [Parameter] public bool ReloadTrigger { get; set; }
+    private bool _lastReloadTrigger;
     private List<ServiceOrderDto> _orders = new();
     private bool _loading = true;
     private string _searchString = "";
@@ -162,12 +160,15 @@
     [Parameter] public EventCallback<ServiceOrderDto> OnEdit { get; set; }
     [Parameter] public EventCallback<ServiceOrderDto> OnTrace { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
-        await LoadData();
+        if (_lastReloadTrigger != ReloadTrigger)
+        {
+            _lastReloadTrigger = ReloadTrigger;
+            await LoadData();
+        }
     }
-
-
+    
     private async Task LoadData(ServiceOrderStatus? filterStatus = null, Guid? filterCustomer = null)
     {
         try

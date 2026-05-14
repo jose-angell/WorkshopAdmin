@@ -42,6 +42,11 @@ public class ServiceOrderClient
             return new List<ServiceOrderDto>();
         }
     }
+    /// <summary>
+    /// Consulta las estadísticas de las órdenes de servicio (total, por estado, retrasadas, etc.)
+    /// </summary>
+    public async Task<ServiceOrderStatsDto?> GetStatsAsync() =>
+        await _http.GetFromJsonAsync<ServiceOrderStatsDto>($"{BaseRoute}/stats");
 
     /// <summary>
     /// Consulta una orden de servicio por su ID

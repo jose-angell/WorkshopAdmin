@@ -48,7 +48,7 @@
     </div>
 
     @* Statistics *@
-    <ServiceOrderStats />
+    <ServiceOrderStats ReloadTrigger="_reloadFlag" />
 
     <MudGrid>
 
@@ -56,7 +56,7 @@
 
             <MudPaper Elevation="0" Class="border rounded-4 overflow-hidden">
 
-                <ServiceOrderTable />
+                <ServiceOrderTable ReloadTrigger="_reloadFlag" />
 
             </MudPaper>
 
@@ -65,3 +65,26 @@
     </MudGrid>
 
 </MudContainer>
+
+
+@code{
+    private bool _reloadFlag = true;
+    private async Task OpenCreateServiceOrderDialog()
+    {
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true,
+            CloseButton = true
+        };
+
+        var dialog = await DialogService.ShowAsync<CreateServiceOrder>(" ", options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled )
+        {
+            _reloadFlag = !_reloadFlag;
+        }
+    }
+}

@@ -17,4 +17,5 @@ public interface IServiceOrderService
     Task UpdatePartToOrderAsync(UpdateOrderPartRequest request);
     Task DeletePartToOrderAsync(Guid serviceOrderId, Guid partId);
     Task UpdateTechnicalDataAsync(UpdateServiceOrderTechnicalDataRequest request);
+    Task<ServiceOrderStatsDto?> GetStatsAsync();
 }
