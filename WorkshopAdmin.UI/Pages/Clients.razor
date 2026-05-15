@@ -44,7 +44,7 @@
     </div>
 
     @* Statistics Grid *@
-    <ClientStats />
+    <ClientStats ReloadTrigger="_reloadFlag" />
 
     <MudGrid>
         @* Main Content *@
@@ -61,7 +61,7 @@
 
 </MudContainer>
 @code {
-    private bool _reloadFlag;
+    private bool _reloadFlag = true;
 
     private async Task OpenCreateCustomerDialog()
     {

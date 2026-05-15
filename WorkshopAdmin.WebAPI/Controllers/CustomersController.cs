@@ -40,7 +40,15 @@ public class CustomersController : ControllerBase
 
         return Ok(customer);
     }
-
+    /// <summary>
+    /// Obtiene las estadísticas de los clientes.
+    /// </summary>
+    [HttpGet("stats")]
+    public async Task<IActionResult> GetStats()
+    {
+        var stats = await _customerService.GetStatsAsync();
+        return Ok(stats);
+    }
     /// <summary>
     /// Registra un nuevo cliente en el sistema (US 1).
     /// </summary>

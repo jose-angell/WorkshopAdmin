@@ -10,10 +10,12 @@ namespace WorkshopAdmin.Application.Services;
 public class CustomerService : ICustomerService
 {
     private readonly ICustomerRepository _repository;
+    private readonly IServiceOrderRepository _orderRepository;
 
-    public CustomerService(ICustomerRepository repository)
+    public CustomerService(ICustomerRepository repository, IServiceOrderRepository orderRepository)
     {
         _repository = repository;
+        _orderRepository = orderRepository;
     }
 
     public async Task<CustomerDto?> GetByIdAsync(Guid id)
@@ -26,6 +28,68 @@ public class CustomerService : ICustomerService
     {
         var customers = await _repository.GetAllAsync();
         return customers.Select(MapToDto);
+    }
+
+    public async Task<CustomerStatsDto> GetStatsAsync()
+    {
+        var now = DateTimeOffset.UtcNow;
+
+        var currentMonthStart = new DateTimeOffset(
+            now.Year,
+            now.Month,
+            1,
+            0, 0, 0,
+            TimeSpan.Zero);
+
+        var previousMonthStart = currentMonthStart.AddMonths(-1);
+
+        // =========================
+        // NUEVOS CLIENTES
+        // =========================
+
+        var newClientsThisMonth =
+            await _repository.CountCreatedSinceAsync(currentMonthStart);
+
+        var newClientsLastMonth =
+            await _repository.CountCreatedBetweenAsync(
+                previousMonthStart,
+                currentMonthStart);
+
+        decimal growth = 0;
+
+        if (newClientsLastMonth > 0)
+        {
+            growth =
+                ((decimal)(
+                    newClientsThisMonth - newClientsLastMonth)
+                / newClientsLastMonth) * 100;
+        }
+
+        // =========================
+        // RETENCIÓN
+        // =========================
+
+        var returningCustomers =
+            await _orderRepository.CountReturningCustomersAsync();
+
+        var totalCustomersWithOrders =
+            await _orderRepository.CountCustomersWithOrdersAsync();
+
+        decimal retention = 0;
+
+        if (totalCustomersWithOrders > 0)
+        {
+            retention =
+                ((decimal)returningCustomers
+                / totalCustomersWithOrders) * 100;
+        }
+
+        return new CustomerStatsDto
+        {
+            NewClientsThisMonth = newClientsThisMonth,
+            NewClientsGrowthPercentage = Math.Round(growth, 1),
+            ServiceRetentionRate = Math.Round(retention, 1)
+        };
     }
 
     public async Task<CustomerDto> CreateAsync(CreateCustomerRequest request)

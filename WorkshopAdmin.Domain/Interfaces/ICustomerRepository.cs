@@ -12,4 +12,7 @@ public interface ICustomerRepository
 
     // Método específico para búsqueda por nombre (Requisito US 1.3)
     Task<IEnumerable<Customer>> SearchByNameAsync(string name);
+
+    Task<int> CountCreatedSinceAsync(DateTimeOffset startDate);
+    Task<int> CountCreatedBetweenAsync(DateTimeOffset start, DateTimeOffset end);
 }

@@ -10,4 +10,5 @@ public interface ICustomerService
     Task UpdateAsync(UpdateCustomerRequest request);
     Task DeleteAsync(Guid id);
     Task IsActivateAsync(Guid id);
+    Task<CustomerStatsDto> GetStatsAsync();
 }

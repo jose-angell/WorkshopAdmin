@@ -58,4 +58,20 @@ public class CustomerRepository : ICustomerRepository
             await _context.SaveChangesAsync();
         }
     }
+    public async Task<int> CountCreatedSinceAsync(DateTimeOffset startDate)
+    {
+        return await _context.Customers
+            .CountAsync(c => c.CreatedAt >= startDate);
+    }
+
+    public async Task<int> CountCreatedBetweenAsync(
+        DateTimeOffset start,
+        DateTimeOffset end)
+    {
+        return await _context.Customers
+            .CountAsync(c =>
+                c.CreatedAt >= start &&
+                c.CreatedAt < end);
+    }
+
 }

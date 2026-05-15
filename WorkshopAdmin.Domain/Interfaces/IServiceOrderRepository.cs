@@ -22,4 +22,7 @@ public interface IServiceOrderRepository
     Task UpdateStatusAsync(Guid id, ServiceOrderStatus status);
     Task<OrderPart?> GetOrderPartAsync(Guid serviceOrderId, Guid partId);
     Task<IEnumerable<OrderPart?>> GetOrderPartByServiceAsync(Guid serviceOrderId);
+    Task<int> CountCustomersWithOrdersAsync();
+    Task<int> CountReturningCustomersAsync();
+
 }

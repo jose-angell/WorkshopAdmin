@@ -201,4 +201,19 @@ public class ServiceOrderRepository : IServiceOrderRepository
         await _context.SaveChangesAsync();
 
     }
+    public async Task<int> CountCustomersWithOrdersAsync()
+    {
+        return await _context.ServiceOrders
+            .Select(o => o.CustomerId)
+            .Distinct()
+            .CountAsync();
+    }
+
+    public async Task<int> CountReturningCustomersAsync()
+    {
+        return await _context.ServiceOrders
+            .GroupBy(o => o.CustomerId)
+            .CountAsync(g => g.Count() > 1);
+    }
+
 }

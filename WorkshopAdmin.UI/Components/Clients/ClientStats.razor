@@ -1,4 +1,7 @@
 ﻿@* Components/Clients/ClientStats.razor *@
+@using WorkshopAdmin.UI.Services
+@inject CustomerClient CustomerClient
+
 <MudGrid Class="mb-4">
 
     @* Card: New Clients *@
@@ -21,7 +24,7 @@
                 <MudText Typo="Typo.h4"
                          Class="fw-bold"
                          Style="color: var(--mud-palette-primary);">
-                    +24
+                    +@NewClientsThisMonth
                 </MudText>
 
                 <!-- TREND -->
@@ -33,7 +36,7 @@
                     <MudText Typo="Typo.caption"
                              Class="fw-bold"
                              Style="color: var(--mud-palette-success);">
-                        12% increase from last month
+                       @NewClientsGrowthPercentage.ToString("F1")% increase from last month
                     </MudText>
                 </MudStack>
 
@@ -69,11 +72,11 @@
                 <MudText Typo="Typo.h4"
                          Class="fw-bold"
                          Style="color: var(--mud-palette-primary);">
-                    88.4%
+                    @ServiceRetentionRate.ToString("F1")%
                 </MudText>
 
                 <!-- PROGRESS -->
-                <MudProgressLinear Value="88.4"
+                <MudProgressLinear Value="@((double)ServiceRetentionRate)"
                                    Color="Color.Primary"
                                    Class="mt-3"
                                    Rounded="true" />
@@ -90,3 +93,30 @@
     </MudItem>
 
 </MudGrid>
+
+@code {
+    [Parameter] public bool ReloadTrigger { get; set; }
+    private bool _lastReloadTrigger;
+    private int NewClientsThisMonth;
+    private decimal NewClientsGrowthPercentage;
+    private decimal ServiceRetentionRate;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_lastReloadTrigger != ReloadTrigger)
+        {
+            _lastReloadTrigger = ReloadTrigger;
+            await LoadStats();
+        }
+    }
+    private async Task LoadStats()
+    {
+        var stats = await CustomerClient.GetStatsAsync();
+        if (stats != null)
+        {
+            NewClientsThisMonth = stats.NewClientsThisMonth;
+            NewClientsGrowthPercentage = stats.NewClientsGrowthPercentage;
+            ServiceRetentionRate = stats.ServiceRetentionRate;
+        }
+    }
+}

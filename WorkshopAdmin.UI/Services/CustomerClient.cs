@@ -47,6 +47,17 @@ public class CustomerClient
     }
 
     /// <summary>
+    /// Obtiene las estadísticas de un cliente
+    /// </summary>
+    public async Task<CustomerStatsDto?> GetStatsAsync()
+    {
+        var response = await _http.GetAsync($"{BaseRoute}/stats");
+        if (!response.IsSuccessStatusCode) return null;
+
+        return await response.Content.ReadFromJsonAsync<CustomerStatsDto>(_options);
+    }
+
+    /// <summary>
     /// Crea un nuevo cliente (POST)
     /// </summary>
     public async Task<CustomerDto?> CreateAsync(CreateCustomerRequest request)
