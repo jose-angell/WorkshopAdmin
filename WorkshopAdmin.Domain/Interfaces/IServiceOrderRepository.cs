@@ -24,5 +24,6 @@ public interface IServiceOrderRepository
     Task<IEnumerable<OrderPart?>> GetOrderPartByServiceAsync(Guid serviceOrderId);
     Task<int> CountCustomersWithOrdersAsync();
     Task<int> CountReturningCustomersAsync();
+    Task<int> CountOrdersWithPartsAsync();
 
 }

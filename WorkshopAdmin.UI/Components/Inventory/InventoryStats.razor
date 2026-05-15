@@ -1,4 +1,6 @@
 ﻿@using MudBlazor
+@using WorkshopAdmin.UI.Services
+@inject InventoryClient InventoryClient
 
 <MudGrid Class="mb-4">
 
@@ -25,7 +27,7 @@
                          Variant="Variant.Filled"
                          Size="Size.Small"
                          Class="fw-bold">
-                    +12%
+                    +@TotalPartsGrowthPercentage.ToString("F1")%
                 </MudChip>
 
             </MudStack>
@@ -38,7 +40,7 @@
 
             <!-- VALUE -->
             <MudText Typo="Typo.h5" Class="fw-bold">
-                2,842
+                @TotalParts
             </MudText>
 
         </MudPaper>
@@ -84,7 +86,7 @@
             </MudText>
 
             <MudText Typo="Typo.h5" Class="fw-bold">
-                18
+                @LowStockAlerts
             </MudText>
 
         </MudPaper>
@@ -145,7 +147,7 @@
             </MudText>
 
             <MudText Typo="Typo.h5" Class="fw-bold">
-                10
+                @OrdersUsingParts
             </MudText>
 
         </MudPaper>
@@ -154,6 +156,32 @@
 </MudGrid>
 
 @code {
-    
-    public decimal TotalValue { get; set; } = 142500;
+    [Parameter] public bool ReloadTrigger { get; set; }
+    private bool _lastReloadTrigger;
+    public int TotalParts { get; set; }
+    public decimal TotalPartsGrowthPercentage { get; set; }
+    public int LowStockAlerts { get; set; }
+    public decimal TotalValue { get; set; }
+    public int OrdersUsingParts { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_lastReloadTrigger != ReloadTrigger)
+        {
+            _lastReloadTrigger = ReloadTrigger;
+            await LoadStats();
+        }
+    }
+    private async Task LoadStats()
+    {
+        var stats = await InventoryClient.GetStatsAsync();
+        if (stats != null)
+        {
+            TotalParts = stats.TotalParts;
+            TotalPartsGrowthPercentage = stats.TotalPartsGrowthPercentage;
+            LowStockAlerts = stats.LowStockAlerts;
+            TotalValue = stats.InventoryValue;
+            OrdersUsingParts = stats.OrdersUsingParts;
+        }
+    }
 }

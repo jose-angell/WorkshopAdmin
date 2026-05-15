@@ -215,5 +215,10 @@ public class ServiceOrderRepository : IServiceOrderRepository
             .GroupBy(o => o.CustomerId)
             .CountAsync(g => g.Count() > 1);
     }
+    public async Task<int> CountOrdersWithPartsAsync()
+    {
+        return await _context.ServiceOrders
+            .CountAsync(o => o.OrderParts.Any());
+    }
 
 }

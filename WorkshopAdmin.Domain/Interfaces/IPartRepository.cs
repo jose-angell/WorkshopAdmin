@@ -15,4 +15,10 @@ public interface IPartRepository
 
     // Método específico: Aprovecha el índice definido en part(name) [7]
     Task<IEnumerable<Part>> GetByNameAsync(string name);
+    Task<int> CountAsync();
+    Task<int> CountCreatedThisMonthAsync();
+    Task<int> CountCreatedLastMonthAsync();
+    Task<int> CountLowStockAsync(int threshold = 5);
+    Task<decimal> GetInventoryValueAsync();
+
 }

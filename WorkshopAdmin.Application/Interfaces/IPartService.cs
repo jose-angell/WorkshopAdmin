@@ -10,4 +10,5 @@ public interface IPartService
     Task<PartDto> CreateAsync(CreatePartRequest request);
     Task UpdateAsync(UpdatePartRequest request);
     Task DeleteAsync(Guid id);
+    Task<InventoryStatsDto> GetStatsAsync();
 }

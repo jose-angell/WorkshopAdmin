@@ -10,10 +10,12 @@ namespace WorkshopAdmin.Application.Services;
 public class PartService : IPartService
 {
     private readonly IPartRepository _repository;
+    private readonly IServiceOrderRepository _orderRepository;
 
-    public PartService(IPartRepository repository)
+    public PartService(IPartRepository repository, IServiceOrderRepository orderRepository)
     {
         _repository = repository;
+        _orderRepository = orderRepository;
     }
 
     public async Task<PartDto?> GetByIdAsync(Guid id)
@@ -93,6 +95,59 @@ public class PartService : IPartService
     public async Task DeleteAsync(Guid id)
     {
         await _repository.DeleteAsync(id);
+    }
+    public async Task<InventoryStatsDto> GetStatsAsync()
+    {
+        // =========================
+        // TOTAL PARTS
+        // =========================
+
+        var totalParts = await _repository.CountAsync();
+
+        var thisMonth =
+            await _repository.CountCreatedThisMonthAsync();
+
+        var lastMonth =
+            await _repository.CountCreatedLastMonthAsync();
+
+        decimal growth = 0;
+
+        if (lastMonth > 0)
+        {
+            growth =
+                ((decimal)(thisMonth - lastMonth)
+                / lastMonth) * 100;
+        }
+
+        // =========================
+        // LOW STOCK
+        // =========================
+
+        var lowStock =
+            await _repository.CountLowStockAsync();
+
+        // =========================
+        // INVENTORY VALUE
+        // =========================
+
+        var inventoryValue =
+            await _repository.GetInventoryValueAsync();
+
+        // =========================
+        // ORDERS USING PARTS
+        // =========================
+
+        var orders =
+            await _orderRepository.CountOrdersWithPartsAsync();
+
+        return new InventoryStatsDto
+        {
+            TotalParts = totalParts,
+            TotalPartsGrowthPercentage = Math.Round(growth, 1),
+            LowStockAlerts = lowStock,
+            InventoryValue = inventoryValue,
+            OrdersUsingParts = orders
+        };
     }
 
     // Helper privado de mapeo manual de Entidad a DTO

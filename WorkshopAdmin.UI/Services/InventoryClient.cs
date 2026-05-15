@@ -40,6 +40,16 @@ public class InventoryClient
         return await response.Content.ReadFromJsonAsync<PartDto>(_options);
     }
     /// <summary>
+    /// Obtiene las estadísticas del inventario
+    /// </summary>
+    public async Task<InventoryStatsDto?> GetStatsAsync()
+    {
+        var response = await _http.GetAsync($"{BaseRoute}/stats");
+        if (!response.IsSuccessStatusCode) return null;
+
+        return await response.Content.ReadFromJsonAsync<InventoryStatsDto>(_options);
+    }
+    /// <summary>
     /// Crea una nueva refaccion (POST)
     /// </summary>
     public async Task<PartDto?> CreateAsync(CreatePartRequest request)

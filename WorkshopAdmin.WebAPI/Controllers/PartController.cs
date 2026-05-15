@@ -42,6 +42,16 @@ public class PartController : ControllerBase
     }
 
     /// <summary>
+    /// Obtiene las estadísticas del inventario.
+    /// </summary>
+    [HttpGet("stats")]
+    public async Task<IActionResult> GetStatsAS()
+    {
+        var stats = await _partService.GetStatsAsync();
+        return Ok(stats);
+    }
+
+    /// <summary>
     /// Busca refacciones en el inventario por coincidencia de nombre.
     /// Aprovecha el índice definido en la base de datos (part_name_idx).
     /// </summary>

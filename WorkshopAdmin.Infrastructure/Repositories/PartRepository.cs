@@ -56,4 +56,50 @@ public class PartRepository : IPartRepository
             await _context.SaveChangesAsync();
         }
     }
+    public async Task<int> CountAsync()
+    {
+        return await _context.Parts.CountAsync();
+    }
+    public async Task<int> CountCreatedThisMonthAsync()
+    {
+        var now = DateTimeOffset.UtcNow;
+
+        var start = new DateTimeOffset(
+            now.Year,
+            now.Month,
+            1,
+            0, 0, 0,
+            TimeSpan.Zero);
+
+        return await _context.Parts
+            .CountAsync(p => p.CreatedAt >= start);
+    }
+    public async Task<int> CountCreatedLastMonthAsync()
+    {
+        var now = DateTimeOffset.UtcNow;
+
+        var currentMonth = new DateTimeOffset(
+            now.Year,
+            now.Month,
+            1,
+            0, 0, 0,
+            TimeSpan.Zero);
+
+        var previousMonth = currentMonth.AddMonths(-1);
+
+        return await _context.Parts
+            .CountAsync(p =>
+                p.CreatedAt >= previousMonth &&
+                p.CreatedAt < currentMonth);
+    }
+    public async Task<int> CountLowStockAsync(int threshold = 5)
+    {
+        return await _context.Parts
+            .CountAsync(p => p.Stock <= threshold);
+    }
+    public async Task<decimal> GetInventoryValueAsync()
+    {
+        return await _context.Parts
+            .SumAsync(p => p.Price * p.Stock);
+    }
 }
