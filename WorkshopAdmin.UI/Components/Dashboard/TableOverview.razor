@@ -3,6 +3,9 @@
 @using WorkshopAdmin.Shared.Dtos.Equipments
 @using WorkshopAdmin.Shared.Dtos.ServiceOrders
 @using WorkshopAdmin.Shared.Enums
+@using WorkshopAdmin.UI.Services
+@inject ISnackbar Snackbar
+@inject ServiceOrderClient OrderClient
 
 <MudPaper Elevation="1"
           Class="rounded-4 border overflow-hidden">
@@ -36,6 +39,7 @@
     <!-- TABLE -->
     <MudTable Items="@Orders"
               Dense="true"
+              Loading="@_loading"
               Hover="true"
               Breakpoint="Breakpoint.Sm"
               Elevation="0"
@@ -220,166 +224,40 @@
             </MudTd>
 
         </RowTemplate>
-
+        <PagerContent>
+            <MudDataGridPager T="ServiceOrderDto" />
+        </PagerContent>
     </MudTable>
 
 </MudPaper>
 
 @code {
 
-    // =========================================
-    // TEMP DATA
-    // =========================================
+    private List<ServiceOrderDto> Orders = new();
+    private bool _loading = true;
 
-   
-    private List<ServiceOrderDto> Orders = new()
+    protected override async Task OnInitializedAsync()
     {
-        new()
+        await LoadData();
+    }
+
+    private async Task LoadData(ServiceOrderStatus? filterStatus = null, Guid? filterCustomer = null)
+    {
+        try
         {
-            Id = Guid.NewGuid(),
-            FriendlyId = "WS-9021",
-
-            Customer = new CustomerDto
-            {
-                Name = "Arthur Jenkins"
-            },
-
-            Equipment = new EquipmentDto
-            {
-                Brand = "Ford",
-                Model = "F-150"
-            },
-
-            Status = ServiceOrderStatus.Received,
-
-            TotalCost = 2400,
-
-            CreatedAt = DateTimeOffset.Now.AddHours(-4),
-
-            ExpectedFinishAt = DateTimeOffset.Now.AddHours(3),
-
-            RemainingBusinessTime = TimeSpan.FromHours(3),
-
-            IsDelayed = false
-        },
-
-        new()
-        {
-            Id = Guid.NewGuid(),
-            FriendlyId = "WS-9018",
-
-            Customer = new CustomerDto
-            {
-                Name = "Sarah Lund"
-            },
-
-            Equipment = new EquipmentDto
-            {
-                Brand = "Toyota",
-                Model = "RAV4"
-            },
-
-            Status = ServiceOrderStatus.Diagnosing,
-
-            TotalCost = 1570,
-
-            CreatedAt = DateTimeOffset.Now.AddHours(-12),
-
-            ExpectedFinishAt = DateTimeOffset.Now.AddHours(8),
-
-            RemainingBusinessTime = TimeSpan.FromHours(8),
-
-            IsDelayed = false
-        },
-
-        new()
-        {
-            Id = Guid.NewGuid(),
-            FriendlyId = "WS-8992",
-
-            Customer = new CustomerDto
-            {
-                Name = "Marcus Knight"
-            },
-
-            Equipment = new EquipmentDto
-            {
-                Brand = "Mercedes-Benz",
-                Model = "Sprinter"
-            },
-
-            Status = ServiceOrderStatus.Completed,
-
-            TotalCost = 1305,
-
-            CreatedAt = DateTimeOffset.Now.AddDays(-1),
-
-            ExpectedFinishAt = DateTimeOffset.Now.AddHours(-1),
-
-            RemainingBusinessTime = TimeSpan.Zero,
-
-            IsDelayed = false
-        },
-
-        new()
-        {
-            Id = Guid.NewGuid(),
-            FriendlyId = "WS-9030",
-
-            Customer = new CustomerDto
-            {
-                Name = "Emma Rodriguez"
-            },
-
-            Equipment = new EquipmentDto
-            {
-                Brand = "Honda",
-                Model = "Civic"
-            },
-
-            Status = ServiceOrderStatus.Repairing,
-
-            TotalCost = 780,
-
-            CreatedAt = DateTimeOffset.Now.AddMinutes(-45),
-
-            ExpectedFinishAt = DateTimeOffset.Now.AddHours(5),
-
-            RemainingBusinessTime = TimeSpan.FromHours(5),
-
-            IsDelayed = false
-        },
-
-        new()
-        {
-            Id = Guid.NewGuid(),
-            FriendlyId = "WS-9007",
-
-            Customer = new CustomerDto
-            {
-                Name = "Daniel Brooks"
-            },
-
-            Equipment = new EquipmentDto
-            {
-                Brand = "Chevrolet",
-                Model = "Silverado"
-            },
-
-            Status = ServiceOrderStatus.Cancelled,
-
-            TotalCost = 3490,
-
-            CreatedAt = DateTimeOffset.Now.AddDays(-2),
-
-            ExpectedFinishAt = DateTimeOffset.Now.AddHours(-5),
-
-            RemainingBusinessTime = TimeSpan.Zero,
-
-            IsDelayed = true
+            _loading = true;
+            // Ahora pasamos los filtros al servicio
+            Orders = await OrderClient.GetAllAsync(filterStatus, filterCustomer);
         }
-    };
-
+        catch (Exception ex)
+        {
+            Snackbar.Add("Error al sincronizar con el servidor", Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
     // =========================================
     // HELPERS
     // =========================================
