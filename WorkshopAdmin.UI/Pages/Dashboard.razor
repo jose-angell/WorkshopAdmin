@@ -1,0 +1,103 @@
+﻿@page "/"
+
+@using WorkshopAdmin.UI.Components.Dashboard
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="py-4">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <MudText Typo="Typo.h4" Class="fw-bold" Style="color: #000666;">
+                Workshop Dashboard
+            </MudText>
+
+            <MudText Typo="Typo.body2" Class="text-secondary">
+                System overview for technical operations.
+            </MudText>
+        </div>
+
+       
+
+    </div>
+
+    <MudGrid Class="mb-4">
+
+        <!-- ACTIVE ORDERS -->
+        <MudItem xs="12" sm="6" md="3">
+
+            <KpiCard Title="Active Orders"
+                     Value="124"
+                     SubText="8 pending approvals"
+                     Icon="@Icons.Material.Filled.PendingActions"
+                     IconColor="Color.Primary"
+                     IconBackground="rgba(76, 86, 175, 0.10)"
+                     BadgeText="+12%"
+                     BadgeColor="Color.Success"
+                     ShowProgress="true"
+                     ProgressValue="68"
+                     ProgressColor="Color.Primary" />
+
+        </MudItem>
+
+        <!-- LOW STOCK -->
+        <MudItem xs="12" sm="6" md="3">
+
+            <KpiCard Title="Low Stock"
+                     Value="12"
+                     SubText="Oil filters critically low"
+                     Icon="@Icons.Material.Filled.Warning"
+                     IconColor="Color.Error"
+                     IconBackground="rgba(186, 26, 26, 0.12)"
+                     BadgeText="Action Required"
+                     BadgeColor="Color.Error"
+                     HighlightBorder="true"
+                     HighlightColor="var(--mud-palette-error)" />
+
+        </MudItem>
+
+        <!-- DAILY REVENUE -->
+        <MudItem xs="12" sm="6" md="3">
+
+            <KpiCard Title="Daily Revenue"
+                     Value="$8,420"
+                     SubText="Avg ticket: $640"
+                     Icon="@Icons.Material.Filled.Payments"
+                     IconColor="Color.Success"
+                     IconBackground="rgba(16, 185, 129, 0.10)"
+                     BadgeText="+8.4%"
+                     BadgeColor="Color.Success" />
+
+        </MudItem>
+
+        <!-- CUSTOMER SAT -->
+        <MudItem xs="12" sm="6" md="3">
+
+            <KpiCard Title="Customer Satisfaction"
+                     Value="4.9"
+                     SubText="142 reviews"
+                     Icon="@Icons.Material.Filled.Star"
+                     IconColor="Color.Warning"
+                     IconBackground="rgba(245, 158, 11, 0.12)"
+                     BadgeText="Excellent"
+                     BadgeColor="Color.Warning" />
+
+        </MudItem>
+
+    </MudGrid>
+    <MudGrid>
+
+        <MudItem xs="12" lg="8">
+
+            <ServiceVolumeChart  />
+
+        </MudItem>
+        <MudItem xs="12" lg="4">
+
+            <LowStockPartsPanel />
+        </MudItem>
+    </MudGrid>
+    <DashboardOverview />
+</MudContainer>
+@code {
+
+}

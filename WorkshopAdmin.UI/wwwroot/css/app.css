@@ -295,3 +295,44 @@ code {
     color: #000666;
     font-weight: 700;
 }
+
+.kpi-card {
+    border-radius: 18px;
+    border: 1px solid rgba(226, 232, 240, 0.7);
+    background: white;
+    transition: all 0.2s ease;
+}
+
+    .kpi-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+    }
+
+.kpi-title {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #64748b;
+}
+
+.kpi-icon-container {
+    background-color: rgba(76, 86, 175, 0.08);
+    color: #4c56af;
+}
+
+.kpi-icon {
+    font-size: 22px;
+}
+
+.kpi-progress {
+    height: 8px;
+}
+
+.mud-chart-bars .mud-chart-series-0 {
+    fill: #e2e8f0 !important;
+}
+
+.mud-chart-bars .mud-chart-series-1 {
+    fill: #4c56af !important;
+}

@@ -1,0 +1,147 @@
+﻿@using MudBlazor
+
+<MudPaper Elevation="1"
+          Class="p-4 rounded-4 border d-flex flex-column kpi-card"
+          Style="@CardStyle">
+
+    <!-- ===================== -->
+    <!-- HEADER -->
+    <!-- ===================== -->
+    <MudStack Row
+              Justify="Justify.SpaceBetween"
+              AlignItems="AlignItems.Center"
+              Class="mb-3">
+
+        <!-- ICON -->
+        <MudPaper Class="p-2 rounded d-flex"
+                  Style="@IconContainerStyle">
+
+            <MudIcon Icon="@Icon"
+                     Color="@IconColor"
+                     Style="opacity:0.75;" />
+
+        </MudPaper>
+
+        <!-- BADGE / DELTA -->
+        @if (!string.IsNullOrWhiteSpace(BadgeText))
+        {
+            <MudChip T="string"
+                     Color="@BadgeColor"
+                     Variant="@BadgeVariant"
+                     Size="Size.Small"
+                     Class="fw-bold">
+
+                @BadgeText
+
+            </MudChip>
+        }
+
+    </MudStack>
+
+    <!-- ===================== -->
+    <!-- LABEL -->
+    <!-- ===================== -->
+    <MudText Typo="Typo.overline"
+             Class="text-uppercase fw-bold text-secondary">
+
+        @Title
+
+    </MudText>
+
+    <!-- ===================== -->
+    <!-- VALUE -->
+    <!-- ===================== -->
+    <MudText Typo="Typo.h5"
+             Class="fw-bold">
+
+        @Value
+
+    </MudText>
+
+    <!-- ===================== -->
+    <!-- SUBTEXT -->
+    <!-- ===================== -->
+    @if (!string.IsNullOrWhiteSpace(SubText))
+    {
+        <MudText Typo="Typo.caption"
+                 Class="text-muted mt-1">
+
+            @SubText
+
+        </MudText>
+    }
+
+    <!-- ===================== -->
+    <!-- PROGRESS -->
+    <!-- ===================== -->
+    @if (ShowProgress)
+    {
+        <MudProgressLinear Value="@ProgressValue"
+                           Color="@ProgressColor"
+                           Rounded="true"
+                           Class="mt-3" />
+    }
+
+</MudPaper>
+
+@code {
+
+    [Parameter]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Value { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? SubText { get; set; }
+
+    [Parameter]
+    public string Icon { get; set; } = Icons.Material.Filled.Analytics;
+
+    [Parameter]
+    public Color IconColor { get; set; } = Color.Primary;
+
+    [Parameter]
+    public string IconBackground { get; set; }
+        = "rgba(76, 86, 175, 0.10)";
+
+    [Parameter]
+    public string? BadgeText { get; set; }
+
+    [Parameter]
+    public Color BadgeColor { get; set; } = Color.Primary;
+
+    [Parameter]
+    public Variant BadgeVariant { get; set; }
+        = Variant.Filled;
+
+    [Parameter]
+    public bool HighlightBorder { get; set; }
+
+    [Parameter]
+    public string HighlightColor { get; set; }
+        = "var(--mud-palette-primary)";
+
+    [Parameter]
+    public bool ShowProgress { get; set; }
+
+    [Parameter]
+    public double ProgressValue { get; set; }
+
+    [Parameter]
+    public Color ProgressColor { get; set; } = Color.Primary;
+
+    private string IconContainerStyle =>
+        $"background-color: {IconBackground};";
+
+    private string CardStyle =>
+        HighlightBorder
+            ? $"""
+               background-color: var(--mud-palette-surface);
+               border-color: {HighlightColor};
+               box-shadow: 0 0 0 2px color-mix(in srgb, {HighlightColor} 20%, transparent);
+               """
+            : """
+              background-color: var(--mud-palette-surface);
+              """;
+}

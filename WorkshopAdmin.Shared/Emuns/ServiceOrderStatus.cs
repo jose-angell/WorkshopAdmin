@@ -29,7 +29,12 @@ public enum ServiceOrderStatus : short
     /// <summary>
     /// El equipo ha sido entregado al cliente (estado final no editable).
     /// </summary>
-    Delivered = 4
+    Delivered = 4,
+
+    /// <summary>
+    /// El equipo ha sido entregado al cliente (estado final no editable).
+    /// </summary>
+    Cancelled = 5
 }
 
 public static class ServiceOrderStatusExtensions
@@ -41,6 +46,7 @@ public static class ServiceOrderStatusExtensions
         ServiceOrderStatus.Repairing => "En Reparación",
         ServiceOrderStatus.Completed => "Servicio Completado",
         ServiceOrderStatus.Delivered => "Equipo Entregado",
+        ServiceOrderStatus.Cancelled => "Servicio Cancelado",
         _ => status.ToString()
     };
 }

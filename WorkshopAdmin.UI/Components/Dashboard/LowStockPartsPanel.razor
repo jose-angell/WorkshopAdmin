@@ -1,0 +1,244 @@
+﻿@using MudBlazor
+@using WorkshopAdmin.Shared.Dtos.Parts
+
+<MudPaper Elevation="1"
+          Class="rounded-4 border h-100 d-flex flex-column">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center p-4 border-bottom">
+
+        <div>
+            <MudText Typo="Typo.h6" Class="fw-bold">
+                Low Stock Parts
+            </MudText>
+
+            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                Parts requiring restock
+            </MudText>
+        </div>
+
+        <MudChip T="string"
+                 Color="Color.Error"
+                 Variant="Variant.Filled"
+                 Size="Size.Small"
+                 Class="fw-bold">
+            @CriticalPartsCount Critical
+        </MudChip>
+
+    </div>
+
+    <!-- CONTENT -->
+    <div class="flex-grow-1 overflow-auto">
+
+        @if (Parts == null || !Parts.Any())
+        {
+            <div class="p-6 text-center">
+
+                <MudIcon Icon="@Icons.Material.Filled.Inventory2"
+                         Size="Size.Large"
+                         Color="Color.Warning" />
+
+                <MudText Typo="Typo.body2"
+                         Color="Color.Secondary"
+                         Class="mt-2">
+                    No low stock alerts
+                </MudText>
+
+            </div>
+        }
+        else
+        {
+            <MudList T="LowStockPartItem">
+
+                @foreach (var part in Parts)
+                {
+                    <MudListItem T="LowStockPartItem"
+                                 Value="part">
+
+                        <ChildContent>
+
+                            <div class="w-100 py-2">
+
+                                <!-- TOP -->
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+
+                                    <!-- PART INFO -->
+                                    <div class="flex-grow-1">
+
+                                        <MudText Typo="Typo.body1"
+                                                 Class="fw-semibold">
+                                            @part.Name
+                                        </MudText>
+
+                                        <MudText Typo="Typo.caption"
+                                                 Color="Color.Secondary">
+                                            SKU: @part.SKU
+                                        </MudText>
+
+                                    </div>
+
+                                    <!-- STATUS -->
+                                    <MudChip T="string"
+                                             Size="Size.Small"
+                                             Variant="Variant.Filled"
+                                             Color="@GetStatusColor(part)">
+
+                                        @GetStatusText(part)
+
+                                    </MudChip>
+
+                                </div>
+
+                                <!-- STOCK -->
+                                <div class="d-flex justify-content-between mb-1">
+
+                                    <MudText Typo="Typo.caption">
+                                        Stock: @part.CurrentStock
+                                    </MudText>
+
+                                    <MudText Typo="Typo.caption">
+                                        Min: @part.MinimumStock
+                                    </MudText>
+
+                                </div>
+
+                                <!-- PROGRESS -->
+                                <MudProgressLinear Value="@GetStockPercentage(part)"
+                                                   Color="@GetStatusColor(part)"
+                                                   Rounded="true"
+                                                   Height="8" />
+
+                            </div>
+
+                        </ChildContent>
+
+                    </MudListItem>
+
+                    <MudDivider />
+
+                }
+
+            </MudList>
+        }
+
+    </div>
+
+    <!-- FOOTER -->
+    <div class="p-3 border-top d-flex justify-content-between align-items-center">
+
+        <MudText Typo="Typo.caption"
+                 Color="Color.Secondary">
+            @Parts.Count parts below threshold
+        </MudText>
+
+        <MudButton Variant="Variant.Text"
+                   Color="Color.Primary"
+                   EndIcon="@Icons.Material.Filled.ArrowForward">
+            View Inventory
+        </MudButton>
+
+    </div>
+
+</MudPaper>
+
+@code {
+
+    private List<LowStockPartItem> Parts = new()
+    {
+        new()
+        {
+            Name = "Brake Pads Front",
+            SKU = "BRK-2031",
+            CurrentStock = 2,
+            MinimumStock = 10
+        },
+
+        new()
+        {
+            Name = "Oil Filter Premium",
+            SKU = "FLT-1102",
+            CurrentStock = 5,
+            MinimumStock = 8
+        },
+
+        new()
+        {
+            Name = "Spark Plug NGK",
+            SKU = "SPK-9981",
+            CurrentStock = 7,
+            MinimumStock = 12
+        },
+
+        new()
+        {
+            Name = "Transmission Fluid",
+            SKU = "TRF-2200",
+            CurrentStock = 1,
+            MinimumStock = 6
+        }
+    };
+
+    // =========================================
+    // STATS
+    // =========================================
+
+    private int CriticalPartsCount =>
+        Parts.Count(x => GetStockPercentage(x) <= 25);
+
+    // =========================================
+    // HELPERS
+    // =========================================
+
+    private double GetStockPercentage(LowStockPartItem part)
+    {
+        if (part.MinimumStock <= 0)
+            return 100;
+
+        var percentage =
+            ((double)part.CurrentStock / part.MinimumStock) * 100;
+
+        return Math.Min(percentage, 100);
+    }
+
+    private Color GetStatusColor(LowStockPartItem part)
+    {
+        var percentage = GetStockPercentage(part);
+
+        if (percentage <= 25)
+            return Color.Error;
+
+        if (percentage <= 60)
+            return Color.Warning;
+
+        return Color.Success;
+    }
+
+    private string GetStatusText(LowStockPartItem part)
+    {
+        var percentage = GetStockPercentage(part);
+
+        if (percentage <= 25)
+            return "Critical";
+
+        if (percentage <= 60)
+            return "Low";
+
+        return "OK";
+    }
+
+    // =========================================
+    // TEMP MODEL
+    // =========================================
+
+    public class LowStockPartItem
+    {
+        public string Name { get; set; } = string.Empty;
+
+        public string SKU { get; set; } = string.Empty;
+
+        public int CurrentStock { get; set; }
+
+        public int MinimumStock { get; set; }
+    }
+
+}
