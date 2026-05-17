@@ -1,4 +1,5 @@
-﻿@using MudBlazor
+﻿@using System.Globalization
+@using MudBlazor
 @using WorkshopAdmin.Shared.Dtos.Customers
 @using WorkshopAdmin.Shared.Dtos.Equipments
 @using WorkshopAdmin.Shared.Dtos.ServiceOrders
@@ -6,6 +7,8 @@
 @using WorkshopAdmin.UI.Services
 @inject ISnackbar Snackbar
 @inject ServiceOrderClient OrderClient
+@inject NavigationManager Navigation
+
 
 <MudPaper Elevation="1"
           Class="rounded-4 border overflow-hidden">
@@ -205,7 +208,7 @@
                 <MudText Class="fw-bold"
                          Style="font-family: monospace;">
 
-                    @context.TotalCost.ToString("C")
+                    @context.TotalCost.ToString("C", new CultureInfo("en-US"))
 
                 </MudText>
 
@@ -322,5 +325,8 @@
             _ => 0
         };
     }
-
+    private void GoToInventory()
+    {
+        Navigation.NavigateTo("/inventory");
+    }
 }

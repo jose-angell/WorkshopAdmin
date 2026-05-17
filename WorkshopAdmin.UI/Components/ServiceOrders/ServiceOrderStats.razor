@@ -1,4 +1,5 @@
-﻿@using MudBlazor
+﻿@using System.Globalization
+@using MudBlazor
 @using WorkshopAdmin.UI.Services
 @inject ServiceOrderClient OrderClient
 
@@ -115,7 +116,7 @@
 
             <!-- VALUE -->
             <MudText Typo="Typo.h4" Class="fw-bold">
-                @TotalRepairCost.ToString("C")
+                @TotalRepairCost.ToString("C", new CultureInfo("en-US"))
             </MudText>
 
             <!-- FOOTER -->

@@ -1,4 +1,5 @@
-﻿@using MudBlazor
+﻿@using System.Globalization
+@using MudBlazor
 @using WorkshopAdmin.UI.Services
 @inject InventoryClient InventoryClient
 
@@ -117,7 +118,7 @@
             </MudText>
 
             <MudText Typo="Typo.h5" Class="fw-bold">
-                @TotalValue.ToString("C")
+                @TotalValue.ToString("C", new CultureInfo("en-US"))
             </MudText>
 
         </MudPaper>

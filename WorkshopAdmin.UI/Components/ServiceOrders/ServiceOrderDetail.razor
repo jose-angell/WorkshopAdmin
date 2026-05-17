@@ -248,7 +248,7 @@
                                                      Adornment="Adornment.Start"
                                                      AdornmentText="$"
                                                      HelperText="Value must be ≥ 0"
-                                                     Culture="@CultureInfo.GetCultureInfo("es-MX")"
+                                                     Culture="@CultureInfo.GetCultureInfo("en-US")"
                                                      Error="@(techData.LaborCost < 0)" />
                                 </MudItem>
                 
@@ -328,7 +328,7 @@
                         <MudPaper Class="p-3 rounded border">
                             <MudText Typo="Typo.caption">Mano de obra</MudText>
                             <MudText Class="fw-bold">
-                                @_order.LaborCost.ToString("C")
+                                @_order.LaborCost.ToString("C", new CultureInfo("en-US"))
                             </MudText>
                         </MudPaper>
                     </MudItem>
@@ -345,7 +345,7 @@
                         <MudPaper Class="p-3 rounded border">
                             <MudText Typo="Typo.caption">Total</MudText>
                             <MudText Class="fw-bold">
-                                @_order.TotalCost.ToString("C")
+                                @_order.TotalCost.ToString("C", new CultureInfo("en-US"))
                             </MudText>
                         </MudPaper>
                     </MudItem>
@@ -403,7 +403,7 @@
                                                     <div class="text-muted text-truncate"
                                                             style="font-size:11px;">
 
-                                                        @part.Quantity x @part.UnitPrice.ToString("C") = @part.Subtotal.ToString("C")
+                                                        @part.Quantity x @part.UnitPrice.ToString("C", new CultureInfo("en-US")) = @part.Subtotal.ToString("C", new CultureInfo("en-US"))
 
                                                     </div>
                                                     
@@ -488,7 +488,7 @@
                                                     <div class="text-muted text-truncate"
                                                          style="font-size:11px;">
 
-                                                        @part.Quantity x @part.UnitPrice.ToString("C") = @part.Subtotal.ToString("C")
+                                                        @part.Quantity x @part.UnitPrice.ToString("C", new CultureInfo("en-US")) = @part.Subtotal.ToString("C", new CultureInfo("en-US"))
 
                                                     </div>
 
