@@ -1,13 +1,13 @@
 ﻿@using System.Globalization
 @using MudBlazor
-@using WorkshopAdmin.Shared.Dtos.Customers
-@using WorkshopAdmin.Shared.Dtos.Equipments
 @using WorkshopAdmin.Shared.Dtos.ServiceOrders
 @using WorkshopAdmin.Shared.Enums
 @using WorkshopAdmin.UI.Services
 @inject ISnackbar Snackbar
 @inject ServiceOrderClient OrderClient
 @inject NavigationManager Navigation
+@inject IDialogService DialogService
+
 
 
 <MudPaper Elevation="1"
@@ -31,6 +31,7 @@
 
         <MudButton Variant="Variant.Text"
                    Color="Color.Primary"
+                   OnClick="GoToOrders"
                    EndIcon="@Icons.Material.Filled.ArrowForward">
 
             View All
@@ -220,6 +221,7 @@
                 <MudTooltip Text="View Details">
 
                     <MudIconButton Icon="@Icons.Material.Filled.Visibility"
+                                   OnClick="@(() => OpenViewDialog(context))"
                                    Size="Size.Small"
                                    Color="Color.Primary" />
 
@@ -325,8 +327,28 @@
             _ => 0
         };
     }
-    private void GoToInventory()
+    private void GoToOrders()
     {
-        Navigation.NavigateTo("/inventory");
+        Navigation.NavigateTo("/orders");
+    }
+    private async Task OpenViewDialog(ServiceOrderDto order)
+    {
+        var IdOrder = order.Id;
+
+        var parameters = new DialogParameters<OrderDetail>
+        {
+            { x => x.OrderId, IdOrder }
+        };
+
+        var options = new DialogOptions
+        {
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true,
+            CloseButton = true,
+            BackdropClick = false // Evita que se cierre por error al dar click fuera
+        };
+
+        var dialog = await DialogService.ShowAsync<OrderDetail>(" ", parameters, options);
+        var result = await dialog.Result;
     }
 }

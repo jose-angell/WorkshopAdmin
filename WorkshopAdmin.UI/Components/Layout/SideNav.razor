@@ -1,4 +1,9 @@
 ﻿@* Components/Layout/SideNav.razor *@
+@using WorkshopAdmin.UI.Components.ServiceOrders
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+
+
 <div class="d-flex flex-column h-100 border-r border-slate-200 bg-slate-50">
     @* Brand Header *@
     <div class="px-6 py-6 d-flex flex-column gap-2">
@@ -39,6 +44,7 @@
                    FullWidth="true"
                    StartIcon="@Icons.Material.Filled.Add"
                    Class="py-3 font-bold shadow-none"
+                   OnClick="OpenCreateServiceOrderDialog"
                    Style="border-radius: 4px; text-transform: none;">
             New Service Order
         </MudButton>
@@ -50,3 +56,24 @@
         <MudNavLink Href="/logout" Icon="@Icons.Material.Filled.Logout" Class="nav-item-industrial-sm text-red-600">LOGOUT</MudNavLink>
     </div>
 </div>
+
+@code{
+    private async Task OpenCreateServiceOrderDialog()
+    {
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true,
+            CloseButton = true
+        };
+
+        var dialog = await DialogService.ShowAsync<CreateServiceOrder>(" ", options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            Snackbar.Add("La orden fue creada, revice la pantalla de ordenes de servicio.", Severity.Success);
+        }
+    }
+}

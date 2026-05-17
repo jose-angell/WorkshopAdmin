@@ -1,0 +1,370 @@
+﻿@using MudBlazor
+@using System.Globalization
+@using WorkshopAdmin.Shared.Dtos.Customers
+@using WorkshopAdmin.Shared.Dtos.Equipments
+@using WorkshopAdmin.Shared.Dtos.ServiceOrders
+@using WorkshopAdmin.Shared.Enums
+@using WorkshopAdmin.UI.Services
+@inject IDialogService DialogService
+@inject ServiceOrderClient ServiceOrderClient
+@inject ISnackbar Snackbar
+
+<MudPaper Class="detail-container rounded border" Elevation="0">
+
+    @if (_loading)
+    {
+        <!-- LOADING -->
+        <MudStack AlignItems="AlignItems.Center" Class="p-4">
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+            <MudText Typo="Typo.caption" Class="mt-2">Cargando orden...</MudText>
+        </MudStack>
+    }
+    else
+        @* ... (Inyecciones y encabezado igual al tuyo) ... *@
+
+        @if (_order is not null)
+        {
+            <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center"
+                      Class="detail-header m-3 p-3 rounded text-white ">
+                <MudStack Spacing="0">
+                    <div class="d-flex gap-3 ">
+                        <MudText Typo="Typo.h6" Class="fw-bold">Orden @_order.FriendlyId  </MudText>  
+                        <MudText Typo="Typo.subtitle1" Class="fw-light"> (@_order.ServiceTypeDescription )</MudText>
+                    </div>
+                    <div class="d-flex gap-4 flex-wrap">
+
+                        <div class="d-flex flex-column">
+                            <MudText Typo="Typo.caption" Class="fw-bold">
+                                Creación:
+                            </MudText>
+
+                            <MudText Typo="Typo.caption">
+                                @_order.CreatedAt.ToLocalTime().ToString("dd/MM/yy hh:mm tt")
+                            </MudText>
+                        </div>
+
+                        <div class="d-flex flex-column">
+                            <MudText Typo="Typo.caption" Class="fw-bold">
+                                Última Actualización:
+                            </MudText>
+
+                            <MudText Typo="Typo.caption">
+                                @_order.UpdatedAt.ToLocalTime().ToString("dd/MM/yy hh:mm tt")
+                            </MudText>
+                        </div>
+
+                        @if (_order.Status == ServiceOrderStatus.Repairing)
+                        {
+                            <div class="d-flex flex-column">
+                                <MudText Typo="Typo.caption" Class="fw-bold">
+                                    Finalización esperada:
+                                </MudText>
+
+                                <MudText Typo="Typo.caption">
+                                    @_order.ExpectedFinishDisplay
+                                </MudText>
+                            </div>
+                        }
+                        else if (_order.Status >= ServiceOrderStatus.Completed)
+                        {
+                            <div class="d-flex flex-column">
+                                <MudText Typo="Typo.caption" Class="fw-bold">
+                                    Finalización:
+                                </MudText>
+
+                                <MudText Typo="Typo.caption">
+                                    @_order.RepairFinishedAt?.ToLocalTime().ToString("dd/MM/yy hh:mm tt")
+                                </MudText>
+                            </div>
+                        }
+
+                    </div>
+                </MudStack>
+
+                <div class="d-flex align-center gap-2">
+                    <MudChip T="ServiceOrderStatus" Color="@GetStatusColor(_order.Status)" Variant="Variant.Filled">
+                        @_order.Status.ToFriendlyName()
+                    </MudChip>
+                </div>
+            </MudStack>
+
+
+            <!-- GRID -->
+            <MudGrid Class="detail-body" >
+
+                <!-- CLIENTE -->
+                <MudItem xs="12" md="5">
+                    <div class="bg-light rounded border p-3 d-flex align-items-start gap-3 mt-3">
+
+                        <!-- ICON -->
+                        <div class="border rounded d-flex align-items-center justify-content-center flex-shrink-0"
+                             style="width:48px; height:48px; background:white;">
+                            <MudIcon Icon="@Icons.Material.Filled.Business"
+                                     Style="color:#000666;" 
+                                     Size="Size.Small" />
+                        </div>
+
+                        <!-- INFO -->
+                        <div class="flex-grow-1 overflow-hidden">
+
+                            @if (_customer != null)
+                            {
+                                <!-- ROW 1 -->
+                                <div class="fw-bold text-truncate"
+                                     style="color:#000666;">
+
+                                    @_customer.FriendlyId - @_customer.Name
+
+                                </div>
+
+                                <!-- ROW 2 -->
+                                <div class="text-muted text-truncate"
+                                     style="font-size:11px;">
+
+                                    (@_customer.Phone) @_customer.Email
+
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-muted">
+                                    No customer Found
+                                </div>
+                            }
+
+                        </div>
+
+                    </div>
+                </MudItem>
+
+                <!-- EQUIPO -->
+                <MudItem xs="12" md="7">
+                    <div class="bg-light rounded border p-3 d-flex align-items-start gap-3 mt-3">
+
+                        <!-- ICON -->
+                        <div class="border rounded d-flex align-items-center justify-content-center flex-shrink-0"
+                             style="width:48px; height:48px; background:white;">
+                            <MudIcon Icon="@Icons.Material.Filled.Construction"
+                                     Color="Color.Primary" 
+                                     Size="Size.Small" />
+                        </div>
+
+                        <!-- INFO -->
+                        <div class="flex-grow-1 overflow-hidden">
+
+                            @if (_equipment != null)
+                            {
+                                <!-- ROW 1 -->
+                                <div class="fw-bold text-truncate"
+                                     style="color:#000666;">
+
+                                    @_equipment.FriendlyId -
+                                    @_equipment.Brand -
+                                    @_equipment.Model
+                                    (@_equipment.DescriptionType)
+
+                                </div>
+
+                                <!-- ROW 2 -->
+                                <div class="text-muted text-truncate"
+                                     style="font-size:11px;">
+                                    @_equipment.TypeId.ToFriendlyName() -
+                                    @_equipment.TechnicalSpecifications
+
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-muted">
+                                    No equipment Found
+                                </div>
+                            }
+
+                        </div>
+                    </div>
+                </MudItem>
+
+                <!-- FALLA -->
+                <MudItem xs="12">
+                    <MudPaper Class="p-3 rounded border">
+                        <MudText Typo="Typo.caption">Falla reportada</MudText>
+                        <MudText>@_order.FailureDescription</MudText>
+                    </MudPaper>
+                </MudItem>
+
+                <!-- DIAGNOSTICO -->
+               
+                <MudItem xs="12">
+                    <MudPaper Class="p-3 rounded border">
+                        <MudText Typo="Typo.caption">Diagnóstico</MudText>
+                        <MudText>@_order.Diagnosis</MudText>
+                    </MudPaper>
+                </MudItem>
+
+                <!-- COSTOS -->
+                <MudItem xs="12" md="4">
+                    <MudPaper Class="p-3 rounded border">
+                        <MudText Typo="Typo.caption">Mano de obra</MudText>
+                        <MudText Class="fw-bold">
+                            @_order.LaborCost.ToString("C", new CultureInfo("en-US"))
+                        </MudText>
+                    </MudPaper>
+                </MudItem>
+
+                <MudItem xs="12" md="4">
+                    <MudPaper Class="p-3 rounded border">
+                        <MudText Typo="Typo.caption">Tiempo estimado</MudText>
+                        <MudText Class="fw-bold">
+                            @_order.EstimatedTimeDisplay
+                        </MudText>
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="12" md="4">
+                    <MudPaper Class="p-3 rounded border">
+                        <MudText Typo="Typo.caption">Total</MudText>
+                        <MudText Class="fw-bold">
+                            @_order.TotalCost.ToString("C", new CultureInfo("en-US"))
+                        </MudText>
+                    </MudPaper>
+                </MudItem>
+                
+              
+                <!-- PARTES -->
+                <MudItem xs="12">
+                    <MudPaper Class="p-3 rounded border">
+                        <MudStack Row Justify="Justify.SpaceBetween" Class="mb-2">
+                            <MudText Typo="Typo.caption">Refacciones</MudText>
+                            <div>
+
+                                <MudChip T="int" Size="Size.Small">
+                                    @_orderPart.Count()
+                                </MudChip>
+                                    
+                            </div>
+                                                
+                        </MudStack>
+
+                        @if (_orderPart.Any())
+                        {
+                            <MudList T="OrderPartDto" Dense="true">
+                                @foreach (var part in _orderPart)
+                                {
+                                    <MudListItem>
+                                        <div class="bg-light rounded border p-3 d-flex align-items-start gap-3 mt-3">
+
+                                            <!-- ICON -->
+                                            <div class="border rounded d-flex align-items-center justify-content-center flex-shrink-0"
+                                                    style="width:48px; height:48px; background:white;">
+                                                <MudIcon Icon="@Icons.Material.Filled.Construction"
+                                                            Color="Color.Primary" />
+                                            </div>
+
+                                            <!-- INFO -->
+                                            <div class="flex-grow-1 overflow-hidden">
+
+                                                    
+                                                <!-- ROW 1 -->
+                                                <div class="fw-bold text-truncate"
+                                                        style="color:#000666;">
+
+                                                    @part.Sku -
+                                                    @part.PartName
+
+
+                                                </div>
+
+                                                <!-- ROW 2 -->
+                                                <div class="text-muted text-truncate"
+                                                        style="font-size:11px;">
+
+                                                    @part.Quantity x @part.UnitPrice.ToString("C", new CultureInfo("en-US")) = @part.Subtotal.ToString("C", new CultureInfo("en-US"))
+
+                                                </div>
+
+                                                    
+                                            </div>
+                                        </div>
+                                    </MudListItem>
+                                }
+                            </MudList>
+                        }
+                        else
+                        {
+                            <MudText Typo="Typo.caption">
+                                Sin refacciones registradas
+                            </MudText>
+                        }
+                    </MudPaper>
+                </MudItem>
+                
+
+            </MudGrid>
+        }
+
+
+</MudPaper>
+
+
+@code {
+
+    [Parameter] public Guid OrderId { get; set; }
+
+    private MudForm? _form;
+    private bool _isValid;
+    private ServiceOrderDto? _order;
+    private bool _loading = true;
+    private CustomerDto? _customer;
+    private EquipmentDto? _equipment;
+    private IEnumerable<OrderPartDto?> _orderPart;
+    private int _hours;
+    private int _minutes;
+    private UpdateServiceOrderTechnicalDataRequest techData = new();
+
+    public async Task GetOrder(Guid id)
+    {
+        _loading = true;
+
+
+        _order = await ServiceOrderClient.GetByIdAsync(id);
+        if(_order is null)
+        {
+            Snackbar.Add("Orden no encontrada.", Severity.Error);
+            return;
+        }
+        _customer = _order.Customer;
+        _equipment = _order.Equipment;
+        _orderPart = _order.OrderPart;
+
+        if (_order.Status == ServiceOrderStatus.Diagnosing)
+        {
+            fillTechData();
+        }
+        _loading = false;
+    }
+    protected override async Task OnParametersSetAsync()
+    {
+        await GetOrder(OrderId);
+    }
+    private void fillTechData()
+    {
+        techData.Diagnosis = _order?.Diagnosis ?? "";
+        techData.LaborCost = _order?.LaborCost ?? 0;
+        var estimated = _order?.EstimatedTime ?? TimeSpan.Zero;
+
+        _hours = (int)estimated.TotalHours;
+        _minutes = estimated.Minutes;
+        techData.EstimatedTime = _order?.EstimatedTime ?? new TimeSpan(_hours, _minutes, 0);
+
+    }
+    private Color GetStatusColor(ServiceOrderStatus status) => status switch
+    {
+        ServiceOrderStatus.Received => Color.Secondary,
+        ServiceOrderStatus.Diagnosing => Color.Info,
+        ServiceOrderStatus.Repairing => Color.Warning,
+        ServiceOrderStatus.Completed => Color.Success,
+        ServiceOrderStatus.Delivered => Color.Secondary,
+        _ => Color.Default
+    };
+   
+   
+}
