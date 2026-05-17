@@ -21,4 +21,5 @@ public interface IPartRepository
     Task<int> CountLowStockAsync(int threshold = 5);
     Task<decimal> GetInventoryValueAsync();
     Task<string?> GetMostCriticalLowStockPartAsync();
+    Task<IEnumerable<Part>> GetLowStockPartsAsync();
 }

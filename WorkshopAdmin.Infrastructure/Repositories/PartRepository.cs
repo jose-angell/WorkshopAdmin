@@ -110,4 +110,14 @@ public class PartRepository : IPartRepository
             .Select(x => x.Name)
             .FirstOrDefaultAsync();
     }
+    public async Task<IEnumerable<Part>> GetLowStockPartsAsync()
+    {
+        return await _context.Parts
+            .AsNoTracking()
+            .Where(x =>
+                x.IsActive &&
+                x.Stock <= x.MinStock)
+            .OrderBy(x => x.Stock)
+            .ToListAsync();
+    }
 }

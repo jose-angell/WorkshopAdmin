@@ -1,5 +1,9 @@
 ﻿@using MudBlazor
-@using WorkshopAdmin.Shared.Dtos.Parts
+@using WorkshopAdmin.Shared.Dtos.Dashboard
+@using WorkshopAdmin.UI.Services
+@inject DashboardClient DashboardClient
+@inject ISnackbar Snackbar
+@inject NavigationManager Navigation
 
 <MudPaper Elevation="1"
           Class="rounded-4 border h-100 d-flex flex-column">
@@ -48,11 +52,11 @@
         }
         else
         {
-            <MudList T="LowStockPartItem">
+            <MudList T="LowStockPartDto">
 
                 @foreach (var part in Parts)
                 {
-                    <MudListItem T="LowStockPartItem"
+                    <MudListItem T="LowStockPartDto"
                                  Value="part">
 
                         <ChildContent>
@@ -72,7 +76,7 @@
 
                                         <MudText Typo="Typo.caption"
                                                  Color="Color.Secondary">
-                                            SKU: @part.SKU
+                                            SKU: @part.Sku
                                         </MudText>
 
                                     </div>
@@ -132,6 +136,7 @@
         </MudText>
 
         <MudButton Variant="Variant.Text"
+                   OnClick="GoToInventory"
                    Color="Color.Primary"
                    EndIcon="@Icons.Material.Filled.ArrowForward">
             View Inventory
@@ -142,41 +147,9 @@
 </MudPaper>
 
 @code {
+    private bool _loading = true;
 
-    private List<LowStockPartItem> Parts = new()
-    {
-        new()
-        {
-            Name = "Brake Pads Front",
-            SKU = "BRK-2031",
-            CurrentStock = 2,
-            MinimumStock = 10
-        },
-
-        new()
-        {
-            Name = "Oil Filter Premium",
-            SKU = "FLT-1102",
-            CurrentStock = 5,
-            MinimumStock = 8
-        },
-
-        new()
-        {
-            Name = "Spark Plug NGK",
-            SKU = "SPK-9981",
-            CurrentStock = 7,
-            MinimumStock = 12
-        },
-
-        new()
-        {
-            Name = "Transmission Fluid",
-            SKU = "TRF-2200",
-            CurrentStock = 1,
-            MinimumStock = 6
-        }
-    };
+    private List<LowStockPartDto> Parts = new();
 
     // =========================================
     // STATS
@@ -189,7 +162,7 @@
     // HELPERS
     // =========================================
 
-    private double GetStockPercentage(LowStockPartItem part)
+    private double GetStockPercentage(LowStockPartDto part)
     {
         if (part.MinimumStock <= 0)
             return 100;
@@ -200,7 +173,7 @@
         return Math.Min(percentage, 100);
     }
 
-    private Color GetStatusColor(LowStockPartItem part)
+    private Color GetStatusColor(LowStockPartDto part)
     {
         var percentage = GetStockPercentage(part);
 
@@ -213,7 +186,7 @@
         return Color.Success;
     }
 
-    private string GetStatusText(LowStockPartItem part)
+    private string GetStatusText(LowStockPartDto part)
     {
         var percentage = GetStockPercentage(part);
 
@@ -226,19 +199,30 @@
         return "OK";
     }
 
-    // =========================================
-    // TEMP MODEL
-    // =========================================
-
-    public class LowStockPartItem
+    private async Task LoadData()
     {
-        public string Name { get; set; } = string.Empty;
+        try
+        {
+            _loading = true;
 
-        public string SKU { get; set; } = string.Empty;
+            Parts = await DashboardClient.GetLowStockPartsAsync() ?? new();
 
-        public int CurrentStock { get; set; }
 
-        public int MinimumStock { get; set; }
+        }
+        catch
+        {
+            Snackbar.Add(
+                "Error loading inventory alerts",
+                Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
     }
 
+    private void GoToInventory()
+    {
+        Navigation.NavigateTo("/inventory");
+    }
 }

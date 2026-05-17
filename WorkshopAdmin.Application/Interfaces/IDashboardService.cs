@@ -6,4 +6,5 @@ public interface IDashboardService
 {
     Task<DashboardStatsDto> GetStatsAsync();
     Task<ServiceVolumeTrendDto> GetServiceVolumeTrendAsync();
+    Task<IEnumerable<LowStockPartDto>> GetLowStockPartsAsync();
 }

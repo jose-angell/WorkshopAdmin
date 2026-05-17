@@ -43,6 +43,7 @@
               Hover="true"
               Breakpoint="Breakpoint.Sm"
               Elevation="0"
+              RowsPerPage="5"
               Class="dashboard-overview-table">
 
         <HeaderContent>
@@ -224,11 +225,16 @@
             </MudTd>
 
         </RowTemplate>
-        <PagerContent>
-            <MudDataGridPager T="ServiceOrderDto" />
-        </PagerContent>
-    </MudTable>
 
+        <!-- PAGINATION -->
+        <PagerContent>
+
+            <MudTablePager PageSizeOptions="new int[] { 5, 10, 20 }"
+                           InfoFormat="{first_item}-{last_item} de {all_items}" />
+
+        </PagerContent>
+
+    </MudTable>
 </MudPaper>
 
 @code {

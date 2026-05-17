@@ -55,6 +55,12 @@ public class DashboardClient
         await _http.GetFromJsonAsync<ServiceVolumeTrendDto>($"{BaseRoute}/service-volume-trend");
 
     /// <summary>
+    /// Obtiene el listado de partes con stock bajo
+    /// </summary>
+    public async Task<List<LowStockPartDto>?> GetLowStockPartsAsync() =>
+        await _http.GetFromJsonAsync<List<LowStockPartDto>>($"{BaseRoute}/low-stock") ?? new();
+
+    /// <summary>
     /// Consulta una orden de servicio por su ID
     /// </summary>
     public async Task<ServiceOrderDto?> GetByIdAsync(Guid id) =>

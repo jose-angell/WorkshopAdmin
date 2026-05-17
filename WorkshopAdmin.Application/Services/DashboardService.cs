@@ -137,4 +137,20 @@ public class DashboardService : IDashboardService
 
         return result;
     }
+    public async Task<IEnumerable<LowStockPartDto>> GetLowStockPartsAsync()
+    {
+        var parts =
+            await _partRepository.GetLowStockPartsAsync();
+
+        return parts.Select(x => new LowStockPartDto
+        {
+            Id = x.Id,
+            Sku = x.Sku,
+            Name = x.Name,
+            CurrentStock = x.Stock,
+            MinimumStock = x.MinStock,
+            Category = x.PartCategoryId.ToFriendlyName(),
+            WarehouseLocation = x.WarehouseLocation
+        });
+    }
 }

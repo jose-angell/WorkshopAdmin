@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WorkshopAdmin.Application.Interfaces;
+using WorkshopAdmin.Shared.Dtos.Dashboard;
 using WorkshopAdmin.Shared.Dtos.ServiceOrders;
 using WorkshopAdmin.Shared.Enums;
 
@@ -50,7 +51,17 @@ public class DashboardController : ControllerBase
         var trend = await _dashboardService.GetServiceVolumeTrendAsync();
         return Ok(trend);
     }
+    /// <summary>
+    /// Obtiene el listado de partes con stock bajo (US 14).
+    /// </summary>
+    [HttpGet("low-stock")]
+    public async Task<ActionResult<IEnumerable<LowStockPartDto>>> GetLowStockParts()
+    {
+        var result =
+            await _dashboardService.GetLowStockPartsAsync();
 
+        return Ok(result);
+    }
 
     /// <summary>
     /// Obtiene el detalle completo de una orden específica (US 10).
