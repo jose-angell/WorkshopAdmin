@@ -102,4 +102,12 @@ public class PartRepository : IPartRepository
         return await _context.Parts
             .SumAsync(p => p.Price * p.Stock);
     }
+    public async Task<string?> GetMostCriticalLowStockPartAsync()
+    {
+        return await _context.Parts
+            .Where(x => x.Stock <= x.MinStock)
+            .OrderBy(x => x.Stock)
+            .Select(x => x.Name)
+            .FirstOrDefaultAsync();
+    }
 }

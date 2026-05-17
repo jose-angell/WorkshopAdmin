@@ -220,5 +220,84 @@ public class ServiceOrderRepository : IServiceOrderRepository
         return await _context.ServiceOrders
             .CountAsync(o => o.OrderParts.Any());
     }
+    public async Task<int> CountActiveOrdersAsync()
+    {
+        return await _context.ServiceOrders
+            .CountAsync(x =>
+                x.Status == ServiceOrderStatus.Received ||
+                x.Status == ServiceOrderStatus.Diagnosing ||
+                x.Status == ServiceOrderStatus.Repairing);
+    }
 
+    public async Task<int> CountPendingDiagnosticsAsync()
+    {
+        return await _context.ServiceOrders
+            .CountAsync(x =>
+                x.Status == ServiceOrderStatus.Diagnosing);
+    }
+
+    public async Task<int> CountCreatedSinceAsync(DateTimeOffset date)
+    {
+        return await _context.ServiceOrders
+            .CountAsync(x => x.CreatedAt >= date);
+    }
+
+    public async Task<int> CountCreatedBetweenAsync(
+        DateTimeOffset start,
+        DateTimeOffset end)
+    {
+        return await _context.ServiceOrders
+            .CountAsync(x =>
+                x.CreatedAt >= start &&
+                x.CreatedAt < end);
+    }
+
+    public async Task<decimal> GetDailyRevenueAsync(DateTimeOffset day)
+    {
+        var nextDay = day.AddDays(1);
+
+        return await _context.ServiceOrders
+            .Where(x =>
+                x.CreatedAt >= day &&
+                x.CreatedAt < nextDay)
+            .SumAsync(x =>
+                x.LaborCost +
+                x.OrderParts.Sum(op =>
+                    op.Quantity * op.UnitPrice));
+    }
+
+    public async Task<decimal> GetAverageTicketAsync()
+    {
+        var orders = await _context.ServiceOrders
+            .Select(x =>
+                x.LaborCost +
+                x.OrderParts.Sum(op =>
+                    op.Quantity * op.UnitPrice))
+            .ToListAsync();
+
+        if (!orders.Any())
+            return 0;
+
+        return orders.Average();
+    }
+    public async Task<int> CountCreatedByDayAsync(DateTimeOffset day)
+    {
+        var nextDay = day.AddDays(1);
+
+        return await _context.ServiceOrders
+            .CountAsync(x =>
+                x.CreatedAt >= day &&
+                x.CreatedAt < nextDay);
+    }
+
+    public async Task<int> CountCompletedByDayAsync(DateTimeOffset day)
+    {
+        var nextDay = day.AddDays(1);
+
+        return await _context.ServiceOrders
+            .CountAsync(x =>
+                x.RepairFinishedAt != null &&
+                x.RepairFinishedAt >= day &&
+                x.RepairFinishedAt < nextDay);
+    }
 }

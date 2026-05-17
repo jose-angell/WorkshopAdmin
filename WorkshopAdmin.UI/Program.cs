@@ -22,5 +22,6 @@ builder.Services.AddScoped<ServiceOrderClient>();
 builder.Services.AddScoped<CustomerClient>();
 builder.Services.AddScoped<InventoryClient>();
 builder.Services.AddScoped<EquipmentClient>();
+builder.Services.AddScoped<DashboardClient>();
 
 await builder.Build().RunAsync();

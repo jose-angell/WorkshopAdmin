@@ -336,3 +336,35 @@ code {
 .mud-chart-bars .mud-chart-series-1 {
     fill: #4c56af !important;
 }
+
+/* Contenedor general */
+.mud-paper {
+    background: white;
+}
+
+/* Grid lines suaves */
+.mud-chart-grid line {
+    stroke: #f1f5f9 !important;
+    stroke-width: 1 !important;
+}
+
+/* Texto eje X */
+.mud-chart-axis text {
+    fill: #94a3b8 !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+}
+
+/* Remover líneas oscuras de ejes */
+.mud-chart-axis path,
+.mud-chart-axis line {
+    stroke: transparent !important;
+}
+
+/* Leyenda */
+.mud-chart-legend text {
+    fill: #64748b !important;
+    font-size: 12px !important;
+    font-weight: 600;
+}

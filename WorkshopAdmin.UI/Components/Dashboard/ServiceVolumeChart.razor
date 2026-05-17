@@ -1,4 +1,8 @@
 ﻿@using MudBlazor
+@using WorkshopAdmin.Shared.Dtos.Dashboard
+@using WorkshopAdmin.UI.Services
+
+@inject DashboardClient DashboardClient
 
 <MudPaper Elevation="1"
           Class="pa-6 rounded-xl border h-100">
@@ -33,93 +37,81 @@
 
     </MudStack>
 
-    <!-- CHART -->
-    <MudChart ChartType="ChartType.Bar"
-              ChartSeries="@_series"
-              ChartLabels="@_xAxisLabels"
-              Width="100%"
-              Height="320px"
-              ChartOptions="@_chartOptions"
-              LegendPosition="Position.Bottom" />
+    @if (_loading)
+    {
+        <MudProgressCircular Indeterminate="true"
+                             Color="Color.Primary" />
+    }
+    else
+    {
+        <MudChart ChartType="ChartType.Bar"
+                  ChartSeries="@_series"
+                  ChartLabels="@_xAxisLabels"
+                  Width="100%"
+                  Height="320px"
+                  ChartOptions="@_chartOptions"
+                  LegendPosition="Position.Bottom" />
+    }
 
 </MudPaper>
 
-<style>
-
-    /* Contenedor general */
-    .mud-paper {
-        background: white;
-    }
-
-    /* Grid lines suaves */
-    .mud-chart-grid line {
-        stroke: #f1f5f9 !important;
-        stroke-width: 1 !important;
-    }
-
-    /* Texto eje X */
-    .mud-chart-axis text {
-        fill: #94a3b8 !important;
-        font-size: 10px !important;
-        font-weight: 700 !important;
-        text-transform: uppercase;
-    }
-
-    /* Remover líneas oscuras de ejes */
-    .mud-chart-axis path,
-    .mud-chart-axis line {
-        stroke: transparent !important;
-    }
-
-    /* Leyenda */
-    .mud-chart-legend text {
-        fill: #64748b !important;
-        font-size: 12px !important;
-        font-weight: 600;
-    }
-
-</style>
-
 @code {
+
+    private bool _loading = true;
 
     private readonly BarChartOptions _chartOptions = new()
     {
         BarWidthRatio = 0.95,
         YAxisTicks = 2,
-        //YAxisRequireZeroPoint = true,
         MaxNumYAxisTicks = 4
     };
 
-    private readonly List<ChartSeries<double>> _series =
-    [
-        new ChartSeries<double>()
-        {
-            Name = "Intake",
-             Data = new double[]
-            {
-                18, 24, 16, 30, 20, 10, 5
-            }
-        },
+    private List<ChartSeries<double>> _series = [];
 
-        new ChartSeries<double>()
+    private string[] _xAxisLabels = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        _loading = true;
+
+        try
         {
-            Name = "Completed",
-            Data = new double[]
-            {
-                12, 18, 10, 25, 15, 5, 2
-            }
+            var stats =
+                await DashboardClient.GetServiceVolumeTrendAsync();
+
+            _xAxisLabels =
+                stats.Points
+                    .Select(x => x.Label)
+                    .ToArray();
+
+            _series =
+            [
+                new ChartSeries<double>()
+                {
+                    Name = "Intake",
+                    Data = stats.Points
+                        .Select(x => (double)x.Intake)
+                        .ToArray()
+                },
+
+                new ChartSeries<double>()
+                {
+                    Name = "Completed",
+                    Data = stats.Points
+                        .Select(x => (double)x.Completed)
+                        .ToArray()
+                }
+            ];
         }
-    ];
-
-    private readonly string[] _xAxisLabels =
-    [
-        "Mon",
-        "Tue",
-        "Wed",
-        "Thu",
-        "Fri",
-        "Sat",
-        "Sun"
-    ];
+        finally
+        {
+            _loading = false;
+        }
+    }
 
 }

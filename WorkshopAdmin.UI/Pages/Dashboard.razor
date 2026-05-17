@@ -1,6 +1,10 @@
 ﻿@page "/"
 
 @using WorkshopAdmin.UI.Components.Dashboard
+@using WorkshopAdmin.Shared.Dtos.Dashboard
+@using WorkshopAdmin.UI.Services
+@inject DashboardClient DashboardClient
+
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="py-4">
 
     <!-- HEADER -->
@@ -26,12 +30,12 @@
         <MudItem xs="12" sm="6" md="3">
 
             <KpiCard Title="Active Orders"
-                     Value="124"
-                     SubText="8 pending approvals"
+                     Value="@Stats.ActiveOrders.ToString()"
+                     SubText="@($"{Stats.PendingApprovals} pending approvals")"
                      Icon="@Icons.Material.Filled.PendingActions"
                      IconColor="Color.Primary"
                      IconBackground="rgba(76, 86, 175, 0.10)"
-                     BadgeText="+12%"
+                     BadgeText="@($"{Stats.ActiveOrdersGrowthPercentage}%")"
                      BadgeColor="Color.Success"
                      ShowProgress="true"
                      ProgressValue="68"
@@ -43,8 +47,8 @@
         <MudItem xs="12" sm="6" md="3">
 
             <KpiCard Title="Low Stock"
-                     Value="12"
-                     SubText="Oil filters critically low"
+                     Value="@Stats.LowStockParts.ToString()"
+                     SubText="@($"{Stats.CriticalPartName} critically low")"
                      Icon="@Icons.Material.Filled.Warning"
                      IconColor="Color.Error"
                      IconBackground="rgba(186, 26, 26, 0.12)"
@@ -59,12 +63,12 @@
         <MudItem xs="12" sm="6" md="3">
 
             <KpiCard Title="Daily Revenue"
-                     Value="$8,420"
-                     SubText="Avg ticket: $640"
+                     Value="@Stats.DailyRevenue.ToString("C")"
+                     SubText="@($"Avg ticket: {Stats.AverageTicket:C}")"
                      Icon="@Icons.Material.Filled.Payments"
                      IconColor="Color.Success"
                      IconBackground="rgba(16, 185, 129, 0.10)"
-                     BadgeText="+8.4%"
+                     BadgeText="@($"{Stats.DailyRevenueGrowthPercentage}%")"
                      BadgeColor="Color.Success" />
 
         </MudItem>
@@ -99,5 +103,10 @@
     <TableOverview />
 </MudContainer>
 @code {
+    private DashboardStatsDto Stats = new();
 
+    protected override async Task OnInitializedAsync()
+    {
+        Stats = await DashboardClient.GetStatsAsync();
+    }
 }

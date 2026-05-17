@@ -25,5 +25,12 @@ public interface IServiceOrderRepository
     Task<int> CountCustomersWithOrdersAsync();
     Task<int> CountReturningCustomersAsync();
     Task<int> CountOrdersWithPartsAsync();
-
+    Task<int> CountActiveOrdersAsync();
+    Task<int> CountPendingDiagnosticsAsync();
+    Task<int> CountCreatedSinceAsync(DateTimeOffset date);
+    Task<int> CountCreatedBetweenAsync( DateTimeOffset start, DateTimeOffset end);
+    Task<decimal> GetDailyRevenueAsync(DateTimeOffset day);
+    Task<decimal> GetAverageTicketAsync();
+    Task<int> CountCreatedByDayAsync(DateTimeOffset day);
+    Task<int> CountCompletedByDayAsync(DateTimeOffset day);
 }
