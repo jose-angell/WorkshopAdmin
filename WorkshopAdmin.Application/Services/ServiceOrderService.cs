@@ -251,7 +251,7 @@ public class ServiceOrderService : IServiceOrderService
         {
             order.RepairFinishedAt = DateTimeOffset.UtcNow;
         }
-
+        order.Status = request.NewStatus;
         await _orderRepository.UpdateAsync(order);
     }
     public async Task<OrderPartDto?> GetOrderPartAsync(Guid serviceOrderId, Guid partId)

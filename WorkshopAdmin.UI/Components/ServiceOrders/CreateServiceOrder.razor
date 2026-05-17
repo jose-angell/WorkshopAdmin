@@ -281,8 +281,7 @@
 
         <div class="d-flex gap-3">
 
-            <MudButton Variant="Variant.Text"
-            OnClick="GoToOrders">
+            <MudButton Variant="Variant.Text" OnClick="Cancel">
                 Cancel
             </MudButton>
 
@@ -301,7 +300,8 @@
 
 </MudForm>
 @code {
-    
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; } = default!;
     private MudForm? _form;
     private bool _isValid;
     private CreateServiceOrderRequest _request = new();
@@ -381,12 +381,19 @@
             return;
         }
 
-        //  aquí iría tu API
-        await ServiceOrderClient.CreateAsync(_request);
+        var result = await ServiceOrderClient.CreateAsync(_request);
 
-        Snackbar.Add("Service Order Created", Severity.Success);
-        GoToOrders();
+        if (result != null)
+        {
+            Snackbar.Add("Service Order Created", Severity.Success);
+            MudDialog.Close(DialogResult.Ok(result));
+        }
+        else
+        {
+            Snackbar.Add("Could not save equipment. Please check the data.", Severity.Error);
+        }
     }
+    private void Cancel() => MudDialog.Cancel();
     private async Task OpenCreateCustomerDialog()
     {
         var options = new DialogOptions
@@ -447,8 +454,5 @@
             }
         }
     }
-    private void GoToOrders()
-    {
-        Navigation.NavigateTo("/orders");
-    }
+   
 }
