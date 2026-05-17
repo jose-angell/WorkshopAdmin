@@ -74,9 +74,7 @@
                                 </MudText>
 
                                 <MudText Typo="Typo.caption">
-                                    @_order.RepairFinishedAt?
-                                    .ToLocalTime()
-                                    .ToString("dd/MM/yy hh:mm tt")
+                                    @_order.RepairFinishedAt?.ToLocalTime().ToString("dd/MM/yy hh:mm tt")
                                 </MudText>
                             </div>
                         }
