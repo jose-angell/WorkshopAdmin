@@ -40,6 +40,7 @@ public class CustomersController : ControllerBase
 
         return Ok(customer);
     }
+    
     /// <summary>
     /// Obtiene las estadísticas de los clientes.
     /// </summary>

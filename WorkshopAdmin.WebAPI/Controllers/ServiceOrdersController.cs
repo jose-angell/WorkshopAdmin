@@ -38,7 +38,21 @@ public class ServiceOrdersController : ControllerBase
         var stats = await _serviceOrderService.GetStatsAsync();
         return Ok(stats);
     }
+    /// <summary>
+    /// Obtiene las ordenes de servicio de un cliente.
+    /// </summary>
+    [HttpGet("{id:guid}/customer-orders")]
+    public async Task<IActionResult> GetOrderByCustomerId(Guid id)
+    {
+        var customer = await _serviceOrderService.GetOrdersByCustomerIdAsync(id);
 
+        if (customer == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(customer);
+    }
     /// <summary>
     /// Obtiene el detalle completo de una orden específica (US 10).
     /// </summary>

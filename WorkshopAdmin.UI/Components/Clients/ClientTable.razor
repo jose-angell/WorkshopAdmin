@@ -87,7 +87,11 @@
                         Filterable="false">
             <CellTemplate>
                 <MudTooltip Text="View History">
-                    <MudIconButton Icon="@Icons.Material.Filled.History" Size="Size.Small" Class="text-slate-400 hover:text-indigo-900" />
+                    <MudIconButton Icon="@Icons.Material.Filled.History" 
+                    Size="Size.Small" 
+                    Class="text-slate-400 hover:text-indigo-900"
+                    OnClick="@(() => OpenHistoryOrdersDialog(context.Item))"
+                    />
                 </MudTooltip>
                 <MudTooltip Text="Edit Client">
                     <MudIconButton Icon="@Icons.Material.Filled.Edit"
@@ -187,5 +191,25 @@
             Snackbar.Add("Cliente actualizado correctamente", Severity.Success);
             await LoadDataClient();
         }
+    }
+    private async Task OpenHistoryOrdersDialog(CustomerDto client)
+    {
+        var IdClient = client.Id;
+
+        var parameters = new DialogParameters<ClientHistoryOrder>
+        {
+            { x => x.ClientId, IdClient }
+        };
+
+        var options = new DialogOptions
+        {
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true,
+            CloseButton = true,
+            BackdropClick = false // Evita que se cierre por error al dar click fuera
+        };
+
+        var dialog = await DialogService.ShowAsync<ClientHistoryOrder>(" ", parameters, options);
+        var result = await dialog.Result;
     }
 }

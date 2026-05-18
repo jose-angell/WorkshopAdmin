@@ -1,4 +1,5 @@
 ﻿using WorkshopAdmin.Shared.Dtos.Customers;
+using WorkshopAdmin.Shared.Dtos.ServiceOrders;
 
 namespace WorkshopAdmin.Application.Interfaces;
 

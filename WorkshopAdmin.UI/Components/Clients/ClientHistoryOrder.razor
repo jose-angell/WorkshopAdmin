@@ -3,6 +3,7 @@
 @using WorkshopAdmin.Shared.Dtos.ServiceOrders
 @using WorkshopAdmin.Shared.Enums
 @using WorkshopAdmin.UI.Services
+@using WorkshopAdmin.UI.Components.Dashboard
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 @inject ServiceOrderClient OrderClient
@@ -40,16 +41,6 @@
                             @item.CreatedAt.ToLocalTime().ToString("dd MMM yyyy - hh:mm tt")
                         </MudText>
                     </MudStack>
-                </CellTemplate>
-            </TemplateColumn>
-
-            <!-- CLIENTE -->
-            <TemplateColumn Title="Cliente" Filterable="true">
-                <CellTemplate Context="context">
-                    <MudText Class="fw-bold"
-                             Style="color: var(--mud-palette-primary-dark);">
-                        @context.Item.Customer.Name
-                    </MudText>
                 </CellTemplate>
             </TemplateColumn>
 
@@ -106,11 +97,11 @@
                 <CellTemplate Context="context">
                     <MudText Class="fw-bold"
                              Style="font-family: monospace;">
-                        @context.Item.TotalCost.ToString("C",new CultureInfo("en-US"))
+                        @context.Item.TotalCost.ToString("C", new CultureInfo("en-US"))
                     </MudText>
                 </CellTemplate>
             </TemplateColumn>
-            
+
             <!-- ACCIONES -->
             <TemplateColumn Title="Acciones" Align="Align.Right">
                 <CellTemplate Context="context">
@@ -118,14 +109,10 @@
                               Class="action-group">
 
 
-                        <MudIconButton Icon="@Icons.Material.Filled.AccountTree"
+                        <MudIconButton Icon="@Icons.Material.Filled.Visibility"
                                        Size="Size.Small"
                                        OnClick="@(() => OpenViewDialog(context.Item))" />
 
-                        <MudIconButton Icon="@Icons.Material.Filled.Edit"
-                                       Size="Size.Small"
-                                       Color="Color.Primary"
-                                       OnClick="@(() => OpenEditDialog(context.Item))" />
 
                     </MudStack>
                 </CellTemplate>
@@ -151,35 +138,26 @@
 </MudPaper>
 
 @code {
-    [Parameter] public bool ReloadTrigger { get; set; }
-    private bool _lastReloadTrigger;
+    [Parameter] public Guid ClientId { get; set; }
     private List<ServiceOrderDto> _orders = new();
     private bool _loading = true;
     private string _searchString = "";
-    private Guid? _selectedOrderId;
-    private bool _openDialog;
+    private int _from => 1;
+    private int _to => _orders?.Count() ?? 0;
+    private string RowClass(ServiceOrderDto item, int index) => "hover-row";
 
-    // Mantenemos tus parámetros por si este componente se usa dentro de otro
-    [Parameter] public EventCallback<ServiceOrderDto> OnView { get; set; }
-    [Parameter] public EventCallback<ServiceOrderDto> OnEdit { get; set; }
-    [Parameter] public EventCallback<ServiceOrderDto> OnTrace { get; set; }
-
-    protected override async Task OnParametersSetAsync()
+    protected override async Task OnInitializedAsync()
     {
-        if (_lastReloadTrigger != ReloadTrigger)
-        {
-            _lastReloadTrigger = ReloadTrigger;
-            await LoadData();
-        }
+        await LoadData();
     }
-    
+
     private async Task LoadData(ServiceOrderStatus? filterStatus = null, Guid? filterCustomer = null)
     {
         try
         {
             _loading = true;
             // Ahora pasamos los filtros al servicio
-            _orders = await OrderClient.GetAllAsync(filterStatus, filterCustomer);
+            _orders = await OrderClient.GetOrdersByCustomerIdAsync(ClientId) ?? new();
         }
         catch (Exception ex)
         {
@@ -199,12 +177,6 @@
                x.FriendlyId.Contains(_searchString, StringComparison.OrdinalIgnoreCase) ||
                x.Equipment.Model.Contains(_searchString, StringComparison.OrdinalIgnoreCase);
     };
-
-    private int _from => 1;
-    private int _to => _orders?.Count() ?? 0;
-    private string RowClass(ServiceOrderDto item, int index)
-       => "hover-row";
-
     private (string bg, string text) GetStatusStyle(ServiceOrderStatus status) => status switch
     {
         ServiceOrderStatus.Received => ("#ECEFF1", "#37474F"),
@@ -218,7 +190,7 @@
     {
         var IdOrder = order.Id;
 
-        var parameters = new DialogParameters<ServiceOrderDetail>
+        var parameters = new DialogParameters<OrderDetail>
         {
             { x => x.OrderId, IdOrder }
         };
@@ -231,29 +203,7 @@
             BackdropClick = false // Evita que se cierre por error al dar click fuera
         };
 
-        var dialog = await DialogService.ShowAsync<ServiceOrderDetail>(" ", parameters, options);
+        var dialog = await DialogService.ShowAsync<OrderDetail>(" ", parameters, options);
         var result = await dialog.Result;
-        await LoadData();
-    }
-    private async Task OpenEditDialog(ServiceOrderDto order)
-    {
-        var IdOrder = order.Id;
-
-        var parameters = new DialogParameters<EditServiceOrder>
-        {
-            { x => x.OrderId, IdOrder }
-        };
-
-        var options = new DialogOptions
-        {
-            MaxWidth = MaxWidth.Medium,
-            FullWidth = true,
-            CloseButton = true,
-            BackdropClick = false // Evita que se cierre por error al dar click fuera
-        };
-
-        var dialog = await DialogService.ShowAsync<EditServiceOrder>(" ", parameters, options);
-        var result = await dialog.Result;
-        await LoadData();
     }
 }

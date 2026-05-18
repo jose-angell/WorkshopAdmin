@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Json;
 using System.Text.Json;
 using WorkshopAdmin.Shared.Dtos.Customers;
+using WorkshopAdmin.Shared.Dtos.ServiceOrders;
 
 namespace WorkshopAdmin.UI.Services;
 

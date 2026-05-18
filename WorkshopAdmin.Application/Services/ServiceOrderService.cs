@@ -146,11 +146,25 @@ public class ServiceOrderService : IServiceOrderService
         };
     }
 
+    /// <summary>
+    /// Consulta órdenes
+    /// </summary>
     public async Task<IEnumerable<ServiceOrderDto>> GetAllAsync()
     {
         var orders = await _orderRepository.GetAllAsync();
         return orders.Select(MapToDto);
     }
+
+    /// <summary>
+    /// Consulta órdenes por ID de cliente.
+    /// </summary>
+    public async Task<IEnumerable<ServiceOrderDto>> GetOrdersByCustomerIdAsync(Guid customerId)
+    {
+        var orders = await _orderRepository.GetByCustomerIdAsync(customerId);
+        return orders.Select(MapToDto);
+    }
+
+    
 
     /// <summary>
     /// Consulta órdenes aplicando filtros opcionales (US 9).

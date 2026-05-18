@@ -10,8 +10,14 @@ public class ServiceOrderClient
 {
     private readonly HttpClient _http;
     private const string BaseRoute = "api/service-orders";
+    private readonly JsonSerializerOptions _options;
 
-    public ServiceOrderClient(HttpClient http) => _http = http;
+
+    public ServiceOrderClient(HttpClient http)
+    {
+        _http = http;
+        _options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+    }
 
     /// <summary>
     /// Consultar todas las órdenes de servicio
@@ -42,6 +48,18 @@ public class ServiceOrderClient
             return new List<ServiceOrderDto>();
         }
     }
+
+    /// <summary>
+    /// Obtiene las órdenes de servicio de un cliente por su GUID
+    /// </summary>
+    public async Task<List<ServiceOrderDto>?> GetOrdersByCustomerIdAsync(Guid id)
+    {
+        var response = await _http.GetAsync($"{BaseRoute}/{id}/customer-orders");
+        if (!response.IsSuccessStatusCode) return null;
+
+        return await response.Content.ReadFromJsonAsync<List<ServiceOrderDto>>(_options);
+    }
+
     /// <summary>
     /// Consulta las estadísticas de las órdenes de servicio (total, por estado, retrasadas, etc.)
     /// </summary>

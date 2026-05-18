@@ -368,3 +368,12 @@ code {
     font-size: 12px !important;
     font-weight: 600;
 }
+.failure-clamp {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 220px;
+    line-height: 1.4;
+}
