@@ -19,7 +19,8 @@
         @* ID con fuente monoespaciada *@
         <PropertyColumn Property="x => x.Id" Title="ID">
             <CellTemplate>
-                <MudText Typo="Typo.caption" Class="font-mono text-slate-400" Style="font-size: 11px;">
+                <MudText Typo="Typo.caption" Class="fw-bold"
+                         Style="font-family: monospace; color: var(--mud-palette-primary);">
                     #@context.Item.FriendlyId
                 </MudText>
             </CellTemplate>

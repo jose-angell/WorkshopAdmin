@@ -41,7 +41,6 @@ public class ServiceOrderRepository : IServiceOrderRepository
 
     public async Task<IEnumerable<ServiceOrder>> GetByStatusAsync(string status)
     {
-        // Convertimos el string a Enum para comparar con el campo smallint de la DB
         if (Enum.TryParse<ServiceOrderStatus>(status, true, out var statusEnum))
         {
             return await _context.ServiceOrders
@@ -57,12 +56,20 @@ public class ServiceOrderRepository : IServiceOrderRepository
 
     public async Task<IEnumerable<ServiceOrder>> GetByCustomerIdAsync(Guid customerId)
     {
-        // Aprovecha el índice service_order(customer_id) definido en el Data Dictionary
         return await _context.ServiceOrders
             .Include(so => so.Equipment)
             .Include(o => o.OrderParts)
             .ThenInclude(op => op.Part)
             .Where(so => so.CustomerId == customerId)
+            .ToListAsync();
+    }
+    public async Task<IEnumerable<ServiceOrder>> GetByEquipmentIdAsync(Guid equipmentId)
+    {
+        return await _context.ServiceOrders
+            .Include(so => so.Equipment)
+            .Include(o => o.OrderParts)
+            .ThenInclude(op => op.Part)
+            .Where(so => so.EquipmentId == equipmentId)
             .ToListAsync();
     }
 

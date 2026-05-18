@@ -19,4 +19,5 @@ public interface IServiceOrderService
     Task UpdateTechnicalDataAsync(UpdateServiceOrderTechnicalDataRequest request);
     Task<ServiceOrderStatsDto?> GetStatsAsync();
     Task<IEnumerable<ServiceOrderDto>> GetOrdersByCustomerIdAsync(Guid customerId);
+    Task<IEnumerable<ServiceOrderDto>> GetOrdersByEquipmentIdAsync(Guid equipmentId);
 }

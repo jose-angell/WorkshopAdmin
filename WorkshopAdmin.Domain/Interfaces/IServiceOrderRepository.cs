@@ -18,6 +18,7 @@ public interface IServiceOrderRepository
     // Métodos específicos solicitados
     Task<IEnumerable<ServiceOrder>> GetByStatusAsync(string status);
     Task<IEnumerable<ServiceOrder>> GetByCustomerIdAsync(Guid customerId);
+    Task<IEnumerable<ServiceOrder>> GetByEquipmentIdAsync(Guid equipmentId);
     Task<IEnumerable<ServiceOrder>> GetAllFilteredAsync(ServiceOrderStatus? status, Guid? customerId);
     Task UpdateStatusAsync(Guid id, ServiceOrderStatus status);
     Task<OrderPart?> GetOrderPartAsync(Guid serviceOrderId, Guid partId);

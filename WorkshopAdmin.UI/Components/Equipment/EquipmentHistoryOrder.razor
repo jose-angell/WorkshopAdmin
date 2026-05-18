@@ -1,0 +1,208 @@
+﻿@using System.Globalization
+@using MudBlazor
+@using WorkshopAdmin.Shared.Dtos.ServiceOrders
+@using WorkshopAdmin.Shared.Enums
+@using WorkshopAdmin.UI.Services
+@using WorkshopAdmin.UI.Components.Dashboard
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@inject ServiceOrderClient OrderClient
+
+<MudPaper Elevation="0" Class="border rounded-4">
+
+    <MudDataGrid T="ServiceOrderDto"
+                 Items="@_orders"
+                 Loading="@_loading"
+                 Dense="true"
+                 Hover="true"
+                 Filterable="true"
+                 QuickFilter="@_quickFilter"
+                 RowsPerPage="8"
+                 Class="rounded-4"
+                 RowClassFunc="RowClass">
+
+        <Columns>
+
+            <!-- ID + FECHA -->
+            <TemplateColumn Title="ID / Fecha">
+                <CellTemplate Context="context">
+                    @{
+                        var item = context.Item;
+                    }
+
+                    <MudStack Spacing="0">
+                        <MudText Class="fw-bold"
+                                 Style="font-family: monospace; color: var(--mud-palette-primary);">
+                            @item.FriendlyId
+                        </MudText>
+
+                        <MudText Typo="Typo.caption"
+                                 Class="text-muted">
+                            @item.CreatedAt.ToLocalTime().ToString("dd MMM yyyy - hh:mm tt")
+                        </MudText>
+                    </MudStack>
+                </CellTemplate>
+            </TemplateColumn>
+
+           
+
+            <!-- FALLA -->
+            <TemplateColumn Title="Falla">
+                <CellTemplate Context="context">
+
+                    <MudText Typo="Typo.body2"
+                             Class="failure-clamp">
+
+                        @context.Item.FailureDescription
+
+                    </MudText>
+
+                </CellTemplate>
+            </TemplateColumn>
+
+            <!-- Diagnostico -->
+            <TemplateColumn Title="Diagnóstico">
+                <CellTemplate Context="context">
+
+                    <MudText Typo="Typo.body2"
+                             Class="failure-clamp">
+
+                        @context.Item.Diagnosis
+
+                    </MudText>
+
+                </CellTemplate>
+            </TemplateColumn>
+
+            <!-- STATUS -->
+            <TemplateColumn Title="Estado">
+                <CellTemplate Context="context">
+                    @{
+                        var status = context.Item.Status;
+                        var (bg, color) = GetStatusStyle(status);
+                    }
+
+                    <MudChip T="string"
+                             Size="Size.Small"
+                             Class="fw-bold text-uppercase"
+                             Style=$"background:{bg}; color:{color}; letter-spacing:0.5px;">
+                        @status.ToFriendlyName()
+                    </MudChip>
+                </CellTemplate>
+            </TemplateColumn>
+
+            <!-- TOTAL -->
+            <TemplateColumn Title="Total" Align="Align.Right">
+                <CellTemplate Context="context">
+                    <MudText Class="fw-bold"
+                             Style="font-family: monospace;">
+                        @context.Item.TotalCost.ToString("C", new CultureInfo("en-US"))
+                    </MudText>
+                </CellTemplate>
+            </TemplateColumn>
+
+            <!-- ACCIONES -->
+            <TemplateColumn Title="Acciones" Align="Align.Right">
+                <CellTemplate Context="context">
+                    <MudStack Row Justify="Justify.FlexEnd"
+                              Class="action-group">
+
+
+                        <MudIconButton Icon="@Icons.Material.Filled.Visibility"
+                                       Size="Size.Small"
+                                       OnClick="@(() => OpenViewDialog(context.Item))" />
+
+
+                    </MudStack>
+                </CellTemplate>
+            </TemplateColumn>
+
+        </Columns>
+
+        <!-- PAGER -->
+        <PagerContent>
+            <MudStack Row Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="p-3">
+
+                <MudText Typo="Typo.caption">
+                    Mostrando @($"{_from}-{_to} de {_orders?.Count() ?? 0} órdenes")
+                </MudText>
+
+                <MudDataGridPager T="ServiceOrderDto" />
+
+            </MudStack>
+        </PagerContent>
+
+    </MudDataGrid>
+
+</MudPaper>
+
+@code {
+    [Parameter] public Guid EquipmentId { get; set; }
+    private List<ServiceOrderDto> _orders = new();
+    private bool _loading = true;
+    private string _searchString = "";
+    private int _from => 1;
+    private int _to => _orders?.Count() ?? 0;
+    private string RowClass(ServiceOrderDto item, int index) => "hover-row";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData(ServiceOrderStatus? filterStatus = null, Guid? filterCustomer = null)
+    {
+        try
+        {
+            _loading = true;
+            // Ahora pasamos los filtros al servicio
+            _orders = await OrderClient.GetOrdersByEquipmentIdAsync(EquipmentId) ?? new();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Error al sincronizar con el servidor", Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    // Filtro rápido actualizado
+    private Func<ServiceOrderDto, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString)) return true;
+        return x.Customer.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase) ||
+               x.FriendlyId.Contains(_searchString, StringComparison.OrdinalIgnoreCase) ||
+               x.Equipment.Model.Contains(_searchString, StringComparison.OrdinalIgnoreCase);
+    };
+    private (string bg, string text) GetStatusStyle(ServiceOrderStatus status) => status switch
+    {
+        ServiceOrderStatus.Received => ("#ECEFF1", "#37474F"),
+        ServiceOrderStatus.Diagnosing => ("#E3F2FD", "#1565C0"),
+        ServiceOrderStatus.Repairing => ("#FFF3E0", "#EF6C00"),
+        ServiceOrderStatus.Completed => ("#E8F5E9", "#2E7D32"),
+        ServiceOrderStatus.Delivered => ("#1A237E", "#FFFFFF"),
+        _ => ("#ECEFF1", "#37474F")
+    };
+    private async Task OpenViewDialog(ServiceOrderDto order)
+    {
+        var IdOrder = order.Id;
+
+        var parameters = new DialogParameters<OrderDetail>
+        {
+            { x => x.OrderId, IdOrder }
+        };
+
+        var options = new DialogOptions
+        {
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true,
+            CloseButton = true,
+            BackdropClick = false // Evita que se cierre por error al dar click fuera
+        };
+
+        var dialog = await DialogService.ShowAsync<OrderDetail>(" ", parameters, options);
+        var result = await dialog.Result;
+    }
+}

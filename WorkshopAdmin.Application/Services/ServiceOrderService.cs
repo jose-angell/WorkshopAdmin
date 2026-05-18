@@ -164,7 +164,14 @@ public class ServiceOrderService : IServiceOrderService
         return orders.Select(MapToDto);
     }
 
-    
+    /// <summary>
+    /// Consulta órdenes por ID de cliente.
+    /// </summary>
+    public async Task<IEnumerable<ServiceOrderDto>> GetOrdersByEquipmentIdAsync(Guid equipmentId)
+    {
+        var orders = await _orderRepository.GetByEquipmentIdAsync(equipmentId);
+        return orders.Select(MapToDto);
+    }
 
     /// <summary>
     /// Consulta órdenes aplicando filtros opcionales (US 9).

@@ -56,6 +56,8 @@
 
             <MudTh>Customer</MudTh>
 
+            <MudTh>Equipment</MudTh>
+
             <MudTh>Status</MudTh>
 
             <MudTh>Progress</MudTh>
@@ -86,7 +88,7 @@
                     <MudText Typo="Typo.caption"
                              Color="Color.Secondary">
 
-                        @context.CreatedAt.ToLocalTime().ToString("dd MMM - hh:mm tt")
+                        @context.CreatedAt.ToLocalTime().ToString("dd/MM/yy hh:mm tt")
 
                     </MudText>
 
@@ -97,14 +99,7 @@
             <!-- CUSTOMER -->
             <MudTd>
 
-                <MudStack Row AlignItems="AlignItems.Center" Spacing="2">
-
-                    <MudAvatar Size="Size.Medium"
-                               Color="Color.Primary">
-
-                        @GetInitials(context.Customer.Name)
-
-                    </MudAvatar>
+                <MudStack Row AlignItems="AlignItems.Center" Spacing="1">
 
                     <div>
 
@@ -112,6 +107,36 @@
                                  Class="fw-semibold">
 
                             @context.Customer.Name
+
+                        </MudText>
+
+                        <MudText Typo="Typo.caption"
+                                 Color="Color.Secondary">
+
+                            @context.Customer.Email
+                            (@context.Customer.Phone)
+
+                        </MudText>
+
+                    </div>
+
+                </MudStack>
+
+            </MudTd>
+
+            <!-- Equipment -->
+            <MudTd>
+
+                <MudStack Row AlignItems="AlignItems.Center" Spacing="1">
+
+                    
+
+                    <div>
+
+                        <MudText Typo="Typo.body2"
+                                 Class="fw-semibold">
+
+                            @context.Equipment.DescriptionType
 
                         </MudText>
 
@@ -145,7 +170,7 @@
             </MudTd>
 
             <!-- PROGRESS -->
-            <MudTd Style="min-width: 140px;">
+            <MudTd Style="min-width: 100px;">
 
                 <MudStack Spacing="1">
 

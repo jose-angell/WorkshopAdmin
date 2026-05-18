@@ -54,6 +54,22 @@ public class ServiceOrdersController : ControllerBase
         return Ok(customer);
     }
     /// <summary>
+    /// Obtiene las ordenes de servicio de un equipo.
+    /// </summary>
+    [HttpGet("{id:guid}/equipment-orders")]
+    public async Task<IActionResult> GetOrderByEquipmentId(Guid id)
+    {
+        var equipment = await _serviceOrderService.GetOrdersByEquipmentIdAsync(id);
+
+        if (equipment == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(equipment);
+    }
+
+    /// <summary>
     /// Obtiene el detalle completo de una orden específica (US 10).
     /// </summary>
     [HttpGet("{id:guid}")]

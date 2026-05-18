@@ -61,6 +61,18 @@ public class ServiceOrderClient
     }
 
     /// <summary>
+    /// Obtiene las órdenes de servicio de un equipo por su GUID
+    /// </summary>
+    public async Task<List<ServiceOrderDto>?> GetOrdersByEquipmentIdAsync(Guid id)
+    {
+        var response = await _http.GetAsync($"{BaseRoute}/{id}/equipment-orders");
+        if (!response.IsSuccessStatusCode) return null;
+
+        return await response.Content.ReadFromJsonAsync<List<ServiceOrderDto>>(_options);
+    }
+
+
+    /// <summary>
     /// Consulta las estadísticas de las órdenes de servicio (total, por estado, retrasadas, etc.)
     /// </summary>
     public async Task<ServiceOrderStatsDto?> GetStatsAsync() =>

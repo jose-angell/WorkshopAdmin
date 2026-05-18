@@ -20,7 +20,8 @@
 
             <PropertyColumn Property="x => x.Id" Title="ID">
                 <CellTemplate>
-                    <MudText Typo="Typo.caption" Class="font-mono text-slate-400" Style="font-size: 13px;">
+                <MudText Typo="Typo.caption" Class="fw-bold"
+                         Style="font-family: monospace; color: var(--mud-palette-primary);">
                         #@context.Item.FriendlyId
                     </MudText>
                 </CellTemplate>
@@ -81,7 +82,7 @@
 
                         <MudIconButton Icon="@Icons.Material.Filled.History"
                                        Size="Size.Small"
-                                       OnClick="@(() => OnHistory.InvokeAsync(context.Item))" />
+                                   OnClick="@(() => OpenHistoryOrdersDialog(context.Item))" />
 
                         @* <MudIconButton Icon="@Icons.Material.Filled.Settings"
                                        Size="Size.Small"
@@ -199,5 +200,25 @@
             Snackbar.Add("Equipo actualizado correctamente", Severity.Success);
             await LoadDataEquipment(); 
         }
+    }
+    private async Task OpenHistoryOrdersDialog(EquipmentDto equipment)
+    {
+        var IdEquipment = equipment.Id;
+
+        var parameters = new DialogParameters<EquipmentHistoryOrder>
+        {
+            { x => x.EquipmentId, IdEquipment }
+        };
+
+        var options = new DialogOptions
+        {
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true,
+            CloseButton = true,
+            BackdropClick = false // Evita que se cierre por error al dar click fuera
+        };
+
+        var dialog = await DialogService.ShowAsync<EquipmentHistoryOrder>(" ", parameters, options);
+        var result = await dialog.Result;
     }
 }
