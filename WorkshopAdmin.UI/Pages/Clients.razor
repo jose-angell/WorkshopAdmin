@@ -50,10 +50,11 @@
         @* Main Content *@
         <MudItem xs="12" lg="12">
 
-            <ClientFilters />
+            <ClientFilters Filters="_filters"
+                           FiltersChanged="OnFiltersChanged" />
 
             <MudPaper Elevation="0" Class="rounded-4 border overflow-hidden" Style="border-color: #dee2e6;">
-                <ClientTable ReloadTrigger="_reloadFlag" />
+                <ClientTable ReloadTrigger="_reloadFlag" Filters="_filters" />
             </MudPaper>
 
         </MudItem>
@@ -62,7 +63,14 @@
 </MudContainer>
 @code {
     private bool _reloadFlag = true;
+    private ClientFilterModel _filters = new();
 
+    private async Task OnFiltersChanged(ClientFilterModel filters)
+    {
+        _filters = filters;
+
+        StateHasChanged();
+    }
     private async Task OpenCreateCustomerDialog()
     {
         var options = new DialogOptions

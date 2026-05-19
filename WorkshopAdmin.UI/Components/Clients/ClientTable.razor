@@ -6,14 +6,13 @@
 @inject CustomerClient CustomerClient
 
 <MudDataGrid T="CustomerDto"
-             Items="@_clients"
+             Items="@FilteredClients"
              Loading="@_loading"
              Hover="true"
              Striped="false"
              Elevation="0"
              Class="border rounded-4 border-slate-200 overflow-hidden"
-             Filterable="true"
-             QuickFilter="@_quickFilter">
+             Filterable="true" >
     
     <Columns>
         @* ID con fuente monoespaciada *@
@@ -21,7 +20,7 @@
             <CellTemplate>
                 <MudText Typo="Typo.caption" Class="fw-bold"
                          Style="font-family: monospace; color: var(--mud-palette-primary);">
-                    #@context.Item.FriendlyId
+                    @context.Item.FriendlyId
                 </MudText>
             </CellTemplate>
         </PropertyColumn>
@@ -111,6 +110,7 @@
 
 @code {
     [Parameter] public bool ReloadTrigger { get; set; }
+    [Parameter] public ClientFilterModel Filters { get; set; } = new();
     private List<CustomerDto> _clients = new();
     private string _searchString = "";
     private bool _loading = true;
@@ -147,18 +147,25 @@
         }
     }
 
-
-    // Filtro rápido para el buscador del TopBar o ClientFilters
-    private Func<CustomerDto, bool> _quickFilter => x =>
+    private IEnumerable<CustomerDto> FilteredClients =>
+    _clients.Where(x =>
     {
-        if (string.IsNullOrWhiteSpace(_searchString))
-            return true;
-        if (x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (x.Email.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        return false;
-    };
+        // SEARCH
+        var matchesSearch =
+            string.IsNullOrWhiteSpace(Filters.Search)
+            || x.Name.Contains(Filters.Search, StringComparison.OrdinalIgnoreCase)
+            || x.Email.Contains(Filters.Search, StringComparison.OrdinalIgnoreCase)
+            || x.Phone.Contains(Filters.Search, StringComparison.OrdinalIgnoreCase)
+            || x.FriendlyId.Contains(Filters.Search, StringComparison.OrdinalIgnoreCase);
+
+        // STATUS
+        var matchesStatus =
+            Filters.IsActive == null
+            || x.IsActive == Filters.IsActive;
+
+        return matchesSearch && matchesStatus;
+    });
+    
     private async Task OpenEditDialog(CustomerDto client)
     {
         // 1. Mapeamos el DTO al modelo de edición
