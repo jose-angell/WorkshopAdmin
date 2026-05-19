@@ -3,6 +3,7 @@
 @using WorkshopAdmin.Shared.Dtos.Equipments
 @using WorkshopAdmin.UI.Components.Equipment
 @using WorkshopAdmin.UI.Components.Clients
+@using WorkshopAdmin.Shared.Filters
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 
@@ -47,13 +48,14 @@
     <MudGrid>
         <MudItem xs="12">
 
-            <EquipmentFilters />
+            <EquipmentFilters Filters="_filters"
+                              FiltersChanged="OnFiltersChanged" />
 
             <!-- TABLE -->
             <MudPaper Elevation="0"
                       Class="border rounded-4 overflow-hidden">
 
-                <EquipmentTable ReloadTrigger="_reloadFlag"/>
+                <EquipmentTable ReloadTrigger="_reloadFlag" Filters="_filters" />
 
             </MudPaper>
 
@@ -63,6 +65,14 @@
 </MudContainer>
 @code {
     private bool _reloadFlag;
+    private EquipmentFilterModel _filters = new();
+
+    private async Task OnFiltersChanged(EquipmentFilterModel filters)
+    {
+        _filters = filters;
+
+        StateHasChanged();
+    }
     private async Task OpenCreateEquipmentDialog()
     {
         var options = new DialogOptions

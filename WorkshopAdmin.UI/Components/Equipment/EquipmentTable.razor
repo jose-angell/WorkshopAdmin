@@ -1,6 +1,7 @@
 ﻿@using MudBlazor
 @using WorkshopAdmin.Shared.Dtos.Equipments
 @using WorkshopAdmin.Shared.Enums
+@using WorkshopAdmin.Shared.Filters
 @using WorkshopAdmin.UI.Services
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
@@ -8,13 +9,13 @@
 
 
     <MudDataGrid T="EquipmentDto"
-                 Items="_equipment"
-                 Loading="_loading"
-                 Dense="true"
-                 Hover="true"
-                 Bordered="false"
-                 Striped="false"
-                 Elevation="0">
+            Items="FilteredEquipment"
+            Loading="_loading"
+            Dense="true"
+            Hover="true"
+            Bordered="false"
+            Striped="false"
+            Elevation="0">
 
         <Columns>
 
@@ -109,6 +110,7 @@
 
 @code {
     [Parameter] public bool ReloadTrigger { get; set; }
+    [Parameter] public EquipmentFilterModel Filters { get; set; } = new();
     public List<EquipmentDto> _equipment  = new();
     private bool _loading = true;
     private bool _lastReloadTrigger;
@@ -147,7 +149,29 @@
             _loading = false;
         }
     }
-   
+    private IEnumerable<EquipmentDto> FilteredEquipment =>
+     _equipment.Where(x =>
+     {
+         // SEARCH
+         var matchesSearch =
+             string.IsNullOrWhiteSpace(Filters.Search)
+             || x.CustomerFriendlyId.Contains(Filters.Search, StringComparison.OrdinalIgnoreCase)
+             || x.DescriptionType.Contains(Filters.Search, StringComparison.OrdinalIgnoreCase)
+             || x.Brand.Contains(Filters.Search, StringComparison.OrdinalIgnoreCase)
+             || x.Model.Contains(Filters.Search, StringComparison.OrdinalIgnoreCase)
+             || x.FriendlyId.Contains(Filters.Search, StringComparison.OrdinalIgnoreCase);
+
+         // STATUS
+         var matchesStatus =
+             Filters.IsActive == null
+             || x.IsActive == Filters.IsActive;
+
+         var matchesType =
+             Filters.Type == null
+             || x.TypeId == Filters.Type;
+
+         return matchesSearch && matchesStatus && matchesType;
+     });
 
     private Color GetStatusColor(EquipmentDto item)
     {

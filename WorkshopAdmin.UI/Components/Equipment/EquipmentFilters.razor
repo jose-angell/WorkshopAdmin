@@ -1,4 +1,6 @@
-﻿@* Components/Equipment/EquipmentFilters.razor *@
+﻿@using WorkshopAdmin.Shared.Enums
+@using WorkshopAdmin.Shared.Filters
+@* Components/Equipment/EquipmentFilters.razor *@
 <MudPaper Elevation="0" Class="p-4 rounded-4 border bg-white mb-4">
 
     <MudGrid Spacing="3" Class="align-items-center">
@@ -6,7 +8,9 @@
         <!-- SEARCH -->
         <MudItem xs="12" sm="6" md="4">
             <MudTextField T="string"
-                          Placeholder="Search parts by name, SKU or category..."
+                          Value="@Filters.Search"
+                          ValueChanged="OnSearchChanged"
+                          Placeholder="Search Equipment..."
                           Variant="Variant.Outlined"
                           Margin="Margin.Dense"
                           Adornment="Adornment.Start"
@@ -16,32 +20,83 @@
 
         <!-- STATUS -->
         <MudItem xs="12" sm="3" md="2">
-            <MudSelect T="string"
+            <MudSelect T="bool?"
+                       Value="@Filters.IsActive"
+                       ValueChanged="OnStatusChanged"
                        Label="Status"
                        Variant="Variant.Outlined"
                        Margin="Margin.Dense"
                        Class="bg-light w-100">
 
-                <MudSelectItem Value="@("All")">All Parts</MudSelectItem>
-                <MudSelectItem Value="@("Active")">Active</MudSelectItem>
-                <MudSelectItem Value="@("Inactive")">Inactive</MudSelectItem>
+                <MudSelectItem Value="@((bool?)null)">
+                    All
+                </MudSelectItem>
+
+                <MudSelectItem Value="@((bool?)true)">
+                    Active
+                </MudSelectItem>
+
+                <MudSelectItem Value="@((bool?)false)">
+                    Inactive
+                </MudSelectItem>
 
             </MudSelect>
         </MudItem>
 
         <!-- BUTTON -->
         <MudItem xs="12" sm="3" md="2">
-            <MudButton Variant="Variant.Outlined"
-                       StartIcon="@Icons.Material.Filled.FilterList"
-                       FullWidth="true"
-                       Class="w-100"
-                       Style="height: 40px; text-transform: none;">
+            <MudSelect T="EquipmentType?"
+                       Label="CATEGORY"
+                       Value="@Filters.Type"
+                       ValueChanged="OnTypeChanged"
+                       Variant="Variant.Outlined"
+                       Margin="Margin.Dense">
 
-                More Filters
+                <MudSelectItem Value="@((EquipmentType?)null)">
+                    All Categories
+                </MudSelectItem>
 
-            </MudButton>
+                @foreach (var equipment in Enum.GetValues<EquipmentType>())
+                {
+                    <MudSelectItem Value="@((EquipmentType?)equipment)">
+                        @equipment.ToFriendlyName()
+                    </MudSelectItem>
+                }
+
+            </MudSelect>
         </MudItem>
 
     </MudGrid>
 
 </MudPaper>
+
+                       
+@code {
+
+    [Parameter]
+    public EquipmentFilterModel Filters { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<EquipmentFilterModel> FiltersChanged { get; set; }
+
+    private async Task OnSearchChanged(string value)
+    {
+        Filters.Search = value;
+
+        await FiltersChanged.InvokeAsync(Filters);
+    }
+
+    private async Task OnStatusChanged(bool? value)
+    {
+        Filters.IsActive = value;
+
+        await FiltersChanged.InvokeAsync(Filters);
+    }
+
+    private async Task OnTypeChanged(EquipmentType? value)
+    {
+        Filters.Type = value;
+
+        await FiltersChanged.InvokeAsync(Filters);
+    }
+}
