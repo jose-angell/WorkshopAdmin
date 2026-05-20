@@ -18,54 +18,51 @@
                           Class="bg-light w-100" />
         </MudItem>
 
-        <!-- STATUS -->
-        <MudItem xs="12" sm="3" md="2">
-            <MudSelect T="bool?"
-                       Value="@Filters.IsActive"
-                       ValueChanged="OnStatusChanged"
-                       Label="Status"
-                       Variant="Variant.Outlined"
-                       Margin="Margin.Dense"
-                       Class="bg-light w-100">
-
-                <MudSelectItem Value="@((bool?)null)">
-                    All
-                </MudSelectItem>
-
-                <MudSelectItem Value="@((bool?)true)">
-                    Active
-                </MudSelectItem>
-
-                <MudSelectItem Value="@((bool?)false)">
-                    Inactive
-                </MudSelectItem>
-
-            </MudSelect>
-        </MudItem>
+       
 
         <!-- BUTTON -->
         <MudItem xs="12" sm="3" md="2">
-            <MudSelect T="PartCategory?"
-                       Label="CATEGORY"
-                       Value="@Filters.Category"
-                       ValueChanged="OnCategoryChanged"
+            <MudSelect T="ServiceOrderStatus?"
+                       Label="ORDER STATUS"
+                       Value="@Filters.orderStatus"
+                       ValueChanged="OnOrderStatusChanged"
                        Variant="Variant.Outlined"
                        Margin="Margin.Dense">
 
-                <MudSelectItem Value="@((PartCategory?)null)">
-                    All Categories
+                <MudSelectItem Value="@((ServiceOrderStatus?)null)">
+                    All Statuses
                 </MudSelectItem>
 
-                @foreach (var category in Enum.GetValues<PartCategory>())
+                @foreach (var status in Enum.GetValues<ServiceOrderStatus>())
                 {
-                    <MudSelectItem Value="@((PartCategory?)category)">
-                        @category.ToFriendlyName()
+                    <MudSelectItem Value="@((ServiceOrderStatus?)status)">
+                        @status.ToFriendlyName()
                     </MudSelectItem>
                 }
 
             </MudSelect>
         </MudItem>
+        <MudItem xs="12" sm="3" md="2">
+            <MudSelect T="ServiceType?"
+                       Label="Service Type"
+                       Value="@Filters.serviceType"
+                       ValueChanged="OnServiceTypeChanged"
+                       Variant="Variant.Outlined"
+                       Margin="Margin.Dense">
 
+                <MudSelectItem Value="@((ServiceType?)null)">
+                    All Types
+                </MudSelectItem>
+
+                @foreach (var type in Enum.GetValues<ServiceType>())
+                {
+                    <MudSelectItem Value="@((ServiceType?)type)">
+                        @type.ToFriendlyName()
+                    </MudSelectItem>
+                }
+
+            </MudSelect>
+        </MudItem>
     </MudGrid>
 
 </MudPaper>
@@ -74,10 +71,10 @@
 @code {
 
     [Parameter]
-    public PartFilterModel Filters { get; set; } = new();
+    public ServiceOrderFilterModel Filters { get; set; } = new();
 
     [Parameter]
-    public EventCallback<PartFilterModel> FiltersChanged { get; set; }
+    public EventCallback<ServiceOrderFilterModel> FiltersChanged { get; set; }
 
     private async Task OnSearchChanged(string value)
     {
@@ -86,16 +83,16 @@
         await FiltersChanged.InvokeAsync(Filters);
     }
 
-    private async Task OnStatusChanged(bool? value)
+
+    private async Task OnOrderStatusChanged(ServiceOrderStatus? value)
     {
-        Filters.IsActive = value;
+        Filters.orderStatus = value;
 
         await FiltersChanged.InvokeAsync(Filters);
     }
-
-    private async Task OnCategoryChanged(PartCategory? value)
+    private async Task OnServiceTypeChanged(ServiceType? value)
     {
-        Filters.Category = value;
+        Filters.serviceType = value;
 
         await FiltersChanged.InvokeAsync(Filters);
     }

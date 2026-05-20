@@ -2,6 +2,7 @@
 @using MudBlazor
 @using WorkshopAdmin.Shared.Dtos.ServiceOrders
 @using WorkshopAdmin.Shared.Enums
+@using WorkshopAdmin.Shared.Filters
 @using WorkshopAdmin.UI.Services
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
@@ -10,12 +11,11 @@
 <MudPaper Elevation="0" Class="border rounded-4">
 
     <MudDataGrid T="ServiceOrderDto"
-                 Items="@_orders"
+                 Items="@FilteredOrders"
                  Loading="@_loading"
                  Dense="true"
                  Hover="true"
                  Filterable="true"
-                 QuickFilter="@_quickFilter"
                  RowsPerPage="8"
                  Class="rounded-4"
                  RowClassFunc="RowClass">
@@ -152,6 +152,7 @@
 
 @code {
     [Parameter] public bool ReloadTrigger { get; set; }
+    [Parameter] public ServiceOrderFilterModel Filters { get; set; } = new();
     private bool _lastReloadTrigger;
     private List<ServiceOrderDto> _orders = new();
     private bool _loading = true;
@@ -191,14 +192,29 @@
         }
     }
 
-    // Filtro rápido actualizado
-    private Func<ServiceOrderDto, bool> _quickFilter => x =>
+    private IEnumerable<ServiceOrderDto> FilteredOrders =>
+    _orders.Where(x =>
     {
-        if (string.IsNullOrWhiteSpace(_searchString)) return true;
-        return x.Customer.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase) ||
-               x.FriendlyId.Contains(_searchString, StringComparison.OrdinalIgnoreCase) ||
-               x.Equipment.Model.Contains(_searchString, StringComparison.OrdinalIgnoreCase);
-    };
+        // SEARCH
+        var matchesSearch =
+            string.IsNullOrWhiteSpace(Filters.Search)
+            || (x.Diagnosis?.Contains(Filters.Search, StringComparison.OrdinalIgnoreCase) ?? false)
+            || x.ServiceTypeDescription.Contains(Filters.Search, StringComparison.OrdinalIgnoreCase)
+            || x.FailureDescription.Contains(Filters.Search, StringComparison.OrdinalIgnoreCase)
+            || x.Customer.FriendlyId.Contains(Filters.Search, StringComparison.OrdinalIgnoreCase)
+            || x.Equipment.FriendlyId.Contains(Filters.Search, StringComparison.OrdinalIgnoreCase)
+            || x.FriendlyId.Contains(Filters.Search, StringComparison.OrdinalIgnoreCase);
+
+        var matchesOrderStatus =
+            Filters.orderStatus == null
+            || x.Status == Filters.orderStatus;
+
+        var matchesServiceType =
+            Filters.serviceType == null
+            || x.ServiceTypeId == Filters.serviceType;
+
+        return matchesSearch && matchesOrderStatus && matchesServiceType;
+    });
 
     private int _from => 1;
     private int _to => _orders?.Count() ?? 0;

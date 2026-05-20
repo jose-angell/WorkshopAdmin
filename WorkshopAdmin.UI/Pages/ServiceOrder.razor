@@ -2,6 +2,7 @@
 @using WorkshopAdmin.Shared.Dtos
 @using WorkshopAdmin.Shared.Dtos.ServiceOrders
 @using WorkshopAdmin.UI.Components.ServiceOrders
+@using WorkshopAdmin.Shared.Filters
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 
@@ -53,10 +54,12 @@
     <MudGrid>
 
         <MudItem xs="12">
+            <ServiceOrderFilters Filters="_filters"
+                                 FiltersChanged="OnFiltersChanged" />
 
             <MudPaper Elevation="0" Class="border rounded-4 overflow-hidden">
 
-                <ServiceOrderTable ReloadTrigger="_reloadFlag" />
+                <ServiceOrderTable ReloadTrigger="_reloadFlag" Filters="_filters" />
 
             </MudPaper>
 
@@ -69,6 +72,14 @@
 
 @code{
     private bool _reloadFlag = true;
+    private ServiceOrderFilterModel _filters = new();
+
+    private async Task OnFiltersChanged(ServiceOrderFilterModel filters)
+    {
+        _filters = filters;
+
+        StateHasChanged();
+    }
     private async Task OpenCreateServiceOrderDialog()
     {
         var options = new DialogOptions
