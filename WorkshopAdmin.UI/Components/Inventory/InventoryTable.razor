@@ -1,6 +1,7 @@
 ﻿@using System.Globalization
 @using MudBlazor
 @using WorkshopAdmin.Shared.Dtos.Parts
+@using WorkshopAdmin.Shared.Filters
 @using WorkshopAdmin.UI.Services
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
@@ -8,13 +9,12 @@
 
 
 <MudDataGrid T="PartDto"
-             Items="@PartsList"
+             Items="@FilteredParts"
              Loading="@_loading"
              Dense="true"
              Hover="true"
              Elevation="0"
              Filterable="true"
-             QuickFilter="@_quickFilter"
              RowsPerPage="5">
 
     <Columns>
@@ -134,7 +134,7 @@
 </MudDataGrid>
 @code {
     [Parameter] public bool ReloadTrigger { get; set; }
-
+    [Parameter] public PartFilterModel Filters { get; set; } = new();
     private List<PartDto> PartsList = new();
     private string _searchString = "";
     private bool _loading = true;
@@ -170,14 +170,28 @@
             _loading = false;
         }
     }
-    // Lógica de búsqueda rápida de MudBlazor
-    private Func<PartDto, bool> _quickFilter => x =>
-    {
-        if (string.IsNullOrWhiteSpace(_searchString)) return true;
-        if (x.Sku.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
-        if (x.Name.Contains(_searchString, StringComparison.OrdinalIgnoreCase)) return true;
-        return false;
-    };
+    private IEnumerable<PartDto> FilteredParts=>
+     PartsList.Where(x =>
+     {
+         // SEARCH
+         var matchesSearch =
+             string.IsNullOrWhiteSpace(Filters.Search)
+             || x.Sku.Contains(Filters.Search, StringComparison.OrdinalIgnoreCase)
+             || x.Name.Contains(Filters.Search, StringComparison.OrdinalIgnoreCase)
+             || x.Brand.Contains(Filters.Search, StringComparison.OrdinalIgnoreCase)
+             || x.WarehouseLocation.Contains(Filters.Search, StringComparison.OrdinalIgnoreCase);
+
+         // STATUS
+         var matchesStatus =
+             Filters.IsActive == null
+             || x.IsActive == Filters.IsActive;
+
+         var matchesCategory =
+             Filters.Category == null
+             || x.CategoryId == Filters.Category;
+
+         return matchesSearch && matchesStatus && matchesCategory;
+     });
 
 
 
