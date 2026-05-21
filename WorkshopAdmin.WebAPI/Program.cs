@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using WorkshopAdmin.Application; 
 using WorkshopAdmin.Infrastructure;
 using WorkshopAdmin.WebAPI.Middleware;
@@ -16,19 +19,40 @@ builder.Services.AddSwaggerGen();  // La parte de Swashbuckle para generar el UI
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 
+var key = builder.Configuration["Jwt:key"];
+builder.Services.AddAuthentication(config =>
+{
+    config.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    config.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(config =>
+{
+    config.RequireHttpsMetadata = false;
+    config.SaveToken = true;
+    config.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ClockSkew = TimeSpan.Zero,
+        RoleClaimType = "role",
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key!))
+    };
+});
+
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(policy =>
+    options.AddPolicy("AllowSpecificOrigins",policy =>
     {
-        policy.AllowAnyOrigin() // En producción cambia esto por tu URL real
+        policy.WithOrigins("https://localhost:7004") 
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
 });
 
 var app = builder.Build();
-
-app.UseCors();
+app.UseHttpsRedirection();
+app.UseCors("AllowSpecificOrigins");
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
@@ -41,7 +65,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
 
 app.Run();
