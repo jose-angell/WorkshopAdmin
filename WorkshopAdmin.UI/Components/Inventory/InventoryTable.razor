@@ -179,7 +179,7 @@
              || x.Sku.Contains(Filters.Search, StringComparison.OrdinalIgnoreCase)
              || x.Name.Contains(Filters.Search, StringComparison.OrdinalIgnoreCase)
              || x.Brand.Contains(Filters.Search, StringComparison.OrdinalIgnoreCase)
-             || x.WarehouseLocation.Contains(Filters.Search, StringComparison.OrdinalIgnoreCase);
+             || (x.WarehouseLocation?.Contains(Filters.Search, StringComparison.OrdinalIgnoreCase) ?? false);
 
          // STATUS
          var matchesStatus =
