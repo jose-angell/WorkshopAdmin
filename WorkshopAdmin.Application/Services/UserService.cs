@@ -3,6 +3,7 @@ using WorkshopAdmin.Domain.Entities;
 using WorkshopAdmin.Domain.Exceptions;
 using WorkshopAdmin.Domain.Interfaces;
 using WorkshopAdmin.Shared.Dtos.Auth;
+using WorkshopAdmin.Shared.Dtos.Users;
 
 namespace WorkshopAdmin.Application.Services;
 
@@ -34,7 +35,7 @@ public class UserService : IUserService
         return new LoginDto { Message = "Login successful.", IsLoggedIn = true, Token = token };
 
     }
-    public async Task<UserDto> AddUserAsync(SignInDto userDto)
+    public async Task<UserDto> AddUserAsync(UserRequest userDto)
     {
         var existingUser = await _userRepository.GetUserByEmailAsync(userDto.Email);
         if (existingUser != null)

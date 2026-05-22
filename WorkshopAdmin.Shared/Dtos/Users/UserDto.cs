@@ -1,6 +1,6 @@
 ﻿using WorkshopAdmin.Shared.Emuns;
 
-namespace WorkshopAdmin.Shared.Dtos.Auth
+namespace WorkshopAdmin.Shared.Dtos.Users
 {
     public class UserDto
     {
