@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using WorkshopAdmin.Domain.Entities;
-using WorkshopAdmin.Shared.Dtos.Auth;
+﻿using WorkshopAdmin.Shared.Dtos.Auth;
 
 namespace WorkshopAdmin.Application.Interfaces
 {

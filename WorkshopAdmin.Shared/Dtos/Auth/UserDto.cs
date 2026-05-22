@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using WorkshopAdmin.Shared.Emuns;
+﻿using WorkshopAdmin.Shared.Emuns;
 
 namespace WorkshopAdmin.Shared.Dtos.Auth
 {

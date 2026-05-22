@@ -1,8 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using WorkshopAdmin.Domain.Entities;
 
 namespace WorkshopAdmin.Infrastructure.Persistence.Configurations;

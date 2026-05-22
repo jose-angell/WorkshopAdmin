@@ -3,6 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using WorkshopAdmin.Application; 
 using WorkshopAdmin.Infrastructure;
+using WorkshopAdmin.Infrastructure.Persistence;
 using WorkshopAdmin.WebAPI.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -50,8 +51,11 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddScoped<DbSeeder>();
+
+
 var app = builder.Build();
-app.UseHttpsRedirection();
+
 app.UseCors("AllowSpecificOrigins");
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
@@ -69,5 +73,11 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var seeder = scope.ServiceProvider.GetRequiredService<DbSeeder>();
+    await seeder.SeedAsync();
+}
 
 app.Run();

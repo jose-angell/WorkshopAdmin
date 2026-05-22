@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace WorkshopAdmin.Shared.Dtos.Auth
+﻿namespace WorkshopAdmin.Shared.Dtos.Auth
 {
     public class LoginRequest
     {
