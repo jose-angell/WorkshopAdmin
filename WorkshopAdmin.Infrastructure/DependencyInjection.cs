@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using WorkshopAdmin.Domain.Interfaces;
+using WorkshopAdmin.Infrastructure.Security;
 using WorkshopAdmin.Infrastructure.Persistence;
 using WorkshopAdmin.Infrastructure.Repositories;
 
@@ -36,6 +37,10 @@ public static class DependencyInjection
         services.AddScoped<IEquipmentRepository, EquipmentRepository>();
         services.AddScoped<IPartRepository, PartRepository>();
         services.AddScoped<IServiceOrderRepository, ServiceOrderRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
+
+        services.AddScoped<IPasswordHasher, PasswordHasher>();
+        services.AddScoped<IJwtService, JwtService>();
 
         return services;
     }
