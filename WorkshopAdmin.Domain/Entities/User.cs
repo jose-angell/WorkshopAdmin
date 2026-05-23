@@ -15,4 +15,7 @@ public class User: BaseEntity
     public UserRole Role { get; set; }
 
     public bool IsActive { get; set; } = true;
+    public string? Phone { get; set; }
+
+
 }

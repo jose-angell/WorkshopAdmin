@@ -6,6 +6,9 @@ namespace WorkshopAdmin.Application.Interfaces
     public interface IUserService
     {
         Task<LoginDto> LoginAsync(LoginRequest login);
-        Task<UserDto> AddUserAsync(UserRequest user);
+        Task<UserDto> AddUserAsync(CreateUserRequest user);
+        Task<IEnumerable<UserDto>> GetAllUsersAsync();
+        Task UpdateUserAsync(UpdateUserRequest user);
+        Task<UserDto?> GetUserByIdAsync(Guid id);
     }
 }

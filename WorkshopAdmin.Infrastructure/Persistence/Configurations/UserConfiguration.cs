@@ -61,5 +61,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
            .HasColumnName("is_active")
            .HasColumnType("boolean")
            .HasDefaultValue(true);
+
+        builder.Property(c => c.Phone)
+            .HasColumnName("phone")
+            .HasColumnType("varchar(20)");
     }
 }

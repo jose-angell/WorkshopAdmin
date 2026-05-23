@@ -35,7 +35,21 @@ public class UserService : IUserService
         return new LoginDto { Message = "Login successful.", IsLoggedIn = true, Token = token };
 
     }
-    public async Task<UserDto> AddUserAsync(UserRequest userDto)
+    public async Task<IEnumerable<UserDto>> GetAllUsersAsync()
+    {
+        var users = await _userRepository.GetAllAsync();
+        return users.Select(MapToDto);
+    }
+    public async Task<UserDto?> GetUserByIdAsync(Guid id)
+    {
+        var user = await _userRepository.GetUserByIdAsync(id);
+        if (user == null)
+        {
+            throw new DomainException($"User with ID {id} not found.");
+        }
+        return MapToDto(user);
+    }
+    public async Task<UserDto> AddUserAsync(CreateUserRequest userDto)
     {
         var existingUser = await _userRepository.GetUserByEmailAsync(userDto.Email);
         if (existingUser != null)
@@ -48,12 +62,28 @@ public class UserService : IUserService
             Email = userDto.Email,
             FullName = userDto.FullName,
             Role = userDto.Role,
-            PasswordHash = _PasswordHasher.Hash(userDto.Password)
+            PasswordHash = _PasswordHasher.Hash(userDto.Password),
+            Phone = userDto.Phone
         };
         await _userRepository.AddUserAsync(newUser);
         return MapToDto(newUser);
     }
 
+    public async Task UpdateUserAsync(UpdateUserRequest user)
+    {
+        var existingUser = await _userRepository.GetUserByIdAsync(user.Id);
+        if (existingUser == null)
+        {
+            throw new DomainException($"User with ID {user.Id} not found.");
+        }
+        existingUser.FullName = user.FullName ?? existingUser.FullName;
+        existingUser.Email = user.Email ?? existingUser.Email;
+        existingUser.Role = user.Role ?? existingUser.Role;
+        existingUser.Phone = user.Phone ?? existingUser.Phone;
+
+        await _userRepository.UpdateUserAsync(existingUser);
+    }
+   
     private static UserDto MapToDto(User user)
     {
         return new UserDto
