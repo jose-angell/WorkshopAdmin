@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WorkshopAdmin.Application.Interfaces;
 using WorkshopAdmin.Shared.Dtos.Customers;
 
 namespace WorkshopAdmin.WebAPI.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/customers")]
 public class CustomersController : ControllerBase
@@ -84,6 +86,7 @@ public class CustomersController : ControllerBase
     /// Elimina un cliente del sistema.
     /// </summary>
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(Guid id)
     {
         await _customerService.DeleteAsync(id);

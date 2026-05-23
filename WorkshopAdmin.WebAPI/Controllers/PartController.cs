@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WorkshopAdmin.Application.Interfaces;
 using WorkshopAdmin.Shared.Dtos.Parts;
 
 namespace WorkshopAdmin.WebAPI.Controllers;
 
+[Authorize(Roles = "Admin")]
 [ApiController]
 [Route("api/inventory")]
 public class PartController : ControllerBase

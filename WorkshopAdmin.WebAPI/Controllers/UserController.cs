@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WorkshopAdmin.Application.Interfaces;
 using WorkshopAdmin.Domain.Exceptions;
 using WorkshopAdmin.Shared.Dtos.Users;
 
 namespace WorkshopAdmin.WebAPI.Controllers;
 
+[Authorize(Roles = "Admin")]
 [ApiController]
 [Route("api/user")]
 public class UserController : ControllerBase

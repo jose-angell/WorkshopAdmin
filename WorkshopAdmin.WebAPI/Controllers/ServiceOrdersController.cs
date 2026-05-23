@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WorkshopAdmin.Application.Interfaces;
 using WorkshopAdmin.Shared.Dtos.ServiceOrders;
 using WorkshopAdmin.Shared.Enums;
 
 namespace WorkshopAdmin.WebAPI.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/service-orders")]
 public class ServiceOrdersController : ControllerBase

@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WorkshopAdmin.Application.Interfaces;
 using WorkshopAdmin.Shared.Dtos.Equipments;
 
 namespace WorkshopAdmin.WebAPI.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/equipment")]
 public class EquipmentController : ControllerBase

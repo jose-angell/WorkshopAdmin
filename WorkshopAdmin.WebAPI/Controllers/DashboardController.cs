@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WorkshopAdmin.Application.Interfaces;
 using WorkshopAdmin.Shared.Dtos.Dashboard;
 using WorkshopAdmin.Shared.Dtos.ServiceOrders;
@@ -6,6 +7,7 @@ using WorkshopAdmin.Shared.Enums;
 
 namespace WorkshopAdmin.WebAPI.Controllers;
 
+[Authorize(Roles = "Admin")]
 [ApiController]
 [Route("api/dashboard")]
 public class DashboardController : ControllerBase
