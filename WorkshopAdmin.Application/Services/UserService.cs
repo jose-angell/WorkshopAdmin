@@ -12,11 +12,13 @@ public class UserService : IUserService
     private readonly IUserRepository _userRepository;
     private readonly IPasswordHasher _PasswordHasher;
     private readonly IJwtService _jwtService;
-    public UserService(IUserRepository userRepository, IPasswordHasher passwordHasher, IJwtService jwtService)
+    private readonly ICurrentUserService _currentUserService;
+    public UserService(IUserRepository userRepository, IPasswordHasher passwordHasher, IJwtService jwtService, ICurrentUserService currentUserService)
     {
         _userRepository = userRepository;
         _PasswordHasher = passwordHasher;
         _jwtService = jwtService;
+        _currentUserService = currentUserService;
     }
 
     public async Task<LoginDto> LoginAsync(LoginRequest login)
@@ -37,6 +39,7 @@ public class UserService : IUserService
     }
     public async Task<IEnumerable<UserDto>> GetAllUsersAsync()
     {
+        var id = _currentUserService.UserId;
         var users = await _userRepository.GetAllAsync();
         return users.Select(MapToDto);
     }
@@ -63,7 +66,8 @@ public class UserService : IUserService
             FullName = userDto.FullName,
             Role = userDto.Role,
             PasswordHash = _PasswordHasher.Hash(userDto.Password),
-            Phone = userDto.Phone
+            Phone = userDto.Phone,
+            CreatedByUserId = _currentUserService.UserId,
         };
         await _userRepository.AddUserAsync(newUser);
         return MapToDto(newUser);

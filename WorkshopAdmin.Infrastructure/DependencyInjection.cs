@@ -1,10 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using WorkshopAdmin.Application.Interfaces;
 using WorkshopAdmin.Domain.Interfaces;
-using WorkshopAdmin.Infrastructure.Security;
 using WorkshopAdmin.Infrastructure.Persistence;
 using WorkshopAdmin.Infrastructure.Repositories;
+using WorkshopAdmin.Infrastructure.Security;
 
 namespace WorkshopAdmin.Infrastructure;
 
@@ -32,6 +34,7 @@ public static class DependencyInjection
                 connectionString,
                 b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
 
+        services.AddHttpContextAccessor();
         // 2. Registro de Repositorios (Aquí se registrarán las implementaciones más adelante)
         services.AddScoped<ICustomerRepository, CustomerRepository>();
         services.AddScoped<IEquipmentRepository, EquipmentRepository>();
@@ -41,6 +44,7 @@ public static class DependencyInjection
 
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<IJwtService, JwtService>();
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
 
         return services;
     }
