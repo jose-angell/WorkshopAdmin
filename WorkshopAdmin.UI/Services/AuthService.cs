@@ -13,7 +13,6 @@ public class AuthService(AuthenticationStateProvider authenticationStateProvider
         return authState.User.Identity?.IsAuthenticated ?? false;
     }
 
-    // AJUSTE: Ahora busca el NameIdentifier o el Email para el username
     public async Task<string> GetUsername()
     {
         var authState = await _authStateProvider.GetAuthenticationStateAsync();
@@ -24,14 +23,12 @@ public class AuthService(AuthenticationStateProvider authenticationStateProvider
     public async Task<string> GetRole()
     {
         var authState = await _authStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-        return user.FindFirst(c => c.Type == ClaimTypes.Role)?.Value ?? string.Empty;
+        return authState.User.FindFirst(c => c.Type == ClaimTypes.Role)?.Value ?? string.Empty;
     }
-
     public async Task<string> GetFullName()
     {
         var authState = await _authStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-        return user.FindFirst(c => c.Type == ClaimTypes.Name)?.Value ?? "Usuario";
+        return user.FindFirst(c => c.Type == "unique_name")?.Value ?? "Usuario";
     }
 }

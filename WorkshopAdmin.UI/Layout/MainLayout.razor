@@ -1,5 +1,5 @@
 ﻿@inherits LayoutComponentBase
-
+@inject NavigationManager Navigation
 <MudPopoverProvider />
 <MudThemeProvider Theme="Theme" />
 <MudDialogProvider />
@@ -9,25 +9,31 @@
     <AuthorizeView>
         @* Caso 1: Usuario Autenticado (Admin o Técnico) *@
         <Authorized>
-            @* Sidebar (Drawer) visible solo si está logueado *@
-            <MudDrawer @bind-Open="_drawerOpen"
-                       Elevation="0"
-                       ClipMode="DrawerClipMode.Never"
-                       Variant="@DrawerVariant.Responsive"
-                       Width="260px"
-                       Class="bg-slate-50 border-r border-slate-200">
-                <SideNav />
-            </MudDrawer>
+            @if (!Navigation.Uri.Contains("/login"))
+            {
+                @* Sidebar (Drawer) visible solo si está logueado *@
+                <MudDrawer @bind-Open="_drawerOpen"
+                Elevation="0"
+                ClipMode="DrawerClipMode.Never"
+                Variant="@DrawerVariant.Responsive"
+                Width="260px"
+                Class="bg-slate-50 border-r border-slate-200">
+                    <SideNav />
+                </MudDrawer>
 
-            @* Barra superior con el nombre del usuario y logout *@
-            <TopBar DrawerToggleCallback="DrawerToggle" />
-
-            @* Contenido principal con el espaciado para el Sidebar *@
-            <MudMainContent Class="bg-slate-50">
-                <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="pt-16 px-8 min-h-screen">
-                    @Body
-                </MudContainer>
-            </MudMainContent>
+                @* Barra superior con el nombre del usuario y logout *@
+                <TopBar DrawerToggleCallback="DrawerToggle" />
+                @* Contenido principal con el espaciado para el Sidebar *@
+                <MudMainContent Class="bg-slate-50">
+                    <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="pt-16 px-8 min-h-screen">
+                        @Body
+                    </MudContainer>
+                </MudMainContent>
+            }
+            else
+            {
+                <h3>Loading...</h3>
+            }
         </Authorized>
 
         @* Caso 2: Usuario Anónimo (Pantalla de Login) *@

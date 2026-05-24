@@ -1,4 +1,7 @@
 ﻿@* Components/Layout/TopBar.razor *@
+@using WorkshopAdmin.UI.Services
+@inject AuthService Auth
+
 <MudAppBar Elevation="0" Class="border-b border-slate-200 bg-white" Fixed="true">
     <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@DrawerToggleCallback" Class="d-md-none mr-2" />
     
@@ -29,8 +32,8 @@
 
         <div class="d-flex align-center gap-3">
             <div class="text-right d-none d-lg-block">
-                <MudText Typo="Typo.caption" Class="font-bold d-block leading-none" Style="color: #000666;">Admin User</MudText>
-                <MudText Typo="Typo.caption" Class="uppercase text-slate-500" Style="font-size: 10px;">Supervisor</MudText>
+                <MudText Typo="Typo.caption" Class="font-bold d-block leading-none" Style="color: #000666;">@_fullName</MudText>
+                <MudText Typo="Typo.caption" Class="uppercase text-slate-500" Style="font-size: 10px;color: #000666;">@_role</MudText>
             </div>
             <MudAvatar Size="Size.Medium" Image="https://randomuser.me/api/portraits/men/32.jpg" Class="border border-slate-200" />
         </div>
@@ -39,5 +42,28 @@
 
 @code {
     private string _search = "";
+    private string _fullName = "Cargando...";
+    private string _role = "";
     [Parameter] public EventCallback DrawerToggleCallback { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _fullName = await Auth.GetFullName();
+
+        // Obtenemos el rol y usamos el friendly name si lo deseas
+        var roleRaw = await Auth.GetRole();
+        _role = roleRaw == "Admin" ? "Administrador" : "Técnico";
+    }
+    private string GetInitials(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            return "?";
+
+        var parts = name.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+
+        if (parts.Length == 1)
+            return parts[0][0].ToString().ToUpper();
+
+        return $"{parts[0][0]}{parts[1][0]}".ToUpper();
+    }
 }
