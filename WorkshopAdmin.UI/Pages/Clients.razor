@@ -1,5 +1,5 @@
 ﻿@page "/clients"
-@using WorkshopAdmin.Shared.Dtos
+@attribute [Authorize]
 @using WorkshopAdmin.Shared.Dtos.Customers
 @using WorkshopAdmin.UI.Components.Clients
 @inject IDialogService DialogService

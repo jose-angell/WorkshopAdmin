@@ -1,6 +1,43 @@
-﻿<Router AppAssembly="@typeof(App).Assembly" NotFoundPage="typeof(Pages.NotFound)">
-    <Found Context="routeData">
-        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)"/>
-        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
-    </Found>
-</Router>
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using WorkshopAdmin.UI.Pages
+
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                <NotAuthorized>
+                    @* 1. Verificamos si el usuario NO está autenticado *@
+                    @if (context.User.Identity?.IsAuthenticated != true)
+                    {
+                        @* Redirigimos al Login si no hay sesión activa *@
+                        <RedirectToLogin />
+                    }
+                    else
+                    {
+                        @* 2. Si está autenticado pero no tiene el rol (ej. US-28), mostramos el error *@
+                        <LayoutView Layout="@typeof(MainLayout)">
+                            <MudContainer Class="mt-10">
+                                <MudAlert Severity="Severity.Error" Variant="Variant.Filled" ContentAlignment="HorizontalAlignment.Center">
+                                    Acceso Denegado: No tienes los privilegios necesarios (Admin) para ver esta sección.
+                                </MudAlert>
+                            </MudContainer>
+                        </LayoutView>
+                    }
+                </NotAuthorized>
+                <Authorizing>
+                    @* Mensaje mientras el ProviderJWT decodifica el token [3, 4] *@
+                    <MudText Typo="Typo.h6" Align="Align.Center" Class="mt-10">Verificando credenciales...</MudText>
+                </Authorizing>
+            </AuthorizeRouteView>
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
+        <NotFound>
+            <PageTitle>No encontrado</PageTitle>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <MudAlert Severity="Severity.Warning" Variant="Variant.Filled">
+                    Lo sentimos, no hay nada en esta dirección.
+                </MudAlert>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>

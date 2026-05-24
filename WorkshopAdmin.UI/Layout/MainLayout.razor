@@ -6,25 +6,40 @@
 <MudSnackbarProvider />
 
 <MudLayout>
-    @* 1. Inyectamos el Header *@
+    <AuthorizeView>
+        @* Caso 1: Usuario Autenticado (Admin o Técnico) *@
+        <Authorized>
+            @* Sidebar (Drawer) visible solo si está logueado *@
+            <MudDrawer @bind-Open="_drawerOpen"
+                       Elevation="0"
+                       ClipMode="DrawerClipMode.Never"
+                       Variant="@DrawerVariant.Responsive"
+                       Width="260px"
+                       Class="bg-slate-50 border-r border-slate-200">
+                <SideNav />
+            </MudDrawer>
 
-    @* 2. Inyectamos el Sidebar (Drawer) *@
-    <MudDrawer @bind-Open="_drawerOpen"
-               Elevation="0"
-               ClipMode="DrawerClipMode.Never"
-               Variant="@DrawerVariant.Responsive"
-               Width="260px"
-               Class="bg-slate-50 border-r border-slate-200">
-        <SideNav />
-    </MudDrawer>
+            @* Barra superior con el nombre del usuario y logout *@
+            <TopBar DrawerToggleCallback="DrawerToggle" />
 
-    <TopBar DrawerToggleCallback="DrawerToggle" />
-    @* 3. Aquí se inyectan las páginas (ej. Index.razor) *@
-    <MudMainContent Class="bg-slate-50">
-        <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="pt-16 px-8 min-h-screen">
-            @Body
-        </MudContainer>
-    </MudMainContent>
+            @* Contenido principal con el espaciado para el Sidebar *@
+            <MudMainContent Class="bg-slate-50">
+                <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="pt-16 px-8 min-h-screen">
+                    @Body
+                </MudContainer>
+            </MudMainContent>
+        </Authorized>
+
+        @* Caso 2: Usuario Anónimo (Pantalla de Login) *@
+        <NotAuthorized>
+            <MudMainContent>
+                @* Renderiza solo el Body (Login.razor) sin SideNav ni TopBar *@
+                <div class="d-flex align-center justify-center min-h-screen">
+                    @Body
+                </div>
+            </MudMainContent>
+        </NotAuthorized>
+    </AuthorizeView>
 </MudLayout>
 
 @code {

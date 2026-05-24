@@ -5,7 +5,7 @@ using WorkshopAdmin.Shared.Dtos.Parts;
 
 namespace WorkshopAdmin.WebAPI.Controllers;
 
-[Authorize(Roles = "Admin")]
+[Authorize]
 [ApiController]
 [Route("api/inventory")]
 public class PartController : ControllerBase

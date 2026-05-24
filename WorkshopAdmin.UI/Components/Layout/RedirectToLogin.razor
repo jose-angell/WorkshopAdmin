@@ -1,0 +1,8 @@
+﻿@inject NavigationManager Navigation
+@code {
+    protected override void OnInitialized()
+    {
+        // Fuerza la navegación a la página de login definida en tus rutas [5]
+        Navigation.NavigateTo("login");
+    }
+}

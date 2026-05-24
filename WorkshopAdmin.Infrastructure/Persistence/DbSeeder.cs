@@ -41,7 +41,7 @@ public class DbSeeder
             PasswordHash = _passwordHasher.Hash("Admin123*"),
             Role = UserRole.Admin,
             IsActive = true,
-
+            Phone = "555-1234",
             // Campos de BaseEntity (Auditoría)
             CreatedAt = DateTimeOffset.UtcNow,
             // Regla técnica: El primer admin se referencia a sí mismo

@@ -7,7 +7,7 @@ using WorkshopAdmin.Shared.Enums;
 
 namespace WorkshopAdmin.WebAPI.Controllers;
 
-[Authorize(Roles = "Admin")]
+[Authorize]
 [ApiController]
 [Route("api/dashboard")]
 public class DashboardController : ControllerBase

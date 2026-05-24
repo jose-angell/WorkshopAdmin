@@ -2,7 +2,8 @@
 @using WorkshopAdmin.UI.Components.ServiceOrders
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
-
+@inject ILoginService LoginService
+@inject NavigationManager Navigation
 
 <div class="d-flex flex-column h-100 border-r border-slate-200 bg-slate-50">
     @* Brand Header *@
@@ -15,65 +16,84 @@
         </MudText>
     </div>
 
-    @* Navigation *@
+    @* Navigation protegida por Roles *@
     <MudNavMenu Class="px-4 flex-grow-1 mt-2">
-        <MudNavLink Href="/" Icon="@Icons.Material.Filled.Dashboard" Match="NavLinkMatch.All" Class="nav-item-industrial">
-            DASHBOARD
-        </MudNavLink>
-        <MudNavLink Href="/orders" Icon="@Icons.Material.Filled.Engineering" Class="nav-item-industrial">
-            SERVICE ORDERS
-        </MudNavLink>
-        <MudNavLink Href="/inventory" Icon="@Icons.Material.Filled.Inventory2" Class="nav-item-industrial">
-            INVENTORY
-        </MudNavLink>
-        <MudNavLink Href="/equipment" Icon="@Icons.Material.Filled.Handyman" Class="nav-item-industrial">
-            EQUIPMENT
-        </MudNavLink>
-        <MudNavLink Href="/clients" Icon="@Icons.Material.Filled.Badge" Class="nav-item-industrial">
-            CLIENTS
-        </MudNavLink>
-        <MudNavLink Href="/reports" Icon="@Icons.Material.Filled.Analytics" Class="nav-item-industrial">
-            REPORTS
-        </MudNavLink>
+        <AuthorizeView>
+            <Authorized>
+                <MudNavLink Href="/" Icon="@Icons.Material.Filled.Dashboard" Match="NavLinkMatch.All">
+                    DASHBOARD
+                </MudNavLink>
+                <MudNavLink Href="/orders" Icon="@Icons.Material.Filled.Engineering">
+                    SERVICE ORDERS
+                </MudNavLink>
+                <MudNavLink Href="/inventory" Icon="@Icons.Material.Filled.Inventory2">
+                    INVENTORY
+                </MudNavLink>
+                <MudNavLink Href="/equipment" Icon="@Icons.Material.Filled.Handyman">
+                    EQUIPMENT
+                </MudNavLink>
+                <MudNavLink Href="/clients" Icon="@Icons.Material.Filled.Badge">
+                    CLIENTS
+                </MudNavLink>
+            </Authorized>
+        </AuthorizeView>
+
+        @* Opciones exclusivas del Administrador (US-27, US-28, US-29) *@
+        <AuthorizeView Roles="Admin">
+            <Authorized>
+                <MudNavLink Href="/reports" Icon="@Icons.Material.Filled.Analytics">
+                    REPORTS
+                </MudNavLink>
+            </Authorized>
+        </AuthorizeView>
     </MudNavMenu>
 
-    @* Quick Action Button *@
-    <div class="px-4 mb-6">
-        <MudButton Variant="Variant.Filled"
-                   Color="Color.Primary"
-                   FullWidth="true"
-                   StartIcon="@Icons.Material.Filled.Add"
-                   Class="py-3 font-bold shadow-none"
-                   OnClick="OpenCreateServiceOrderDialog"
-                   Style="border-radius: 4px; text-transform: none;">
-            New Service Order
-        </MudButton>
-    </div>
+    @* Quick Action Button - Disponible para ambos roles (US-08) *@
+    <AuthorizeView>
+        <Authorized>
+            <div class="px-4 mb-6">
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           FullWidth="true"
+                           StartIcon="@Icons.Material.Filled.Add"
+                           Class="py-3 font-bold"
+                           OnClick="OpenCreateServiceOrderDialog">
+                    New Service Order
+                </MudButton>
+            </div>
+        </Authorized>
+    </AuthorizeView>
 
     @* Bottom Actions *@
     <div class="px-4 py-4 border-t border-slate-200">
-        <MudNavLink Href="/settings" Icon="@Icons.Material.Filled.Settings" Class="nav-item-industrial-sm">SETTINGS</MudNavLink>
-        <MudNavLink Href="/logout" Icon="@Icons.Material.Filled.Logout" Class="nav-item-industrial-sm text-red-600">LOGOUT</MudNavLink>
+        <AuthorizeView Roles="Admin">
+            <MudNavLink Href="/settings" Icon="@Icons.Material.Filled.Settings">SETTINGS</MudNavLink>
+        </AuthorizeView>
+
+        @* Logout como botón para ejecutar la lógica de limpieza *@
+        <MudNavLink OnClick="HandleLogout" Icon="@Icons.Material.Filled.Logout" Class="text-red-600" Style="cursor: pointer;">
+            LOGOUT
+        </MudNavLink>
     </div>
 </div>
 
-@code{
+@code {
     private async Task OpenCreateServiceOrderDialog()
     {
-        var options = new DialogOptions
-        {
-            CloseOnEscapeKey = true,
-            MaxWidth = MaxWidth.Medium,
-            FullWidth = true,
-            CloseButton = true
-        };
-
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true, CloseButton = true };
         var dialog = await DialogService.ShowAsync<CreateServiceOrder>(" ", options);
         var result = await dialog.Result;
 
         if (!result.Canceled)
         {
-            Snackbar.Add("La orden fue creada, revice la pantalla de ordenes de servicio.", Severity.Success);
+            Snackbar.Add("La orden fue creada exitosamente.", Severity.Success);
         }
+    }
+
+    private async Task HandleLogout()
+    {
+        // Limpia el token y notifica el estado anónimo (fuente [3, 6])
+        await LoginService.Logout();
+        Navigation.NavigateTo("/login");
     }
 }
