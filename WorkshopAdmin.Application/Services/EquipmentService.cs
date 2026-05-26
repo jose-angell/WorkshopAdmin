@@ -10,10 +10,11 @@ namespace WorkshopAdmin.Application.Services;
 public class EquipmentService : IEquipmentService
 {
     private readonly IEquipmentRepository _repository;
-
-    public EquipmentService(IEquipmentRepository repository)
+    private readonly ICurrentUserService _currentUserService;
+    public EquipmentService(IEquipmentRepository repository, ICurrentUserService currentUserService)
     {
         _repository = repository;
+        _currentUserService = currentUserService;
     }
 
     public async Task<EquipmentDto?> GetByIdAsync(Guid id)
@@ -45,7 +46,8 @@ public class EquipmentService : IEquipmentService
             Model = request.Model,
             TechnicalSpecifications = request.TechnicalSpecifications,
             IsActive = true, // Nuevo equipo se asume activo por defecto
-            CreatedAt = DateTimeOffset.UtcNow // timestamptz automático
+            CreatedAt = DateTimeOffset.UtcNow, // timestamptz automático
+            CreatedByUserId = _currentUserService.UserId
         };
 
         await _repository.AddAsync(equipment);
@@ -66,6 +68,8 @@ public class EquipmentService : IEquipmentService
         existingEquipment.Model = request.Model;
         existingEquipment.TechnicalSpecifications = request.TechnicalSpecifications;
         existingEquipment.IsActive = request.IsActive;
+        existingEquipment.UpdatedAt = DateTimeOffset.UtcNow; 
+        existingEquipment.UpdatedByUserId = _currentUserService.UserId;
 
         await _repository.UpdateAsync(existingEquipment);
         
@@ -95,6 +99,9 @@ public class EquipmentService : IEquipmentService
             CustomerName = equipment.Customer.Name ?? "N/A",
             CustomerFriendlyId = equipment.Customer.FriendlyId ?? "N/A",
             IsActive = equipment.IsActive,
-            CreatedAt = equipment.CreatedAt
+            CreatedByUserId = equipment.CreatedByUserId,
+            UpdatedByUserId = equipment.UpdatedByUserId,
+            CreatedAt = equipment.CreatedAt,
+            UpdatedAt = equipment.UpdatedAt
         };
 }

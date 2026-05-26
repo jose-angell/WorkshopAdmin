@@ -11,11 +11,12 @@ public class CustomerService : ICustomerService
 {
     private readonly ICustomerRepository _repository;
     private readonly IServiceOrderRepository _orderRepository;
-
-    public CustomerService(ICustomerRepository repository, IServiceOrderRepository orderRepository)
+    private readonly ICurrentUserService _currentUserService;
+    public CustomerService(ICustomerRepository repository, IServiceOrderRepository orderRepository, ICurrentUserService currentUserService)
     {
         _repository = repository;
         _orderRepository = orderRepository;
+        _currentUserService = currentUserService;
     }
 
     public async Task<CustomerDto?> GetByIdAsync(Guid id)
@@ -101,7 +102,8 @@ public class CustomerService : ICustomerService
             Name = request.Name,
             Email = request.Email,
             Phone = request.Phone,
-            CreatedAt = DateTimeOffset.UtcNow // timestamptz 
+            CreatedAt = DateTimeOffset.UtcNow, 
+            CreatedByUserId = _currentUserService.UserId
         };
 
         await _repository.AddAsync(customer);
@@ -118,6 +120,8 @@ public class CustomerService : ICustomerService
         existingCustomer.Name = request.Name;
         existingCustomer.Email = request.Email;
         existingCustomer.Phone = request.Phone;
+        existingCustomer.UpdatedAt = DateTimeOffset.UtcNow;
+        existingCustomer.UpdatedByUserId = _currentUserService.UserId;
 
         await _repository.UpdateAsync(existingCustomer);
         
@@ -145,7 +149,10 @@ public class CustomerService : ICustomerService
          Email = customer.Email,
          Phone = customer.Phone,
          IsActive = customer.IsActive,
+         CreatedByUserId = customer.CreatedByUserId,
+         UpdatedByUserId = customer.UpdatedByUserId,
          CreatedAt = customer.CreatedAt,
+         UpdatedAt = customer.UpdatedAt,
          // Lógica para contar órdenes activas (no entregadas)
          ActiveOrders = customer.ServiceOrders?
              .Count(o => o.Status != ServiceOrderStatus.Delivered) ?? 0

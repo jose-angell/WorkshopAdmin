@@ -14,5 +14,9 @@ public class CustomerDto
     public string Phone { get; set; } = string.Empty;
     public bool IsActive { get; set; } = true;
     public int ActiveOrders { get; set; } = 0;
-    public DateTimeOffset CreatedAt { get; set; }
+    public Guid CreatedByUserId { get; set; }
+    public Guid? UpdatedByUserId { get; set; }
+
+    public DateTimeOffset CreatedAt { get; set; } // timestamptz
+    public DateTimeOffset? UpdatedAt { get; set; }
 }
