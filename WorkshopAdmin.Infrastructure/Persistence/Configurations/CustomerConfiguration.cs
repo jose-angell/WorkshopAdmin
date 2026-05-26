@@ -29,16 +29,33 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
             .HasColumnName("email")
             .HasColumnType("varchar(150)");
 
+        builder.Property(c => c.CreatedAt)
+             .HasColumnName("created_at")
+             .HasColumnType("timestamptz")
+             .HasDefaultValueSql("now()")
+             .IsRequired();
+
+        builder.Property(c => c.CreatedByUserId)
+            .HasColumnName("created_by_user_id")
+            .HasColumnType("uuid")
+            .IsRequired();
+
+        builder.Property(c => c.UpdatedAt)
+           .HasColumnName("updated_at")
+           .HasColumnType("timestamptz");
+
+        builder.Property(c => c.UpdatedByUserId)
+            .HasColumnName("updated_by_user_id")
+            .HasColumnType("uuid");
+
         builder.Property(c => c.IsActive)
            .HasColumnName("is_active")
            .HasColumnType("boolean")
            .HasDefaultValue(true);
 
-        builder.Property(c => c.CreatedAt)
-            .HasColumnName("created_at")
-            .HasColumnType("timestamptz")
-            .HasDefaultValueSql("now()")
-            .IsRequired();
+        builder.HasOne(p => p.CreatedByUser)
+        .WithMany()
+        .HasForeignKey(p => p.CreatedByUserId);
 
         builder.Property(c => c.CustomerNumber)
             .HasColumnName("customer_number")
