@@ -50,7 +50,7 @@
                             </MudText>
 
                             <MudText Typo="Typo.caption">
-                                @_order.UpdatedAt.ToLocalTime().ToString("dd/MM/yy hh:mm tt")
+                                @_order.UpdatedAt?.ToLocalTime().ToString("dd/MM/yy hh:mm tt")
                             </MudText>
                         </div>
 

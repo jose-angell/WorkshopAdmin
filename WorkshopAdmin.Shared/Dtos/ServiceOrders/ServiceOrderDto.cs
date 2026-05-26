@@ -36,6 +36,6 @@ public class ServiceOrderDto
     public ServiceType ServiceTypeId { get; set; }
     public string ServiceTypeDescription { get; set; } = string.Empty;
     public DateTimeOffset CreatedAt { get; set; }
-    public DateTimeOffset UpdatedAt { get; set; }
+    public DateTimeOffset? UpdatedAt { get; set; }
     public IEnumerable<OrderPartDto?> OrderPart { get; set; } = Enumerable.Empty<OrderPartDto?>();
 }

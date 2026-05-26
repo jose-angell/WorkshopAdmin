@@ -56,15 +56,37 @@ public class ServiceOrderConfiguration : IEntityTypeConfiguration<ServiceOrder>
             .HasColumnType("smallint")
             .IsRequired();
 
-        builder.Property(so => so.CreatedAt)
+        builder.Property(c => c.TechnicianId)
+            .HasColumnName("technician_id")
+            .HasColumnType("uuid")
+            .IsRequired();
+
+        builder.Property(c => c.CreatedAt)
             .HasColumnName("created_at")
             .HasColumnType("timestamptz")
-            .HasDefaultValueSql("now()");
+            .HasDefaultValueSql("now()")
+            .IsRequired();
 
-        builder.Property(so => so.UpdatedAt)
-            .HasColumnName("updated_at")
-            .HasColumnType("timestamptz")
-            .HasDefaultValueSql("now()");
+        builder.Property(c => c.CreatedByUserId)
+            .HasColumnName("created_by_user_id")
+            .HasColumnType("uuid")
+            .IsRequired();
+
+        builder.Property(c => c.UpdatedAt)
+           .HasColumnName("updated_at")
+           .HasColumnType("timestamptz");
+
+        builder.Property(c => c.UpdatedByUserId)
+            .HasColumnName("updated_by_user_id")
+            .HasColumnType("uuid");
+
+        builder.HasOne(p => p.CreatedByUser)
+        .WithMany()
+        .HasForeignKey(p => p.CreatedByUserId);
+
+        builder.HasOne(p => p.Technician)
+        .WithMany()
+        .HasForeignKey(p => p.TechnicianId);
 
         // 1. Configurar el número secuencial
         builder.Property(so => so.OrderNumber)

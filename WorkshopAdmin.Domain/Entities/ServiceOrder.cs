@@ -2,7 +2,7 @@
 
 namespace WorkshopAdmin.Domain.Entities;
 
-public class ServiceOrder
+public class ServiceOrder: BaseEntity
 {
     public Guid Id { get; set; } // PK: uuid 
     public Guid CustomerId { get; set; } // FK: uuid 
@@ -16,13 +16,14 @@ public class ServiceOrder
     public DateTimeOffset? RepairFinishedAt { get; set; } // timestamptz
     public DateTimeOffset? ExpectedFinishAt { get; set; } // timestamptz
     public ServiceType ServiceTypeId { get; set; } // Enum: Preventive, Corrective, etc. [8]
-    public DateTimeOffset CreatedAt { get; set; } // timestamptz 
-    public DateTimeOffset UpdatedAt { get; set; } // timestamptz 
     public int OrderNumber { get; private set; } // El número secuencial (ej: 1, 2, 3)
     public string FriendlyId { get; private set; } = string.Empty; // El código (ej: ORD-00001)
+    public Guid TechnicianId { get; set; } // FK: uuid, el técnico asignado a la orden de servicio
 
     // Propiedades de navegación
     public virtual Customer Customer { get; set; } = null!; // Relación 1:N 
     public virtual Equipment Equipment { get; set; } = null!; // Relación 1:N
     public virtual ICollection<OrderPart> OrderParts { get; set; } = new List<OrderPart>(); // Relación 1:N 
+    public virtual User CreatedByUser { get; set; } = null!;
+    public virtual User Technician { get; set; } = null!;
 }
