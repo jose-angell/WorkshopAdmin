@@ -11,11 +11,12 @@ public class PartService : IPartService
 {
     private readonly IPartRepository _repository;
     private readonly IServiceOrderRepository _orderRepository;
-
-    public PartService(IPartRepository repository, IServiceOrderRepository orderRepository)
+    private readonly ICurrentUserService _currentUserService;
+    public PartService(IPartRepository repository, IServiceOrderRepository orderRepository, ICurrentUserService currentUserService)
     {
         _repository = repository;
         _orderRepository = orderRepository;
+        _currentUserService = currentUserService;
     }
 
     public async Task<PartDto?> GetByIdAsync(Guid id)
@@ -60,7 +61,8 @@ public class PartService : IPartService
             UnitOfMeasure = request.UnitOfMeasure ?? "Pz", // Unidad (Pz, L, Kg)
             WarehouseLocation = request.WarehouseLocation, // Ubicación física 
             IsActive = true, // Estado lógico inicial 
-            CreatedAt = DateTimeOffset.UtcNow // timestamptz automática 
+            CreatedAt = DateTimeOffset.UtcNow, // timestamptz automática 
+            CreatedByUserId = _currentUserService.UserId
         };
 
         // 3. Persistencia mediante el repositorio
@@ -88,6 +90,8 @@ public class PartService : IPartService
         existingPart.UnitOfMeasure = request.UnitOfMeasure;
         existingPart.WarehouseLocation = request.WarehouseLocation;
         existingPart.IsActive = request.IsActive;
+        existingPart.UpdatedAt = DateTimeOffset.UtcNow;
+        existingPart.UpdatedByUserId = _currentUserService.UserId;
 
         await _repository.UpdateAsync(existingPart);
     }
@@ -168,6 +172,9 @@ public class PartService : IPartService
             UnitOfMeasure = part.UnitOfMeasure,
             WarehouseLocation = part.WarehouseLocation ?? string.Empty,
             IsActive = part.IsActive,
-            CreatedAt = part.CreatedAt
+            CreatedByUserId = part.CreatedByUserId,
+            UpdatedByUserId = part.UpdatedByUserId,
+            CreatedAt = part.CreatedAt,
+            UpdatedAt = part.UpdatedAt
         };
 }

@@ -20,5 +20,11 @@ public class PartDto
     public string? WarehouseLocation { get; set; }
 
     public bool IsActive { get; set; }
+
+    
+    public Guid CreatedByUserId { get; set; }
+    public Guid? UpdatedByUserId { get; set; }
+
     public DateTimeOffset CreatedAt { get; set; } // timestamptz
+    public DateTimeOffset? UpdatedAt { get; set; }
 }
