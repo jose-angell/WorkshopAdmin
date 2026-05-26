@@ -58,15 +58,34 @@ public class PartConfiguration : IEntityTypeConfiguration<Part>
             .HasColumnName("warehouse_location")
             .HasColumnType("varchar(100)");
 
+        builder.Property(c => c.CreatedAt)
+            .HasColumnName("created_at")
+            .HasColumnType("timestamptz")
+            .HasDefaultValueSql("now()")
+            .IsRequired();
+
+        builder.Property(c => c.CreatedByUserId)
+            .HasColumnName("created_by_user_id")
+            .HasColumnType("uuid")
+            .IsRequired();
+
+        builder.Property(c => c.UpdatedAt)
+           .HasColumnName("updated_at")
+           .HasColumnType("timestamptz");
+
+        builder.Property(c => c.UpdatedByUserId)
+            .HasColumnName("updated_by_user_id")
+            .HasColumnType("uuid");
+
         builder.Property(c => c.IsActive)
            .HasColumnName("is_active")
            .HasColumnType("boolean")
            .HasDefaultValue(true);
 
-        builder.Property(p => p.CreatedAt)
-            .HasColumnName("created_at")
-            .HasColumnType("timestamptz")
-            .HasDefaultValueSql("now()");
+        builder.HasOne(p => p.CreatedByUser)
+        .WithMany()
+        .HasForeignKey(p => p.CreatedByUserId)
+        .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasIndex(x => x.Name);
     }

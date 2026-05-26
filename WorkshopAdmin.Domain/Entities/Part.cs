@@ -2,7 +2,7 @@
 
 namespace WorkshopAdmin.Domain.Entities;
 
-public class Part
+public class Part : BaseEntity
 {
     public Guid Id { get; set; } // PK: uuid 
     public string Sku { get; set; } = string.Empty;
@@ -15,8 +15,9 @@ public class Part
     public string UnitOfMeasure { get; set; } = "Pz";
     public string? WarehouseLocation { get; set; }
     public bool IsActive { get; set; } = true;
-    public DateTimeOffset CreatedAt { get; set; } // timestamptz 
 
     // Propiedades de navegación
     public virtual ICollection<OrderPart> OrderParts { get; set; } = new List<OrderPart>(); // Relación 1:N 
+    public virtual User CreatedByUser { get; set; } = null!; // Relación N:1 con User (quién creó o actualizó el registro)
+
 }
