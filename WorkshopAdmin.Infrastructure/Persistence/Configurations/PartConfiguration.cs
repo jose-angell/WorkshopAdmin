@@ -84,8 +84,7 @@ public class PartConfiguration : IEntityTypeConfiguration<Part>
 
         builder.HasOne(p => p.CreatedByUser)
         .WithMany()
-        .HasForeignKey(p => p.CreatedByUserId)
-        .OnDelete(DeleteBehavior.Restrict);
+        .HasForeignKey(p => p.CreatedByUserId);
 
         builder.HasIndex(x => x.Name);
     }

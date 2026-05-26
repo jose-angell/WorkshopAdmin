@@ -2,7 +2,7 @@
 
 namespace WorkshopAdmin.Domain.Entities;
 
-public class Equipment
+public class Equipment: BaseEntity
 {
     public Guid Id { get; set; } // PK: uuid 
     public string FriendlyId { get; private set; } = string.Empty; // EQ-00001
@@ -17,8 +17,8 @@ public class Equipment
     public string Model { get; set; } = string.Empty; // varchar(100) 
     public string? TechnicalSpecifications { get; set; } = string.Empty; // varchar(2000) 
     public bool IsActive { get; set; } = true; // Estado lógico [2]
-    public DateTimeOffset CreatedAt { get; set; } // timestamptz 
 
     // Propiedades de navegación
+    public virtual User CreatedByUser { get; set; } = null!;
     public virtual ICollection<ServiceOrder> ServiceOrders { get; set; } = new List<ServiceOrder>(); // Relación 1:N 
 }
