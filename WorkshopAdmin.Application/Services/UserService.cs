@@ -4,6 +4,7 @@ using WorkshopAdmin.Domain.Exceptions;
 using WorkshopAdmin.Domain.Interfaces;
 using WorkshopAdmin.Shared.Dtos.Auth;
 using WorkshopAdmin.Shared.Dtos.Users;
+using WorkshopAdmin.Shared.Emuns;
 
 namespace WorkshopAdmin.Application.Services;
 
@@ -37,10 +38,10 @@ public class UserService : IUserService
         return new LoginDto { Message = "Login successful.", IsLoggedIn = true, Token = token };
 
     }
-    public async Task<IEnumerable<UserDto>> GetAllUsersAsync()
+    public async Task<IEnumerable<UserDto>> GetAllUsersAsync(UserRole? role)
     {
         var id = _currentUserService.UserId;
-        var users = await _userRepository.GetAllAsync();
+        var users = await _userRepository.GetAllAsync(role);
         return users.Select(MapToDto);
     }
     public async Task<UserDto?> GetUserByIdAsync(Guid id)
@@ -49,6 +50,15 @@ public class UserService : IUserService
         if (user == null)
         {
             throw new DomainException($"User with ID {id} not found.");
+        }
+        return MapToDto(user);
+    }
+    public async Task<UserDto?> GetTechnicianById(Guid technicianId)
+    {
+        var user = await _userRepository.GetTechnicianById(technicianId);
+        if (user == null)
+        {
+            throw new DomainException($"Technician with ID {technicianId} not found.");
         }
         return MapToDto(user);
     }
