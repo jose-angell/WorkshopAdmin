@@ -8,4 +8,5 @@ public class CreateServiceOrderRequest
     public Guid EquipmentId { get; set; } // Obligatorio
     public string FailureDescription { get; set; } = string.Empty;
     public ServiceType ServiceTypeId { get; set; }
+    public Guid TechnicianId { get; set; }
 }

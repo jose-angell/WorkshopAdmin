@@ -14,17 +14,20 @@ public class ServiceOrderService : IServiceOrderService
     private readonly ICustomerRepository _customerRepository;
     private readonly IEquipmentRepository _equipmentRepository;
     private readonly IPartRepository _partRepository;
+    private readonly ICurrentUserService _currentUserService;
 
     public ServiceOrderService(
         IServiceOrderRepository orderRepository,
         ICustomerRepository customerRepository,
         IEquipmentRepository equipmentRepository,
-        IPartRepository partRepository)
+        IPartRepository partRepository,
+        ICurrentUserService currentUserService)
     {
         _orderRepository = orderRepository;
         _customerRepository = customerRepository;
         _equipmentRepository = equipmentRepository;
         _partRepository = partRepository;
+        _currentUserService = currentUserService;
     }
 
     public async Task<ServiceOrderDto> CreateAsync(CreateServiceOrderRequest request)
@@ -52,7 +55,8 @@ public class ServiceOrderService : IServiceOrderService
             ServiceTypeId = request.ServiceTypeId,
             // Regla: La fecha de creación es obligatoria y automática [4]
             CreatedAt = DateTimeOffset.UtcNow,
-            UpdatedAt = DateTimeOffset.UtcNow
+            CreatedByUserId = _currentUserService.UserId,
+            TechnicianId = request.TechnicianId 
         };
         // 3. Persistencia [6]
         await _orderRepository.AddAsync(order);
@@ -84,7 +88,8 @@ public class ServiceOrderService : IServiceOrderService
             ServiceTypeDescription = order.ServiceTypeId.ToFriendlyName(),
             LaborCost = order.LaborCost,
             CreatedAt = order.CreatedAt,
-            UpdatedAt = order.UpdatedAt
+            CreatedByUserId = order.CreatedByUserId,
+            TechnicianId = order.TechnicianId
         };
     }
 
@@ -204,6 +209,8 @@ public class ServiceOrderService : IServiceOrderService
         order.Diagnosis = request.Diagnosis;
         order.LaborCost = request.LaborCost;
         order.UpdatedAt = DateTimeOffset.UtcNow; // Actualización de timestamptz [4]
+        order.UpdatedByUserId = _currentUserService.UserId; 
+        order.TechnicianId = request.TechnicianId ?? order.TechnicianId;
 
         await _orderRepository.UpdateAsync(order);
     }
@@ -231,7 +238,9 @@ public class ServiceOrderService : IServiceOrderService
         }
         order.Diagnosis = request.Diagnosis;
         order.LaborCost = request.LaborCost;
-        order.Status = request.NewStatus; 
+        order.Status = request.NewStatus;
+        order.UpdatedAt = DateTimeOffset.UtcNow; 
+        order.UpdatedByUserId = _currentUserService.UserId;
 
         await _orderRepository.UpdateAsync(order);
     }
@@ -273,6 +282,8 @@ public class ServiceOrderService : IServiceOrderService
             order.RepairFinishedAt = DateTimeOffset.UtcNow;
         }
         order.Status = request.NewStatus;
+        order.UpdatedAt = DateTimeOffset.UtcNow;
+        order.UpdatedByUserId = _currentUserService.UserId;
         await _orderRepository.UpdateAsync(order);
     }
     public async Task<OrderPartDto?> GetOrderPartAsync(Guid serviceOrderId, Guid partId)
@@ -398,6 +409,8 @@ public class ServiceOrderService : IServiceOrderService
         IsDelayed = order.ExpectedFinishAt.HasValue && DateTimeOffset.UtcNow > order.ExpectedFinishAt.Value && order.Status != ServiceOrderStatus.Completed && order.Status != ServiceOrderStatus.Delivered,
         CreatedAt = order.CreatedAt,
         UpdatedAt = order.UpdatedAt,
+        CreatedByUserId = order.CreatedByUserId,
+        UpdatedByUserId = order.UpdatedByUserId,
         OrderPart = order.OrderParts?.Select(op => new OrderPartDto
         {
             PartId = op.PartId,

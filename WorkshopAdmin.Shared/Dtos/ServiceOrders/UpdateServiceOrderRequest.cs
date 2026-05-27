@@ -10,4 +10,5 @@ public class UpdateServiceOrderRequest
     public string? Diagnosis { get; set; } 
     public ServiceType ServiceTypeId { get; set; }
     public decimal LaborCost { get; set; } // numeric(12,2)
+    public Guid? TechnicianId { get; set; }
 }
