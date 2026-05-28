@@ -1,0 +1,190 @@
+﻿@* Components/Users/UserTable.razor *@
+@using WorkshopAdmin.Shared.Dtos.Users
+@using WorkshopAdmin.Shared.Filters
+@using WorkshopAdmin.UI.Services
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@inject UserClient UserClient
+
+<MudDataGrid T="UserDto"
+             Items="@FilteredUsers"
+             Loading="@_loading"
+             Hover="true"
+             Striped="false"
+             Elevation="0"
+             Class="border rounded-4 border-slate-200 overflow-hidden"
+             Filterable="true">
+
+    <Columns>
+        @* ID con fuente monoespaciada *@
+        <PropertyColumn Property="x => x.Role" Title="Role">
+            <CellTemplate>
+                <MudText Typo="Typo.caption" Class="fw-bold"
+                         Style="font-family: monospace; color: var(--mud-palette-primary);">
+                    @context.Item.RoleName
+                </MudText>
+            </CellTemplate>
+        </PropertyColumn>
+
+        @* Nombre y Detalles *@
+        <PropertyColumn Property="x => x.FullName" Title="User / Contact">
+            <CellTemplate>
+                <div class="d-flex flex-column">
+                    <MudText Typo="Typo.body2" Class="font-bold text-indigo-900" Style="color: #000666;">
+                        @context.Item.FullName
+                    </MudText>
+                    <MudText Typo="Typo.caption" Class="text-slate-500">@context.Item.Email</MudText>
+                </div>
+            </CellTemplate>
+        </PropertyColumn>
+
+        <PropertyColumn Property="x => x.Phone" Title="Phone" />
+
+        
+
+        @* Estatus con Chips Industriales *@
+        <PropertyColumn Property="x => x.IsActive" Title="Status">
+            <CellTemplate>
+                @if (context.Item.IsActive)
+                {
+                    <MudChip T="string" Color="Color.Success" Variant="Variant.Text" Size="Size.Small"
+                             Class="font-black px-2 uppercase font-bold tracking-tighter" Style="font-size: 12px; background-color: #f0fdf4;">
+                        ACTIVE
+                    </MudChip>
+                }
+                else
+                {
+                    <MudChip T="string" Color="Color.Default" Variant="Variant.Text" Size="Size.Small"
+                             Class="font-black px-2 uppercase font-bold tracking-tighter" Style="font-size: 12px; background-color: #f1f5f9;">
+                        INACTIVE
+                    </MudChip>
+                }
+            </CellTemplate>
+        </PropertyColumn>
+
+
+        @* Fecha de registro *@
+        <PropertyColumn Property="x => x.CreatedAt" Title="Registered">
+            <CellTemplate>
+                <MudText Typo="Typo.caption">@context.Item.CreatedAt.ToString("MMM dd, yyyy")</MudText>
+            </CellTemplate>
+        </PropertyColumn>
+
+        @* Acciones con iconos de la interfaz industrial *@
+        <TemplateColumn Title="Actions"
+                        HeaderClass="justify-end pr-4"
+                        CellClass="d-flex justify-end align-center gap-1 py-5"
+                        Sortable="false"
+                        Filterable="false">
+            <CellTemplate>
+                
+                <MudTooltip Text="Edit Client">
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                   Size="Size.Small"
+                                   Color="Color.Primary"
+                                   OnClick="@(() => OpenEditDialog(context.Item))" />
+                </MudTooltip>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+
+    <PagerContent>
+        <MudDataGridPager T="UserDto" />
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+    [Parameter] public bool ReloadTrigger { get; set; }
+    [Parameter] public UserFilterModel Filters { get; set; } = new();
+    private List<UserDto> _users = new();
+    private string _searchString = "";
+    private bool _loading = true;
+    private bool _lastReloadTrigger;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDataClient();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_lastReloadTrigger != ReloadTrigger)
+        {
+            _lastReloadTrigger = ReloadTrigger;
+            await LoadDataClient();
+        }
+    }
+    private async Task LoadDataClient()
+    {
+        try
+        {
+            _loading = true;
+
+            _users = await UserClient.GetAllAsync(null);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Error al sincronizar con el servidor", Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private IEnumerable<UserDto> FilteredUsers =>
+    _users.Where(x =>
+    {
+        // SEARCH
+        var matchesSearch =
+            string.IsNullOrWhiteSpace(Filters.Search)
+            || x.FullName.Contains(Filters.Search, StringComparison.OrdinalIgnoreCase)
+            || x.Email.Contains(Filters.Search, StringComparison.OrdinalIgnoreCase)
+            || x.Phone.Contains(Filters.Search, StringComparison.OrdinalIgnoreCase);
+
+        // STATUS
+        var matchesStatus =
+            Filters.IsActive == null
+            || x.IsActive == Filters.IsActive;
+
+        return matchesSearch && matchesStatus;
+    });
+
+    private async Task OpenEditDialog(UserDto user)
+    {
+        // 1. Mapeamos el DTO al modelo de edición
+        var updateRequest = new UpdateUserRequest
+        {
+            Id = user.Id,
+            FullName = user.FullName,
+            Email = user.Email,
+            Phone = user.Phone,
+            Role = user.Role,
+            Password = "",
+            IsActive = user.IsActive
+        };
+
+        var parameters = new DialogParameters<UpdateUserDialog>
+        {
+            { x => x.InitialData, updateRequest }
+        };
+
+        var options = new DialogOptions
+        {
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true,
+            CloseButton = true,
+            BackdropClick = false // Evita que se cierre por error al dar click fuera
+        };
+
+        var dialog = await DialogService.ShowAsync<UpdateUserDialog>(" ", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled && result.Data is UserDto updated)
+        {
+            Snackbar.Add("Cliente actualizado correctamente", Severity.Success);
+            await LoadDataClient();
+        }
+    }
+   
+}

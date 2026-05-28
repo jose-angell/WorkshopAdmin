@@ -31,6 +31,7 @@ builder.Services.AddScoped<InventoryClient>();
 builder.Services.AddScoped<EquipmentClient>();
 builder.Services.AddScoped<DashboardClient>();
 builder.Services.AddScoped<AuthClient>();
+builder.Services.AddScoped<UserClient>();
 
 
 await builder.Build().RunAsync();

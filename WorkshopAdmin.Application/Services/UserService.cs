@@ -92,8 +92,9 @@ public class UserService : IUserService
         }
         existingUser.FullName = user.FullName ?? existingUser.FullName;
         existingUser.Email = user.Email ?? existingUser.Email;
-        existingUser.Role = user.Role ?? existingUser.Role;
+        existingUser.Role = user.Role ;
         existingUser.Phone = user.Phone ?? existingUser.Phone;
+        existingUser.PasswordHash = user.Password != null ? _PasswordHasher.Hash(user.Password) : existingUser.PasswordHash;
 
         await _userRepository.UpdateUserAsync(existingUser);
     }
@@ -105,7 +106,13 @@ public class UserService : IUserService
             Id = user.Id,
             Email = user.Email,
             FullName = user.FullName,
-            Role = user.Role
+            Role = user.Role,
+            Phone = user.Phone,
+            IsActive = user.IsActive,
+            CreatedByUserId = user.CreatedByUserId,
+            UpdatedByUserId = user.UpdatedByUserId,
+            CreatedAt = user.CreatedAt,
+            UpdatedAt = user.UpdatedAt
         };
     }
 }
