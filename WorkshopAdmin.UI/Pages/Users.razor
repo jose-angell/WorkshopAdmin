@@ -1,0 +1,94 @@
+﻿@page "/Users"
+@attribute [Authorize]
+@using WorkshopAdmin.Shared.Dtos.Users
+@using WorkshopAdmin.Shared.Filters
+@using WorkshopAdmin.UI.Components.Users
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="py-1">
+
+    @* Header Section *@
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <MudText Typo="Typo.h4" Class="fw-bold" Style="color: #000666;">
+                Users
+            </MudText>
+
+            <MudText Typo="Typo.body2" Class="text-muted">
+                Manage your Users database and history.
+            </MudText>
+        </div>
+
+        @* Button Group *@
+        <div class="d-flex" style="gap: 0.75rem;">
+
+            <MudButton Variant="Variant.Outlined"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Description"
+                       Class="py-2 px-4 fw-bold"
+                       Style="text-transform: none; border-radius: 4px; border-color: #dee2e6; color: #000666;">
+                Create Report
+            </MudButton>
+
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       OnClick="OpenCreateCustomerDialog"
+                       StartIcon="@Icons.Material.Filled.Add"
+                       Class="py-2 px-4 fw-bold"
+                       Style="text-transform: none; border-radius: 4px;">
+                Add New User
+            </MudButton>
+
+        </div>
+    </div>
+
+    @* Statistics Grid *@
+    @* <ClientStats ReloadTrigger="_reloadFlag" /> *@
+
+    <MudGrid>
+        @* Main Content *@
+        <MudItem xs="12" lg="12">
+
+            <UserFilters Filters="_filters"
+                           FiltersChanged="OnFiltersChanged" />
+
+            <MudPaper Elevation="0" Class="rounded-4 border overflow-hidden" Style="border-color: #dee2e6;">
+                <UserTable ReloadTrigger="_reloadFlag" Filters="_filters" />
+            </MudPaper>
+
+        </MudItem>
+    </MudGrid>
+
+</MudContainer>
+@code {
+    private bool _reloadFlag = true;
+    private UserFilterModel _filters = new();
+
+    private async Task OnFiltersChanged(UserFilterModel filters)
+    {
+        _filters = filters;
+
+        StateHasChanged();
+    }
+    private async Task OpenCreateCustomerDialog()
+    {
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true,
+            CloseButton = true
+        };
+
+        var dialog = await DialogService.ShowAsync<CreateUserDialog>(" ", options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled && result.Data is UserDto newUser)
+        {
+            _reloadFlag = !_reloadFlag; 
+            Snackbar.Add($"User {newUser.FullName} added to the system.", Severity.Success);
+        }
+    }
+}

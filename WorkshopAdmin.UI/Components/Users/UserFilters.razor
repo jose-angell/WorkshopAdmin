@@ -1,0 +1,103 @@
+﻿@using WorkshopAdmin.Shared.Emuns
+@using WorkshopAdmin.Shared.Filters
+
+<MudPaper Elevation="0" Class="p-4 rounded-4 border bg-white mb-4">
+
+    <MudGrid Spacing="3" Class="align-items-center">
+
+        <!-- SEARCH -->
+        <MudItem xs="12" sm="6" md="4">
+
+            <MudTextField T="string"
+                          Value="@Filters.Search"
+                          ValueChanged="OnSearchChanged"
+                          Placeholder="Search clients..."
+                          Variant="Variant.Outlined"
+                          Margin="Margin.Dense"
+                          Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          Class="bg-light w-100" />
+
+        </MudItem>
+
+        <!-- STATUS -->
+        <MudItem xs="12" sm="3" md="2">
+
+            <MudSelect T="bool?"
+                       Value="@Filters.IsActive"
+                       ValueChanged="OnStatusChanged"
+                       Label="Status"
+                       Variant="Variant.Outlined"
+                       Margin="Margin.Dense"
+                       Class="bg-light w-100">
+
+                <MudSelectItem Value="@((bool?)null)">
+                    All
+                </MudSelectItem>
+
+                <MudSelectItem Value="@((bool?)true)">
+                    Active
+                </MudSelectItem>
+
+                <MudSelectItem Value="@((bool?)false)">
+                    Inactive
+                </MudSelectItem>
+
+            </MudSelect>
+
+        </MudItem>
+        <MudItem xs="12" sm="3" md="2">
+            <MudSelect T="UserRole?"
+                       Label="ROLE"
+                       Value="@Filters.role"
+                       ValueChanged="OnRoleChanged"
+                       Variant="Variant.Outlined"
+                       Margin="Margin.Dense">
+
+                <MudSelectItem Value="@((UserRole?)null)">
+                    All Roles
+                </MudSelectItem>
+
+                @foreach (var role in Enum.GetValues<UserRole>())
+                {
+                    <MudSelectItem Value="@((UserRole?)role)">
+                        @role.ToFriendlyName()
+                    </MudSelectItem>
+                }
+
+            </MudSelect>
+        </MudItem>
+
+    </MudGrid>
+
+</MudPaper>
+
+@code {
+
+    [Parameter]
+    public UserFilterModel Filters { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<UserFilterModel> FiltersChanged { get; set; }
+
+    private async Task OnSearchChanged(string value)
+    {
+        Filters.Search = value;
+
+        await FiltersChanged.InvokeAsync(Filters);
+    }
+
+    private async Task OnStatusChanged(bool? value)
+    {
+        Filters.IsActive = value;
+
+        await FiltersChanged.InvokeAsync(Filters);
+    }
+
+    private async Task OnRoleChanged(UserRole? value)
+    {
+        Filters.role = value;
+
+        await FiltersChanged.InvokeAsync(Filters);
+    }
+}
