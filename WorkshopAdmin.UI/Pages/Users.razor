@@ -34,7 +34,7 @@
 
             <MudButton Variant="Variant.Filled"
                        Color="Color.Primary"
-                       OnClick="OpenCreateCustomerDialog"
+                       OnClick="OpenCreateUserDialog"
                        StartIcon="@Icons.Material.Filled.Add"
                        Class="py-2 px-4 fw-bold"
                        Style="text-transform: none; border-radius: 4px;">
@@ -72,7 +72,7 @@
 
         StateHasChanged();
     }
-    private async Task OpenCreateCustomerDialog()
+    private async Task OpenCreateUserDialog()
     {
         var options = new DialogOptions
         {
@@ -85,10 +85,10 @@
         var dialog = await DialogService.ShowAsync<CreateUserDialog>(" ", options);
         var result = await dialog.Result;
 
-        if (!result.Canceled && result.Data is UserDto newUser)
+        if (!result.Canceled)
         {
             _reloadFlag = !_reloadFlag; 
-            Snackbar.Add($"User {newUser.FullName} added to the system.", Severity.Success);
+            Snackbar.Add("User added to the system.", Severity.Success);
         }
     }
 }

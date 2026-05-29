@@ -147,7 +147,11 @@
             Filters.IsActive == null
             || x.IsActive == Filters.IsActive;
 
-        return matchesSearch && matchesStatus;
+        var matchesRole =
+            Filters.role == null
+            || x.Role == Filters.role;
+
+        return matchesSearch && matchesStatus && matchesRole;
     });
 
     private async Task OpenEditDialog(UserDto user)
@@ -180,7 +184,7 @@
         var dialog = await DialogService.ShowAsync<UpdateUserDialog>(" ", parameters, options);
         var result = await dialog.Result;
 
-        if (!result.Canceled && result.Data is UserDto updated)
+        if (!result.Canceled )
         {
             Snackbar.Add("Cliente actualizado correctamente", Severity.Success);
             await LoadDataClient();
