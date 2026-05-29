@@ -7,7 +7,7 @@ using WorkshopAdmin.Shared.Emuns;
 
 namespace WorkshopAdmin.WebAPI.Controllers;
 
-[Authorize]
+//[Authorize]
 [ApiController]
 [Route("api/user")]
 public class UserController : ControllerBase
