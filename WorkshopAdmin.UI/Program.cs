@@ -13,16 +13,21 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddAuthorizationCore();
 //builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+builder.Services.AddTransient<UnauthorizedHandler>();
+
+builder.Services.AddHttpClient("WorkshopApi", client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7017/");
+})
+.AddHttpMessageHandler<UnauthorizedHandler>();
+
+builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("WorkshopApi"));
+
 builder.Services.AddScoped<AuthenticationProviderJWT>();
 builder.Services.AddScoped<AuthenticationStateProvider, AuthenticationProviderJWT>(x => x.GetRequiredService<AuthenticationProviderJWT>());
 builder.Services.AddScoped<ILoginService, AuthenticationProviderJWT>(x => x.GetRequiredService<AuthenticationProviderJWT>());
 
 builder.Services.AddScoped<AuthService>();
-
-builder.Services.AddScoped(sp => new HttpClient
-{
-    BaseAddress = new Uri("https://localhost:7017/")
-});
 
 builder.Services.AddMudServices();
 builder.Services.AddScoped<ServiceOrderClient>();
