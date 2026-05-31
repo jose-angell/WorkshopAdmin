@@ -2,6 +2,7 @@
 @using WorkshopAdmin.Shared.Dtos.Customers
 @using WorkshopAdmin.Shared.Dtos.Equipments
 @using WorkshopAdmin.Shared.Dtos.ServiceOrders
+@using WorkshopAdmin.Shared.Dtos.Users
 @using WorkshopAdmin.Shared.Enums
 @using WorkshopAdmin.UI.Components.Clients
 @using WorkshopAdmin.UI.Components.Equipment
@@ -11,6 +12,7 @@
 @inject CustomerClient CustomerClient
 @inject EquipmentClient EquipmentClient
 @inject ServiceOrderClient ServiceOrderClient
+@inject UserClient UserClient
 @inject NavigationManager Navigation
 <MudDialog >
     <DialogContent>
@@ -277,6 +279,83 @@
                                 </div>
                             </div>
 
+                            <!-- ===================== -->
+                            <!-- Technician -->
+                            <!-- ===================== -->
+                            <div class="col-12 col-md-6">
+
+                                <div class="d-flex justify-content-between align-items-end mb-2">
+                                    <label class="text-uppercase fw-bold text-muted" style="font-size:11px;">
+                                        Technician
+                                    </label>
+                                </div>
+
+                                <!-- SELECT -->
+                                <MudAutocomplete T="UserDto"
+                                                 Value="_selectedTechnician"
+                                                 ValueChanged="OnTechnicianChanged"
+                                                 SearchFunc="SearchTechnicians"
+                                                 ToStringFunc="@(c =>c is null ? string.Empty : $"{c.FullName} ({c.Phone})")"
+                                                 Variant="Variant.Outlined"
+                                                 AdornmentIcon="@Icons.Material.Filled.Search"
+                                                 Placeholder="Search by name, ID or phone..."
+                                                 Class="w-100"
+                                                 Required="true" />
+
+                       
+
+                                <!-- CARD -->
+                                <div class="bg-light rounded border p-3 d-flex align-items-start gap-3 mt-3">
+
+                                    <!-- ICON -->
+                                    <div class="border rounded d-flex align-items-center justify-content-center flex-shrink-0"
+                                         style="width:48px; height:48px; background:white;">
+                                        <MudIcon Icon="@Icons.Material.Filled.Construction"
+                                                 Color="Color.Primary" />
+                                    </div>
+
+                                    <!-- INFO -->
+                                    <div class="flex-grow-1 overflow-hidden">
+
+                                        @if (_selectedTechnician != null)
+                                        {
+                                            <!-- ROW 1 -->
+                                            <div class="fw-bold text-truncate"
+                                                 style="color:#000666;">
+
+                                                @_selectedTechnician.FullName -
+                                                @_selectedTechnician.Phone
+
+                                            </div>
+
+                                            <!-- ROW 2 -->
+                                            <div class="text-muted text-truncate"
+                                                 style="font-size:11px;">
+
+                                                @_selectedTechnician.Email
+
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="text-muted">
+                                                No technician selected
+                                            </div>
+                                        }
+
+                                    </div>
+
+                                    <!-- RESET -->
+                                    @if (_selectedTechnician != null)
+                                    {
+                                        <MudIconButton Icon="@Icons.Material.Filled.Close"
+                                                       Color="Color.Error"
+                                                       Size="Size.Small"
+                                                       OnClick="ResetTechnicianSelection" />
+                                    }
+
+                                </div>
+                            </div>
                         </div>
 
                     </section>
@@ -338,6 +417,7 @@
                         </div>
 
                     </section>
+
 
                 </main>
                 <footer class="bg-white border-top p-3 mb-4 d-flex justify-content-end shadow">
@@ -588,6 +668,7 @@
 
     private CustomerDto? _selectedCustomer;
     private EquipmentDto? _selectedEquipment;
+    private UserDto? _selectedTechnician;
 
     private List<EquipmentDto> _customerEquipments = new();
     public async Task GetOrder(Guid id)
@@ -604,6 +685,7 @@
 
         _selectedCustomer = _order.Customer;
         _selectedEquipment = _order.Equipment;
+        _selectedTechnician = _order.Technician;
         _orderPart = _order.OrderPart;
         _totalCost = _order.TotalCost;
         InitialData();
@@ -636,7 +718,7 @@
 
     }
 
-    //  CAMBIO IMPORTANTE: manejar cambio explícito
+  
     private async Task OnCustomerChanged(CustomerDto? value)
     {
         _selectedCustomer = value;
@@ -651,8 +733,12 @@
             await LoadEquipments(value.Id);
         }
     }
-
-    //  DATA FAKE REALISTA
+    private async Task OnTechnicianChanged(UserDto? value)
+    {
+        _selectedTechnician = value;
+        _request.TechnicianId = value?.Id ?? Guid.Empty;
+    }
+   
     private async Task<IEnumerable<CustomerDto>> SearchCustomers(string value, CancellationToken token)
     {
         var data = await CustomerClient.GetAllAsync();
@@ -666,6 +752,18 @@
         return result;
     }
 
+    private async Task<IEnumerable<UserDto>> SearchTechnicians(string value, CancellationToken token)
+    {
+        var data = await UserClient.GetAllAsync(Shared.Emuns.UserRole.Technician);
+
+        var result = data
+            .Where(x => string.IsNullOrWhiteSpace(value)
+                    || x.FullName.Contains(value, StringComparison.OrdinalIgnoreCase)
+                    || (x.Phone?.Contains(value, StringComparison.OrdinalIgnoreCase) ?? false)
+                    || x.Email.Contains(value, StringComparison.OrdinalIgnoreCase));
+
+        return result;
+    }
     private async Task LoadEquipments(Guid customerId)
     {
         _customerEquipments = await EquipmentClient.GetByCustomerIdAsync(customerId);
@@ -880,6 +978,11 @@
     {
         _totalCost = techData.LaborCost +
             (_orderPart?.Sum(op => op.Quantity * op.UnitPrice) ?? 0m);
+    }
+    private void ResetTechnicianSelection()
+    {
+        _request.TechnicianId = Guid.Empty;
+        _selectedTechnician = null;
     }
     private void SyncEstimatedTime()
     {

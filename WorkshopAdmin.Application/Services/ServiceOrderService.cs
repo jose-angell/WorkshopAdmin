@@ -89,7 +89,13 @@ public class ServiceOrderService : IServiceOrderService
             LaborCost = order.LaborCost,
             CreatedAt = order.CreatedAt,
             CreatedByUserId = order.CreatedByUserId,
-            TechnicianId = order.TechnicianId
+            Technician = new Shared.Dtos.Users.UserDto
+            {
+                Id = order.Technician.Id,
+                FullName = order.Technician.FullName ?? "N/A",
+                Email = order.Technician.Email ?? "N/A",
+                Phone = order.Technician.Phone ?? "N/A"
+            } 
         };
     }
 
@@ -393,6 +399,13 @@ public class ServiceOrderService : IServiceOrderService
             Brand = order.Equipment?.Brand ?? "N/A",
             Model = order.Equipment?.Model ?? "N/A",
             TechnicalSpecifications = order.Equipment?.TechnicalSpecifications ?? "N/A"
+        },
+        Technician = new Shared.Dtos.Users.UserDto
+        {
+            Id = order.Technician.Id,
+            FullName = order.Technician?.FullName ?? "N/A",
+            Email = order.Technician?.Email ?? "N/A",
+            Phone = order.Technician?.Phone ?? "N/A"
         },
         FailureDescription = order.FailureDescription,
         Diagnosis = order.Diagnosis,

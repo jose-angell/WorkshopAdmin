@@ -21,6 +21,7 @@ public class ServiceOrderRepository : IServiceOrderRepository
     {
         return await _context.ServiceOrders
             .Include(so => so.Customer)   // Carga relacionada (Relación 1:N)
+            .Include(so => so.Technician) 
             .Include(so => so.Equipment)  // Carga relacionada (Relación 1:N)
             .Include(so => so.OrderParts) // Opcional: para cálculos de costos
             .ThenInclude(op => op.Part)
@@ -31,6 +32,7 @@ public class ServiceOrderRepository : IServiceOrderRepository
     {
         return await _context.ServiceOrders
             .Include(so => so.Customer)
+            .Include(so => so.Technician)
             .Include(so => so.Equipment)
             .Include(o => o.OrderParts) 
             .ThenInclude(op => op.Part)
@@ -45,6 +47,7 @@ public class ServiceOrderRepository : IServiceOrderRepository
         {
             return await _context.ServiceOrders
                 .Include(so => so.Customer)
+                .Include(so => so.Technician)
                 .Include(so => so.Equipment)
                 .Include(so => so.OrderParts)
                 .ThenInclude(op => op.Part)
@@ -58,6 +61,7 @@ public class ServiceOrderRepository : IServiceOrderRepository
     {
         return await _context.ServiceOrders
             .Include(so => so.Equipment)
+            .Include(so => so.Technician)
             .Include(o => o.OrderParts)
             .ThenInclude(op => op.Part)
             .Where(so => so.CustomerId == customerId)
@@ -67,6 +71,7 @@ public class ServiceOrderRepository : IServiceOrderRepository
     {
         return await _context.ServiceOrders
             .Include(so => so.Equipment)
+            .Include(so => so.Technician)
             .Include(o => o.OrderParts)
             .ThenInclude(op => op.Part)
             .Where(so => so.EquipmentId == equipmentId)
@@ -101,6 +106,7 @@ public class ServiceOrderRepository : IServiceOrderRepository
     {
         var query = _context.ServiceOrders
             .Include(so => so.Customer)
+            .Include(so => so.Technician)
             .Include(so => so.Equipment)
             .Include(o => o.OrderParts) 
             .ThenInclude(op => op.Part)

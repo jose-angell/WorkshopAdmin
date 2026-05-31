@@ -1,12 +1,14 @@
-﻿@using MudBlazor
-@using System.Globalization
+﻿@using System.Globalization
+@using MudBlazor
 @using WorkshopAdmin.Shared.Dtos.Customers
 @using WorkshopAdmin.Shared.Dtos.Equipments
 @using WorkshopAdmin.Shared.Dtos.ServiceOrders
+@using WorkshopAdmin.Shared.Dtos.Users
 @using WorkshopAdmin.Shared.Enums
 @using WorkshopAdmin.UI.Services
 @inject IDialogService DialogService
 @inject ServiceOrderClient ServiceOrderClient
+@inject UserClient UserClient
 @inject ISnackbar Snackbar
 
 <MudPaper Class="detail-container rounded border" Elevation="0">
@@ -78,6 +80,9 @@
                             </div>
                         }
 
+                    </div>
+                    <div>
+                        <span class="fw-bold">Technician:</span> @_technician.FullName - @_technician.Phone
                     </div>
                 </MudStack>
 
@@ -526,6 +531,7 @@
     private bool _loading = true;
     private CustomerDto? _customer;
     private EquipmentDto? _equipment;
+    private UserDto? _technician;
     private IEnumerable<OrderPartDto?> _orderPart;
     private int _hours;
     private int _minutes;
@@ -545,6 +551,7 @@
         _customer = _order.Customer;
         _equipment = _order.Equipment;
         _orderPart = _order.OrderPart;
+        _technician = _order.Technician;
 
         if (_order.Status == ServiceOrderStatus.Diagnosing)
         {

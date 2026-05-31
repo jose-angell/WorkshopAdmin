@@ -1,5 +1,6 @@
 ﻿using WorkshopAdmin.Shared.Dtos.Customers;
 using WorkshopAdmin.Shared.Dtos.Equipments;
+using WorkshopAdmin.Shared.Dtos.Users;
 using WorkshopAdmin.Shared.Enums;
 
 namespace WorkshopAdmin.Shared.Dtos.ServiceOrders;
@@ -34,7 +35,7 @@ public class ServiceOrderDto
     public string ExpectedFinishDisplay => ExpectedFinishAt?.ToLocalTime().ToString("dd/MM/yy hh:mm tt") ?? "--";
     public bool IsDelayed { get; set; }
     public ServiceType ServiceTypeId { get; set; }
-    public Guid TechnicianId { get; set; }
+    public UserDto? Technician { get; set; }
     public string ServiceTypeDescription { get; set; } = string.Empty;
     public Guid CreatedByUserId { get; set; }
     public Guid? UpdatedByUserId { get; set; }
